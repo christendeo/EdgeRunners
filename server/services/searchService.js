@@ -1,0 +1,1 @@
+//helper functions for elasticSearch
