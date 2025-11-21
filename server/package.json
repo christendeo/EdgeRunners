@@ -1,0 +1,22 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "\"EdgeRunners backend server\"",
+  "license": "ISC",
+  "author": "\"EdgeRunners CS 554WS\"",
+  "type": "module",
+  "main": "node app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@apollo/server": "^5.1.0",
+    "@elastic/elasticsearch": "^9.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "graphql": "^16.12.0",
+    "graphql-tag": "^2.12.6",
+    "mongodb": "^7.0.0",
+    "redis": "^5.10.0"
+  }
+}
