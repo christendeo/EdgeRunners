@@ -7,7 +7,7 @@
   "type": "module",
   "main": "node app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
   "dependencies": {
     "@apollo/server": "^5.1.0",
@@ -16,6 +16,7 @@
     "express": "^5.1.0",
     "graphql": "^16.12.0",
     "graphql-tag": "^2.12.6",
+    "lodash": "^4.17.21",
     "mongodb": "^7.0.0",
     "redis": "^5.10.0"
   }
