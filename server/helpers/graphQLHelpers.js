@@ -1,6 +1,6 @@
 import {GraphQLError} from 'graphql';
 
-export const validateString = (str, fieldName, minLength = 2, maxLength = 100) => {
+const validateString = (str, fieldName, minLength = 2, maxLength = 100) => {
     if (!str || typeof str !== 'string') throw new GraphQLError(`${fieldName} must be a string`);
     
     if (str.trim().length < minLength) {
@@ -30,7 +30,7 @@ export const validateString = (str, fieldName, minLength = 2, maxLength = 100) =
     return str.trim();
 };
 
-export const validateEmail = (email) => {
+const validateEmail = (email) => {
     if (!email || typeof email !== 'string') {
         throw new GraphQLError('Email must be a non-empty string',
             {
@@ -64,7 +64,7 @@ export const validateEmail = (email) => {
 
 
 
-export const validateDate = (date, fieldName) => {
+const validateDate = (date, fieldName) => {
     
     if (!date || typeof date !== 'string' || date.trim().length === 0) {
         throw new GraphQLError(`${fieldName} must be a non-empty string`,
@@ -96,7 +96,7 @@ export const validateDate = (date, fieldName) => {
       return date.trim(); 
 };
 
-export const validateNumber = (value, fieldName, min = 0, max = null) => {
+const validateNumber = (value, fieldName, min = 0, max = null) => {
     if (typeof value !== 'number' || isNaN(value)) {
         throw new GraphQLError(`${fieldName} must be a valid number`, {
             extensions: { code: 'BAD_USER_INPUT' }
@@ -115,3 +115,6 @@ export const validateNumber = (value, fieldName, min = 0, max = null) => {
     return value;
 };
 
+const graphQLHelpers = { validateString, validateNumber, validateNumber, validateEmail}
+
+export default graphQLHelpers;

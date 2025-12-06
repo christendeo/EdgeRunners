@@ -45,9 +45,21 @@ export async function getCache(redisKey) {
     }
 }
 
-export async function setCache(redisKey, redisValue) {
+export async function setCache(redisKey, redisValue, ttl = 3600) {
     let redisString = JSON.stringify(redisValue);
-    await redisClient.set(redisKey, redisString);
+    if (ttl) {
+        await redisClient.set(redisKey, ttl, redisString);
+    } else {
+        await redisClient.set(redisKey, redisString);
+    }
+}
+
+export async function flushCache() {
+    await client.flushAll();
+}
+
+export async function deleteCache(redisKey) {
+    await redisClient.del(redisKey);
 }
 
 export default redisClient;
