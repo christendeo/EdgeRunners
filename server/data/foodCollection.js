@@ -1,8 +1,8 @@
-// Food Collection CRUD
 import { ObjectId } from 'mongodb';
 
-import { foods } from '../config/mongoCollections.js'
-
+import { foods } from '../config/mongoCollections.js';
+import helpers from '../helpers/serverHelpers.js';
+const { checkId, validateString, validateNumber, validateBoolean } = helpers;
 
 
 export const getAllFoods = async () => {
@@ -13,7 +13,7 @@ export const getAllFoods = async () => {
 }
 
 export const getFoodById = async (foodId) => {
-    const id = (foodId);
+    const id = checkId(foodId, 'foodId');
 
     const foodCollection = await foods();
     const food = await foodCollection.findOne({_id: new ObjectId(id)});
@@ -23,7 +23,7 @@ export const getFoodById = async (foodId) => {
 }
 
 export const removeFood = async (foodId) => {
-    const id = (foodId);
+    const id = checkId(foodId, 'foodId');
     const foodCollection = await foods();
     const deletedFood = await foodCollection.findOneAndDelete({_id: new ObjectId(id)});
 
@@ -39,7 +39,7 @@ export const updateFood = async(foodId, updatedFoodData) => {
     if (!foodId || !updatedFoodData) {
         throw new Error('All inputs must have valid values');
     }
-    const id = (foodId);
+    const id = checkId(foodId, 'foodId');
     const foodCollection = await foods();
 
     let existingFood = await foodCollection.findOne({ _id: new ObjectId(id)});
@@ -51,34 +51,34 @@ export const updateFood = async(foodId, updatedFoodData) => {
     }
     else {
         if (updatedFoodData.name) {
-            updatedFood.name = updatedFoodData.name;
+            updatedFood.name = validateString(updatedFoodData.name, 'name');
         }
         if (updatedFoodData.serving_size) {
-            updatedFood.serving_size = updatedFoodData.serving_size;
+            updatedFood.serving_size = validateNumber(updatedFoodData.serving_size, 'serving_size');
         }
         if (updatedFoodData.serving_unit) {
-            updatedFood.serving_unit = updatedFoodData.serving_unit;
+            updatedFood.serving_unit = validateString(updatedFoodData.serving_unit, 'serving_unit');
         }
         if (updatedFoodData.calories !== undefined) {
-            updatedFood.calories = updatedFoodData.calories;
+            updatedFood.calories = validateNumber(updatedFoodData.calories, 'calories');
         }
         if (updatedFoodData.protein) {
-            updatedFood.protein = updatedFoodData.protein;
+            updatedFood.protein = validateNumber(updatedFoodData.protein, 'protein');
         }
         if (updatedFoodData.carbs) {
-            updatedFood.carbs = updatedFoodData.carbs;
+            updatedFood.carbs = validateNumber(updatedFoodData.carbs, 'carbs');
         }
         if (updatedFoodData.fat) {
-            updatedFood.fat = updatedFoodData.fat;
+            updatedFood.fat = validateNumber(updatedFoodData.fat, 'fat');
         }
         if (updatedFoodData.fiber) {
-            updatedFood.fiber = updatedFoodData.fiber;
+            updatedFood.fiber = validateNumber(updatedFoodData.fiber, 'fiber');
         }
         if (updatedFoodData.added_by) {
-            updatedFood.added_by = updatedFoodData.added_by;
+            updatedFood.added_by = checkId(updatedFoodData.added_by, 'added_by');
         }
         if (updatedFoodData.is_public) {
-            updatedFood.is_public = updatedFoodData.is_public;
+            updatedFood.is_public = validateBoolean(updatedFoodData.is_public, 'is_public');
         }
         await foodCollection.updateOne({"_id": new ObjectId(id)}, {"$set": updatedFood})
         
@@ -99,21 +99,21 @@ export const addFood = async (
     added_by,
     is_public
 ) => {
-    //validation functions for all inputs
+    
 
     const foodCollection = await foods();
 
     const newFood = {
-        name,
-        serving_size,
-        serving_unit,
-        calories,
-        protein,
-        carbs,
-        fat,
-        fiber,
-        added_by,
-        is_public,
+        name: validateString(name, 'name'),
+        serving_size: validateNumber(serving_size, 'serving_size'),
+        serving_unit: validateString(serving_unit, 'serving_unit'),
+        calories: validateNumber(calories, 'calories'),
+        protein: validateNumber(protein, 'protein'),
+        carbs: validateNumber(carbs, 'carbs'),
+        fat: validateNumber(fat, 'fat'),
+        fiber: validateNumber(fiber, 'fiber'),
+        added_by: checkId(added_by, 'added_by'),
+        is_public: validateBoolean(is_public, 'is_public'),
         created_at: new Date()
     }
 
