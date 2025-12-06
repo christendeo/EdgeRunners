@@ -102,7 +102,7 @@ export const updateBlog = async (id, updateInfo) => {
             throw new Error (e);
         }
     } else {
-        throw new Error (`Could not find blog post with id of ${id}`);
+        throw new Error (`Could not find blog post`);
     }
 
     blog.updated_at = new Date();
