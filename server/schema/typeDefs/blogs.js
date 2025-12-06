@@ -9,10 +9,10 @@ export const blogTypeDefs = `#graphql
         user_id: String
         title: String
         content: String
-        post_type:
-        stats_current
-        created_at:
-        updated_at:
+        post_type: String
+        current_weight: Float
+        created_at: String
+        updated_at: String
     }
     type Mutation {
         addBlog(user_id: String!, title: String!, content: String!, post_type: String!): Blog

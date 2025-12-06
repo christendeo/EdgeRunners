@@ -2,6 +2,7 @@
 import {ObjectId} from 'mongodb';
 import blogs from './config/mongoCollections.js';
 import users from './config/mongoCollections.js';
+import * as helpers from '../helpers/serverHelpers.js'
 
 export const getAllBlogs = async () => {
     const blogsCollection = await blogs();
@@ -59,7 +60,7 @@ export const createBlog = async (userId, title, content, postType) => {
         throw new Error (e);
     }
 
-    let date = new Date();
+    let date = new Date().toISOString();
     const newBlog = {
         user_id: userId,
         title: title,
@@ -113,7 +114,7 @@ export const updateBlog = async (id, userId, updateInfo) => {
         throw new Error (`Could not find blog post`);
     }
 
-    blog.updated_at = new Date();
+    blog.updated_at = new Date().toISOString();
 
     await blogsCollection.updateOne({_id: new ObjectId(id)}, {"$set": blog});
     const update = await blogsCollection.findOne({_id: new ObjectId(id)});

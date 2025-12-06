@@ -50,7 +50,12 @@ export const resolvers = {
         }
     },
     Blog: {
-
+        current_weight: async (parentValue) => {
+            const usersCollection = await users();
+            const user = await usersCollection.getUserById(parentValue.user_id);
+            return user.weight;
+        }
+        //add calories_today
     },
     Mutation: {
         addBlog: async (_, args) => {
