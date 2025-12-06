@@ -1,7 +1,7 @@
 // Blog Collection CRUD
 import {ObjectId} from 'mongodb';
-import blogs from './config/mongoCollections.js';
-import users from './config/mongoCollections.js';
+import blogs from '../config/mongoCollections.js';
+import users from '../config/mongoCollections.js';
 import * as helpers from '../helpers/serverHelpers.js'
 
 export const getAllBlogs = async () => {

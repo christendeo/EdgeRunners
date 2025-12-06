@@ -1,5 +1,5 @@
 import {GraphQLError} from 'graphql';
-import * as blogs from '../data/blogCollection.js';
+import * as blogs from '../../data/blogCollection.js';
 
 export const resolvers = {
     Query: {
@@ -123,3 +123,5 @@ export const resolvers = {
         }
     }
 };
+
+export default resolvers;

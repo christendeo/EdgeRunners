@@ -83,6 +83,57 @@ const exportedMethods = {
         return strVal;
     },
 
+    validateString (str, name, minLength = 1, maxLength = 100) {
+    if (!str || typeof str !== 'string' || str.trim().length === 0) {
+        throw new Error(`${name} must be a non-empty string`);
+    }
+    if (str.trim().length < minLength) {
+        throw new Error(`${name} must be at least ${minLength} characters long`);
+    }
+    if (maxLength && str.trim().length > maxLength) {
+        throw new Error(`${name} must be at most ${maxLength} characters long`);
+    }
+    
+    if (name === 'name' && !/^[a-zA-Z .'-]+$/.test(str)) {
+        
+        throw new Error('Name can only contain letters, hyphens, apostrophes and periods.')
+
+    }
+    if (name === 'username' && !/^(?=.*[a-zA-Z])[a-zA-Z0-9]+$/.test(str)) {
+        
+        throw new Error('Username can only contain letters and numbers.')
+
+    }
+    
+    
+    
+
+    return str.trim();
+},
+
+validateNumber (value, fieldName, min = 0, max = null) {
+    if (typeof value !== 'number' || isNaN(value)) {
+        throw new Error(`${fieldName} must be a valid number`);
+    }
+    if (value < min) {
+        throw new Error(`${fieldName} must be at least ${min}`);
+    }
+    if (max !== null && value > max) {
+        throw new Error(`${fieldName} must be no more than ${max}`);
+    }
+    return value;
+},
+
+validateBoolean (value, fieldName) {
+    if (typeof value !== 'boolean') {
+        throw new Error(`${fieldName} must be true or false`);
+    }
+    
+    return value;
+},
+
+    
+
     checkEmailAddress(email, varName) {
 
         // Check if the email was even provided and is a String
