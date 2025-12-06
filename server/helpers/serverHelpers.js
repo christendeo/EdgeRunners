@@ -273,12 +273,6 @@ validateBoolean (value, fieldName) {
 
         return dietGoal;
     },
-    validateString(str) {
-        if(! str || typeof str !== 'string' || str.length < 0){
-            throw "Input must be a non-empty string.";
-        }
-        return str.trim();
-    },
 
     //function to validate user inputed appropriate post type for blogs
     validatePostType(str) {
@@ -287,7 +281,7 @@ validateBoolean (value, fieldName) {
             REVIEW: 'review',
             PROGRESS: 'progress'
         };
-        str = validateString(str);
+        str = checkString(str, 'Post Type');
         switch (str){
             case 'COMMENT':
                 return PostType.COMMENT;
