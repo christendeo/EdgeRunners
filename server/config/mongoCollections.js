@@ -17,6 +17,6 @@ const getCollectionFn = (collection) => {
   };
 };
 
-export const tests = getCollectionFn('tests');
+
 export const foods = getCollectionFn('foods');
 //Export individual collections here
