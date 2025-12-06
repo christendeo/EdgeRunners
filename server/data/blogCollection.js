@@ -1,6 +1,6 @@
 // Blog Collection CRUD
 import {ObjectId} from 'mongodb';
-import blogs from './config/mongoCollections.js';
+import {blogs} from '../config/mongoCollections.js';
 
 export const getAllBlogs = async () => {
     const blogsCollection = await blogs();
