@@ -1,6 +1,7 @@
 // Blog Collection CRUD
 import {ObjectId} from 'mongodb';
 import blogs from './config/mongoCollections.js';
+import users from './config/mongoCollections.js';
 
 export const getAllBlogs = async () => {
     const blogsCollection = await blogs();
@@ -43,10 +44,17 @@ export const createBlog = async (userId, title, content, postType) => {
     //user_id, title, content, post_type
     try {
         userId = helpers.validateString(userId);
-        //ADD: verify userId represents a valid user in the users database
         title = helpers.validateString(title);
         content = helpers.validateString(content);
         postType = helpers.validatePostType(postType);
+    } catch (e) {
+        throw new Error (e);
+    }
+
+    try {
+        const usersCollection = await users();
+        let user = await usersCollection.getUserById(userId);
+        if(!user) throw 'A user with this ID does not exist.';
     } catch (e) {
         throw new Error (e);
     }
@@ -72,21 +80,21 @@ export const createBlog = async (userId, title, content, postType) => {
 }
 
 //takes in the objectID of the blog post and an object updateInfo containing any fields that may be updated
-export const updateBlog = async (id, updateInfo) => {
+export const updateBlog = async (id, userId, updateInfo) => {
     let blog;
 
     try {
-       id = helpers.validateString(id); 
+       id = helpers.validateString(id);
+       userId = helpers.validateString(userId); 
     } catch (e) {
         throw new Error (e);
     }
 
     const blogsCollection = await blogs();
-    blog = await blogsCollection.findOne({_id: new ObjectId(id)}); 
-
-    //VERIFFY THAT USER EDITING POST IS USER WHO MADE IT
+    blog = await blogsCollection.findOne({_id: new ObjectId(id)});     
 
     if(blog){
+        if(blog.user_id.toString() !== userId) throw "Edits can only be made by the user who created this post.";
         //updateable fields: title, content, post_type, updated_at
         try {
             if(updateInfo.title){
@@ -113,17 +121,20 @@ export const updateBlog = async (id, updateInfo) => {
     return update;
 }
 
-export const deleteBlog = async (id) => {
+export const deleteBlog = async (id, userId) => {
     try {
        id = helpers.validateString(id); 
+       userId = helpers.validateString(userId); 
     } catch (e) {
         throw new Error (e);
     }
 
-    //VERIFY USER REMOVING POST IS USER WHO MADE IT
-
     const blogsCollection = await blogs();
-    let blog = await blogsCollection.findOneAndDelete({_id: new ObjectId(id)});
+    let blog = await blogsCollection.findOne({_id: new ObjectId(id)});
+    if(blog.user_id.toString() !== userId) throw "Only the user who created this post can delete it.";
+
+    blog = await blogsCollection.findOneAndDelete({_id: new ObjectId(id)});
+
     if(!blog){
         throw new Error (`Could not delete blog post`);
     }
