@@ -50,7 +50,12 @@ export const resolvers = {
         }
     },
     Blog: {
-
+        current_weight: async (parentValue) => {
+            const usersCollection = await users();
+            const user = await usersCollection.getUserById(parentValue.user_id);
+            return user.weight;
+        }
+        //add calories_today
     },
     Mutation: {
         addBlog: async (_, args) => {
@@ -73,7 +78,7 @@ export const resolvers = {
         removeBlog: async (_, args) => {
             let blogPost;
             try {
-                blogPost = await blogs.deleteBlog(args._id);
+                blogPost = await blogs.deleteBlog(args._id, args.user_id);
             } catch (e) {
                 if(e.message === 'Could not delete blog post'){
                     throw new GraphQLError(e.message, {
@@ -90,7 +95,7 @@ export const resolvers = {
         editBlog: async (_, args) => {
             let blogPost;
             let updateInfo = {};
-
+        
             if(args.title){
                 updateInfo.title = args.title;
             }
@@ -102,7 +107,7 @@ export const resolvers = {
             }
 
             try {
-                blogPost = await blogs.updateBlog(args._id, updateInfo);
+                blogPost = await blogs.updateBlog(args._id, args.user_id, updateInfo);
             } catch (e) {
                 if(e.message === 'Could not find blog post'){
                     throw new GraphQLError(e.message, {

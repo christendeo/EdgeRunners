@@ -10,14 +10,14 @@ export const blogTypeDefs = `#graphql
         title: String
         content: String
         post_type: String
-        stats_current: String
+        current_weight: Float
         created_at: String
         updated_at: String
     }
     type Mutation {
         addBlog(user_id: String!, title: String!, content: String!, post_type: String!): Blog
         editBlog(_id: String!, user_id: String!, title: String, content: String, post_type: String): Blog
-        removeBlog(_id: String!): Blog
+        removeBlog(_id: String!, user_id: String!): Blog
     }
 `;
 export default blogTypeDefs;
