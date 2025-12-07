@@ -115,6 +115,6 @@ const validateNumber = (value, fieldName, min = 0, max = null) => {
     return value;
 };
 
-const graphQLHelpers = { validateString, validateNumber, validateNumber, validateEmail}
+const graphQLHelpers = { validateString, validateNumber, validateDate, validateEmail}
 
 export default graphQLHelpers;
