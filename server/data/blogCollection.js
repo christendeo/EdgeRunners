@@ -15,7 +15,7 @@ export const getAllBlogs = async () => {
 
 export const getBlogById = async (id) => {
     try {
-        id = helpers.validateString(id);
+        id = helpers.checkId(id, 'Blog post ID');
     } catch (e) {
         throw new Error (e);
     }
@@ -29,7 +29,7 @@ export const getBlogById = async (id) => {
 
 export const getBlogsByUserId = async (userId) => {
     try {
-        userId = helpers.validateString(userId);
+        userId = helpers.checkId(userId, "User ID");
     } catch (e) {
         throw new Error (e);
     }
@@ -44,9 +44,9 @@ export const getBlogsByUserId = async (userId) => {
 export const createBlog = async (userId, title, content, postType) => {
     //user_id, title, content, post_type
     try {
-        userId = helpers.validateString(userId);
-        title = helpers.validateString(title);
-        content = helpers.validateString(content);
+        userId = helpers.checkId(userId, "User ID");
+        title = helpers.checkString(title, 'Title');
+        content = helpers.checkString(content, 'Content');
         postType = helpers.validatePostType(postType);
     } catch (e) {
         throw new Error (e);
@@ -85,8 +85,8 @@ export const updateBlog = async (id, userId, updateInfo) => {
     let blog;
 
     try {
-       id = helpers.validateString(id);
-       userId = helpers.validateString(userId); 
+       id = helpers.checkId(id, 'Blog post ID');
+       userId = helpers.checkId(userId, "User ID");
     } catch (e) {
         throw new Error (e);
     }
@@ -99,10 +99,10 @@ export const updateBlog = async (id, userId, updateInfo) => {
         //updateable fields: title, content, post_type, updated_at
         try {
             if(updateInfo.title){
-                blog.title = helpers.validateString(updateInfo.title);
+                blog.title = helpers.checkString(updateInfo.title, 'Title');
             }
             if(updateInfo.content){
-                blog.content = helpers.validateString(updateInfo.content);
+                blog.content = helpers.checkString(updateInfo.content, 'Content');
             }
             if(updateInfo.post_type){
                 blog.post_type = helpers.validatePostType(updateInfo.post_type);
@@ -124,8 +124,8 @@ export const updateBlog = async (id, userId, updateInfo) => {
 
 export const deleteBlog = async (id, userId) => {
     try {
-       id = helpers.validateString(id); 
-       userId = helpers.validateString(userId); 
+       id = helpers.checkId(id, 'Blog post ID');
+       userId = helpers.checkId(userId, "User ID");
     } catch (e) {
         throw new Error (e);
     }
