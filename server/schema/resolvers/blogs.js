@@ -1,9 +1,15 @@
 import {GraphQLError} from 'graphql';
 import * as blogs from '../../data/blogCollection.js';
+import { getCache, setCache, deleteCache, } from '../../config/redisConnection.js';
 
 export const resolvers = {
     Query: {
         blogs: async () => {
+            const cached = await getCache('allBlogs');
+            if(cached){
+                return cached;
+            }
+
             let blogPosts;
             try {
                 blogPosts = await blogs.getAllBlogs();
@@ -12,9 +18,15 @@ export const resolvers = {
                     extensions: {code: 'NOT_FOUND'}
                 });
             }
+            await setCache('allBlogs', blogPosts);
             return blogPosts;
         },
         getBlogById: async (_, args) => {
+            const cached = await getCache(`blog${args._id}`);
+            if(cached){
+                return cached;
+            }
+
             let blogPost;
             try {
                 blogPost = await blogs.getBlogById(args._id);
@@ -29,9 +41,15 @@ export const resolvers = {
                     });
                 }
             }
+            await setCache(`blog${args._id}`, blogPost);
             return blogPost;
         },
         getBlogsByUser: async (_, args) => {
+            const cached = await getCache(`UserBlog${args.user_id}`);
+            if(cached){
+                return cached;
+            }
+
             let blogPosts;
             try {
                 blogPosts = await blogs.getBlogsByUser(args.user_id);
@@ -46,6 +64,7 @@ export const resolvers = {
                     });
                 }
             }
+            await setCache(`UserBlog${args.user_id}`, blogPosts);
             return blogPosts;
         }
     },
@@ -73,6 +92,8 @@ export const resolvers = {
                     });
                 }
             }
+            await deleteCache('allBlogs');
+            await deleteCache(`UserBlog${args.user_id}`);
             return blogPost;
         },
         removeBlog: async (_, args) => {
@@ -90,6 +111,9 @@ export const resolvers = {
                     });
                 }
             }
+            await deleteCache('allBlogs');
+            await deleteCache(`blog${args._id}`);
+            await deleteCache(`UserBlog${args.user_id}`);
             return blogPost;
         },
         editBlog: async (_, args) => {
@@ -119,6 +143,9 @@ export const resolvers = {
                     });
                 }
             }
+            await deleteCache('allBlogs');
+            await deleteCache(`blog${args._id}`);
+            await deleteCache(`UserBlog${args.user_id}`);
             return blogPost;
         }
     }
