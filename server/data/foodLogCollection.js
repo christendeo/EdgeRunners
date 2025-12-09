@@ -2,35 +2,42 @@ import helpers from "../helpers/serverHelpers.js";
 import {foodLogs, foods, meals} from "../config/mongoCollections.js";
 import {ObjectId} from "mongodb";
 
+// Helper function to convert mm/dd/yyyy to Date object
+const parseDate = (dateStr) => {
+    const [month, day, year] = dateStr.split('/');
+    return new Date(year, month - 1, day); // month is 0-indexed in JS
+};
+
 export const getRangedFoodlogs = async (userId, startDate, endDate) => {
     try {
-    userId = helpers.checkId(userId, "User ID");
-    startDate = helpers.checkDateFormat(startDate, "Start Date");
-    endDate = helpers.checkDateFormat(endDate, "End Date");
-    const foodLogCollection = await foodLogs();
-    
-    let query = {user_id: new ObjectId(userId)};
+        userId = helpers.checkId(userId, "User ID");
+        startDate = helpers.checkDateFormat(startDate, "Start Date");
+        endDate = helpers.checkDateFormat(endDate, "End Date");
+        const foodLogCollection = await foodLogs();
+        
+        let query = {user_id: new ObjectId(userId)};
 
 
-    if (startDate && endDate) {
-        query.date = {
-            $gte: new Date(startDate),
-            $lte: new Date(endDate)
-        };
-    } else { //default to last 7 days
-        const end = new Date();
-        const start = new Date();
-        start.setDate(end.getDate() - 7);
-        query.date = {
-            $gte: start,
-            $lte: end
-        };
-    }
-    const foodLogList = await foodLogCollection.find(query).sort({date: -1}).toArray(); //toArray() to return a JS array rather than a MongoDB cursor
-    return foodLogList;
+        if (startDate && endDate) {
+            query.date = {
+                $gte: parseDate(startDate),
+                $lte: parseDate(endDate)
+            };
+        } else { //default to last 7 days
+            const end = new Date();
+            const start = new Date();
+            start.setDate(end.getDate() - 7);
+            query.date = {
+                $gte: start,
+                $lte: end
+            };
+        }
+        const foodLogList = await foodLogCollection.find(query).sort({date: -1}).toArray();
+        return foodLogList;
 
     } catch (e) {
-        throw new Error (`Error getting ranged food logs: ${e.message}`);
+        const errorMsg = e instanceof Error ? e.message : String(e); //TODO: refactor all error handling with throwing errors if given approval
+        throw new Error(`Error getting ranged food logs: ${errorMsg}`);
     }
 }
 
@@ -88,14 +95,14 @@ export const addFoodLog = async (userId, date, meals_logged, notes) => {
         
         const existing = await foodLogCollection.findOne({
             user_id: new ObjectId(userId),
-            date: new Date(date)
+            date: parseDate(date)
         });
         if (existing) {
             throw new Error(`Food log for ${date} already exists.`);
         }
         const newFoodLog = {
             user_id: new ObjectId(userId),
-            date: new Date(date),
+            date: parseDate(date),
             meals_logged: meals_logged,
             //rollback in case recalculation fails:
             daily_total_calories: null,  // ← null = "not yet calculated"
@@ -104,8 +111,7 @@ export const addFoodLog = async (userId, date, meals_logged, notes) => {
             daily_total_fat: null,
             daily_total_fiber: null,            
             notes: notes || "",
-            created_at: new Date(),
-        };
+            created_at: new Date()       };
 
         const insertInfo = await foodLogCollection.insertOne(newFoodLog);
 

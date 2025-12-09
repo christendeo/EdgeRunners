@@ -2,32 +2,37 @@ import {GraphQLError} from 'graphql';
 import * as foodLogs from '../../data/foodLogCollection.js';
 import { getCache, setCache, deleteCache, } from '../../config/redisConnection.js';
 
+const TEST_USER_ID = "693795fa9dc06d59f69c8b46"; //testing without GraphQL context auth system 
+
 export const resolvers = {
     Query: {
         getRangedFoodLogs: async (parent, { startDate, endDate }, context) => {
-            if (!context.user) { //check auth
-                throw new GraphQLError('Not authenticated', {
-                    extensions: { code: 'UNAUTHENTICATED' }
-                });
-            }
+            // if (!context.user) { //check auth
+            //     throw new GraphQLError('Not authenticated', {
+            //         extensions: { code: 'UNAUTHENTICATED' }
+            //     });
+            // }
 
             try {
-                const cacheKey = `foodLogs:${context.user.id}:${startDate}:${endDate}`;
+                const cacheKey = `foodLogs:${context.user ? context.user.id : TEST_USER_ID}:${startDate}:${endDate}`;
                 const cached = await getCache(cacheKey);
                 
                 if (cached) {
-                    return JSON.parse(cached);
-                }
-
+                    console.log("Cache hit:", cacheKey);
+                    return cached;
+                } 
+                else {
                 const logs = await foodLogs.getRangedFoodlogs(
-                    context.user.id,
+                    context.user ? context.user.id : TEST_USER_ID,
                     startDate,
                     endDate
                 );
 
-                await setCache(cacheKey, JSON.stringify(logs), 300);
+                await setCache(cacheKey, logs, 300);
 
                 return logs;
+                }
+
             } catch (e) {
                 throw new GraphQLError(e.message, {
                     extensions: { code: 'INTERNAL_SERVER_ERROR' }
@@ -36,27 +41,27 @@ export const resolvers = {
         },
 
         getFoodLogById: async (parent, { logId }, context) => {
-            if (!context.user) {
-                throw new GraphQLError('Not authenticated', {
-                    extensions: { code: 'UNAUTHENTICATED' }
-                });
-            }
+            // if (!context.user) {
+            //     throw new GraphQLError('Not authenticated', {
+            //         extensions: { code: 'UNAUTHENTICATED' }
+            //     });
+            // }
 
             try {
                 const cacheKey = `foodLog:${logId}`;
                 const cached = await getCache(cacheKey);
                 
                 if (cached) {
-                    return JSON.parse(cached);
+                    return (cached);
                 }
 
                 const log = await foodLogs.getFoodlogById(
-                    context.user.id,
+                    context.user ? context.user.id : TEST_USER_ID,
                     logId
                 );
 
                 // Cache for 5 minutes
-                await setCache(cacheKey, JSON.stringify(log), 300);
+                await setCache(cacheKey, log, 300);
 
                 return log;
             } catch (e) {
@@ -67,24 +72,25 @@ export const resolvers = {
         },
 
         getTodayFoodLog: async (parent, args, context) => {
-            if (!context.user) {
-                throw new GraphQLError('Not authenticated', {
-                    extensions: { code: 'UNAUTHENTICATED' }
-                });
-            }
+            // if (!context.user) {
+            //     throw new GraphQLError('Not authenticated', {
+            //         extensions: { code: 'UNAUTHENTICATED' }
+            //     });
+            // }
 
             try {
-                const today = new Date().toISOString().split('T')[0];
-                const cacheKey = `foodLog:${context.user.id}:today`;
+                const now = new Date();
+                const today = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}/${now.getFullYear()}`
+                const cacheKey = `foodLog:${context.user ? context.user.id : TEST_USER_ID}:today`;
                 const cached = await getCache(cacheKey);
                 
                 if (cached) {
-                    return JSON.parse(cached);
+                    return cached;
                 }
 
                 //get today's log using getRangedFoodlogs
                 const logs = await foodLogs.getRangedFoodlogs(
-                    context.user.id,
+                    context.user ? context.user.id : TEST_USER_ID,
                     today,
                     today
                 );
@@ -93,7 +99,7 @@ export const resolvers = {
 
                 //cache for 1 minute (frequently updated)
                 if (todayLog) {
-                    await setCache(cacheKey, JSON.stringify(todayLog), 60);
+                    await setCache(cacheKey, todayLog, 60);
                 }
 
                 return todayLog;
@@ -107,24 +113,24 @@ export const resolvers = {
 
     Mutation: {
         addFoodLog: async (parent, { input }, context) => {
-            if (!context.user) {
-                throw new GraphQLError('Not authenticated', {
-                    extensions: { code: 'UNAUTHENTICATED' }
-                });
-            }
+            // if (!context.user) {
+            //     throw new GraphQLError('Not authenticated', {
+            //         extensions: { code: 'UNAUTHENTICATED' }
+            //     });
+            // }
 
             try {
                 const result = await foodLogs.addFoodLog(
-                    context.user.id,
+                    context.user ? context.user.id : TEST_USER_ID,
                     input.date,
                     input.meals_logged,
                     input.notes
                 );
 
                 //invalidate relevant caches
-                const dateKey = input.date.split('T')[0];
-                await deleteCache(`foodLog:${context.user.id}:today`);
-                await deleteCache(`foodLogs:${context.user.id}:*`); // Pattern delete if supported
+                const dateKey = input.date.split('T')[0]; //extracts just the date portion (YYYY-MM-DD) from the full ISO timestamp.
+                await deleteCache(`foodLog:${context.user ? context.user.id : TEST_USER_ID}:today`);
+                await deleteCache(`foodLogs:${context.user ? context.user.id : TEST_USER_ID}:*`); // Pattern delete if supported
 
                 return result;
             } catch (e) {
@@ -135,22 +141,22 @@ export const resolvers = {
         },
 
         updateFoodLog: async (parent, { logId, updatedMealsLogged }, context) => {
-            if (!context.user) {
-                throw new GraphQLError('Not authenticated', {
-                    extensions: { code: 'UNAUTHENTICATED' }
-                });
-            }
+            // if (!context.user) {
+            //     throw new GraphQLError('Not authenticated', {
+            //         extensions: { code: 'UNAUTHENTICATED' }
+            //     });
+            // }
 
             try {
                 const result = await foodLogs.updateFoodlog(
-                    context.user.id,
+                    context.user ? context.user.id : TEST_USER_ID,
                     logId,
                     updatedMealsLogged
                 );
 
                 await deleteCache(`foodLog:${logId}`);
-                await deleteCache(`foodLog:${context.user.id}:today`);
-                await deleteCache(`foodLogs:${context.user.id}:*`);
+                await deleteCache(`foodLog:${context.user ? context.user.id : TEST_USER_ID}:today`);
+                await deleteCache(`foodLogs:${context.user ? context.user.id : TEST_USER_ID}:*`);
 
                 return result;
             } catch (e) {
@@ -161,22 +167,22 @@ export const resolvers = {
         },
 
         removeFoodLog: async (parent, { logId }, context) => {
-            if (!context.user) {
-                throw new GraphQLError('Not authenticated', {
-                    extensions: { code: 'UNAUTHENTICATED' }
-                });
-            }
+            // if (!context.user) {
+            //     throw new GraphQLError('Not authenticated', {
+            //         extensions: { code: 'UNAUTHENTICATED' }
+            //     });
+            // }
 
             try {
                 const result = await foodLogs.removeFoodlog(
-                    context.user.id,
+                    context.user ? context.user.id : TEST_USER_ID,  // Fixed: was context.user.id
                     logId
                 );
 
                 //invalidate caches
                 await deleteCache(`foodLog:${logId}`);
-                await deleteCache(`foodLog:${context.user.id}:today`);
-                await deleteCache(`foodLogs:${context.user.id}:*`);
+                await deleteCache(`foodLog:${context.user ? context.user.id : TEST_USER_ID}:today`);
+                await deleteCache(`foodLogs:${context.user ? context.user.id : TEST_USER_ID}:*`);
 
                 return result;
             } catch (e) {
