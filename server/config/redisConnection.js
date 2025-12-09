@@ -6,7 +6,9 @@
 import {createClient} from "redis";
 
 // Similar to Lab 3, create our client
-let redisClient = createClient();
+let redisClient = createClient({
+    url: process.env.REDIS_URL || 'redis://localhost:6379'
+});
 
 // Console logs to check that Redis is actually working
 redisClient.on("connect", () => {
