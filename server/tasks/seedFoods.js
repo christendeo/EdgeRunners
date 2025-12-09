@@ -40,7 +40,8 @@ const transformFood = (usdaFood) => {
         )?.amount || null,
         protein: getNutrient('Protein'),
         carbs: getNutrient('Carbohydrate, by difference'),
-        fat: getNutrient('Total lipid (fat)')
+        fat: getNutrient('Total lipid (fat)'),
+        fiber: getNutrient('Fiber, total dietary')
     };
 };
 

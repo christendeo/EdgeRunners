@@ -1,4 +1,5 @@
 import * as foodData from '../../data/foodCollection.js';
+import { searchFoods } from '../../data/foodSearch.js'
 import {GraphQLError} from 'graphql';
 import { getCache, setCache, deleteCache, } from '../../config/redisConnection.js';
 
@@ -48,7 +49,22 @@ export const resolvers = {
             return allFoods;
         },
 
+        searchFoods: async (_, args) => {
+        const { filters, page = 1, limit = 20 } = args;
+        
+        try {
+            const results = await searchFoods(filters || {}, page, limit);
+            return results;
+        } catch (error) {
+            throw new GraphQLError('Search failed', {
+                extensions: { code: 'INTERNAL_SERVER_ERROR'}
+            });
+        }
     },
+
+    },
+
+    
 
     Mutation: {
 
