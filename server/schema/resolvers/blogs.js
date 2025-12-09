@@ -1,5 +1,6 @@
 import {GraphQLError} from 'graphql';
 import * as blogs from '../../data/blogCollection.js';
+import * as users from "../../data/userCollection.js";
 import { getCache, setCache, deleteCache, } from '../../config/redisConnection.js';
 
 export const resolvers = {

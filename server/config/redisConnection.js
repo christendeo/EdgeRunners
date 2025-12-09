@@ -50,7 +50,7 @@ export async function getCache(redisKey) {
 export async function setCache(redisKey, redisValue, ttl = 3600) {
     let redisString = JSON.stringify(redisValue);
     if (ttl) {
-        await redisClient.set(redisKey, ttl, redisString);
+        await redisClient.set(redisKey, redisString, 'EX', ttl); 
     } else {
         await redisClient.set(redisKey, redisString);
     }
