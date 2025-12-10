@@ -1,6 +1,7 @@
 import {GraphQLError} from 'graphql';
 import * as blogs from '../../data/blogCollection.js';
 import * as users from "../../data/userCollection.js";
+import * as foodLogs from '../../data/foodLogCollection.js';
 import { getCache, setCache, deleteCache, } from '../../config/redisConnection.js';
 
 export const resolvers = {
@@ -71,11 +72,9 @@ export const resolvers = {
     },
     Blog: {
         current_weight: async (parentValue) => {
-            const usersCollection = await users();
-            const user = await usersCollection.getUserById(parentValue.user_id);
+            const user = await users.getUserById(parentValue.user_id);
             return user.weight;
         }
-        //add calories_today
     },
     Mutation: {
         addBlog: async (_, args) => {
