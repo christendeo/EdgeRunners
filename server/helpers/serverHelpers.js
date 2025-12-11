@@ -11,14 +11,14 @@ const exportedMethods = {
 
         // Check if id is a string
         if (typeof id !== 'string') {
-            throw new Error(`Error: ${varName} must be a string`);
+            throw new Error (`Error: ${varName} must be a string`);
         }
 
         id = id.trim();
 
         // Check if id is empty or only contains empty spaces
         if (id.length === 0) {
-            throw new Error(`Error: ${varName} cannot be an empty string or just spaces`);
+            throw new Error (`Error: ${varName} cannot be an empty string or just spaces`);
         }
 
         // Check if id is a valid ObjectID
@@ -83,56 +83,98 @@ const exportedMethods = {
         return strVal;
     },
 
+    checkPassword(password, varName) {
+        if (!password) {
+            throw new Error(`Error: ${varName} is required`);
+        }
+
+        if (typeof password !== "string") {
+            throw new Error(`Error: ${varName} must be a string`);
+        }
+
+        password = password.trim();
+
+        // Validations
+        if (password.length < 8) {
+            throw new Error(`Error: ${varName} must be at least 8 characters long`);
+        }
+
+        // No spaces allowed
+        if (password.indexOf(" ") !== -1) {
+            throw new Error(`Error: ${varName} cannot contain spaces`);
+        }
+
+        // At least one lowercase
+        let hasLower = /[a-z]/.test(password);
+
+        // At least one uppercase
+        let hasUpper = /[A-Z]/.test(password);
+
+        // At least one digit
+        let hasDigit = /[0-9]/.test(password);
+
+        // At least one special character
+        let hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+        if (!hasLower || !hasUpper || !hasDigit || !hasSpecial) {
+            throw new Error(
+                `Error: ${varName} must contain at least one lowercase letter, one uppercase letter, one number, and one special character`
+            );
+        }
+
+        return password;
+    },
+
     validateString (str, name, minLength = 1, maxLength = 100) {
-    if (!str || typeof str !== 'string' || str.trim().length === 0) {
-        throw new Error(`${name} must be a non-empty string`);
-    }
-    if (str.trim().length < minLength) {
-        throw new Error(`${name} must be at least ${minLength} characters long`);
-    }
-    if (maxLength && str.trim().length > maxLength) {
-        throw new Error(`${name} must be at most ${maxLength} characters long`);
-    }
-    
-    if (name === 'name' && !/^[a-zA-Z .'-]+$/.test(str)) {
-        
-        throw new Error('Name can only contain letters, hyphens, apostrophes and periods.')
+        if (!str || typeof str !== 'string' || str.trim().length === 0) {
+            throw new Error(`${name} must be a non-empty string`);
+        }
+        if (str.trim().length < minLength) {
+            throw new Error(`${name} must be at least ${minLength} characters long`);
+        }
+        if (maxLength && str.trim().length > maxLength) {
+            throw new Error(`${name} must be at most ${maxLength} characters long`);
+        }
 
-    }
-    if (name === 'username' && !/^(?=.*[a-zA-Z])[a-zA-Z0-9]+$/.test(str)) {
-        
-        throw new Error('Username can only contain letters and numbers.')
+        if (name === 'name' && !/^[a-zA-Z .'-]+$/.test(str)) {
 
-    }
-    
-    
-    
+            throw new Error('Name can only contain letters, hyphens, apostrophes and periods.')
 
-    return str.trim();
-},
+        }
+        if (name === 'username' && !/^(?=.*[a-zA-Z])[a-zA-Z0-9]+$/.test(str)) {
 
-validateNumber (value, fieldName, min = 0, max = null) {
-    if (typeof value !== 'number' || isNaN(value)) {
-        throw new Error(`${fieldName} must be a valid number`);
-    }
-    if (value < min) {
-        throw new Error(`${fieldName} must be at least ${min}`);
-    }
-    if (max !== null && value > max) {
-        throw new Error(`${fieldName} must be no more than ${max}`);
-    }
-    return value;
-},
+            throw new Error('Username can only contain letters and numbers.')
 
-validateBoolean (value, fieldName) {
-    if (typeof value !== 'boolean') {
-        throw new Error(`${fieldName} must be true or false`);
-    }
-    
-    return value;
-},
+        }
 
-    
+
+
+
+        return str.trim();
+    },
+
+    validateNumber (value, fieldName, min = 0, max = null) {
+        if (typeof value !== 'number' || isNaN(value)) {
+            throw new Error(`${fieldName} must be a valid number`);
+        }
+        if (value < min) {
+            throw new Error(`${fieldName} must be at least ${min}`);
+        }
+        if (max !== null && value > max) {
+            throw new Error(`${fieldName} must be no more than ${max}`);
+        }
+        return value;
+    },
+
+    validateBoolean (value, fieldName) {
+        if (typeof value !== 'boolean') {
+            throw new Error(`${fieldName} must be true or false`);
+        }
+
+        return value;
+    },
+
+
 
     checkEmailAddress(email, varName) {
 
@@ -232,6 +274,45 @@ validateBoolean (value, fieldName) {
         return dateFormat;
     },
 
+    checkHeight(heightValue, varName) {
+
+        // Validations
+        if (heightValue === undefined || heightValue === null) {
+            throw new Error (`Error: ${varName} is required`);
+        }
+
+        if (typeof heightValue !== "number") {
+            throw new Error (`Error: ${varName} must be a number`);
+        }
+
+        // Typical adult range height, between 3' 11" and 8' 11" - can be changed later
+        if (heightValue < 120 || heightValue > 250) {
+            throw new Error (`Error: ${varName} must be between 120 and 250 centimeters`);
+        }
+
+        return heightValue;
+    },
+
+    // Weight in KG
+    checkWeight(weightValue, varName) {
+
+        // Validations
+        if (weightValue === undefined || weightValue === null) {
+            throw new Error (`Error: ${varName} is required`);
+        }
+
+        if (typeof weightValue !== "number") {
+            throw new Error (`Error: ${varName} must be a number`);
+        }
+
+        // Reasonable adult range in kg - can be changed later
+        if (weightValue < 30 || weightValue > 400) {
+            throw new Error (`Error: ${varName} must be between 30 and 400 kilograms`);
+        }
+
+        return weightValue;
+    },
+
     checkActivityLevel(activityLevel, varName) {
 
         // Validations
@@ -272,6 +353,30 @@ validateBoolean (value, fieldName) {
         }
 
         return dietGoal;
+    },
+
+    // Check for the user's sex and use it for caclulating BMR with the
+    // Mifflin–St Jeor BMR formula:
+    // male: 10*kg + 6.25*cm - 5*age + 5
+    // female: 10*kg + 6.25*cm - 5*age - 161
+
+    checkSex(sexCheck, varName) {
+        if (!sexCheck) {
+            throw new Error (`Error: ${varName} is required`);
+        }
+
+        if (typeof sexCheck !== "string") {
+            throw new Error (`Error: ${varName} must be a string`);
+        }
+
+        const normalizedSex = sexCheck.trim().toLowerCase();
+        const allowedSex = ["male", "female"];
+
+        if (!allowedSex.includes(normalizedSex)) {
+            throw new Error (`Error: ${varName} must be one of: ${allowedSex.join(", ")}`);
+        }
+
+        return normalizedSex;
     },
 
     //function to validate user inputed appropriate post type for blogs
