@@ -22,6 +22,7 @@ const userResolvers = {
                 first_name: getUser.first_name,
                 last_name: getUser.last_name,
                 email: getUser.email,
+                sex: getUser.sex,
                 date_of_birth: getUser.date_of_birth,
                 height: getUser.height,
                 weight: getUser.weight,
@@ -43,6 +44,7 @@ const userResolvers = {
                     first_name: currentUser.first_name,
                     last_name: currentUser.last_name,
                     email: currentUser.email,
+                    sex: currentUser.sex,
                     date_of_birth: currentUser.date_of_birth,
                     height: currentUser.height,
                     weight: currentUser.weight,
@@ -65,6 +67,8 @@ const userResolvers = {
                 args.first_name,
                 args.last_name,
                 args.email,
+                args.password,
+                args.sex,
                 args.date_of_birth,
                 args.height,
                 args.weight,
@@ -78,6 +82,7 @@ const userResolvers = {
                 first_name: createdUser.first_name,
                 last_name: createdUser.last_name,
                 email: createdUser.email,
+                sex: createdUser.sex,
                 date_of_birth: createdUser.date_of_birth,
                 height: createdUser.height,
                 weight: createdUser.weight,
@@ -105,6 +110,14 @@ const userResolvers = {
 
             if (args.email !== undefined) {
                 userInput.email = args.email;
+            }
+
+            if (args.password !== undefined) {
+                userInput.password = args.password;
+            }
+
+            if (args.sex !== undefined) {
+                userInput.sex = args.sex;
             }
 
             if (args.date_of_birth !== undefined) {
@@ -138,6 +151,7 @@ const userResolvers = {
                 first_name: updatedUser.first_name,
                 last_name: updatedUser.last_name,
                 email: updatedUser.email,
+                sex: updatedUser.sex,
                 date_of_birth: updatedUser.date_of_birth,
                 height: updatedUser.height,
                 weight: updatedUser.weight,
