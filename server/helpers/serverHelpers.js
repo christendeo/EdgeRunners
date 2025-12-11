@@ -6,24 +6,24 @@ const exportedMethods = {
 
         // Check if an id is provided
         if (!id) {
-            throw `Error: You must provide a ${varName}`;
+            throw new Error (`Error: You must provide a ${varName}`);
         }
 
         // Check if id is a string
         if (typeof id !== 'string') {
-            throw `Error: ${varName} must be a string`;
+            throw new Error(`Error: ${varName} must be a string`);
         }
 
         id = id.trim();
 
         // Check if id is empty or only contains empty spaces
         if (id.length === 0) {
-            throw `Error: ${varName} cannot be an empty string or just spaces`;
+            throw new Error(`Error: ${varName} cannot be an empty string or just spaces`);
         }
 
         // Check if id is a valid ObjectID
         if (!ObjectId.isValid(id)) {
-            throw `Error: ${varName} invalid object ID`;
+            throw new Error (`Error: ${varName} invalid object ID`);
         }
 
         return id;
@@ -33,29 +33,29 @@ const exportedMethods = {
 
         // Check if a string is provided
         if (!strVal) {
-            throw `Error: You must supply a ${varName}!`;
+            throw new Error (`Error: You must supply a ${varName}!`);
         }
 
         // Check if it is a string type
         if (typeof strVal !== 'string') {
-            throw `Error: ${varName} must be a string!`;
+            throw new Error (`Error: ${varName} must be a string!`);
         }
 
         strVal = strVal.trim();
 
         // Check if string is empty or only has spaces
         if (strVal.length === 0) {
-            throw `Error: ${varName} cannot be an empty string or string with just spaces`;
+            throw new Error (`Error: ${varName} cannot be an empty string or string with just spaces`);
         }
 
         // Check if the string has any digits
         if (/\d/.test(strVal)) {
-            throw `Error: ${strVal} is not a valid value for ${varName} as it contains digits`;
+            throw new Error (`Error: ${strVal} is not a valid value for ${varName} as it contains digits`);
         }
 
         // Ensure the name allows only letters, spaces, period, apostrophe, and hyphen
         if (!/^[A-Za-z .'-]+$/.test(strVal)) {
-            throw `Error: ${strVal} is not a valid value for ${varName} as it should only contain letters, spaces, periods, apostrophes, and hyphens`;
+            throw new Error (`Error: ${strVal} is not a valid value for ${varName} as it should only contain letters, spaces, periods, apostrophes, and hyphens`);
         }
 
         return strVal;
@@ -65,19 +65,19 @@ const exportedMethods = {
 
         // Check if a string is provided
         if (!strVal) {
-            throw `Error: You must supply a ${varName}!`;
+            throw new Error (`Error: You must supply a ${varName}!`);
         }
 
         // Check if it is a string type
         if (typeof strVal !== 'string') {
-            throw `Error: ${varName} must be a string!`;
+            throw new Error (`Error: ${varName} must be a string!`);
         }
 
         strVal = strVal.trim();
 
         // Check if string is empty or only has spaces
         if (strVal.length === 0) {
-            throw `Error: ${varName} cannot be an empty string or string with just spaces`;
+            throw new Error (`Error: ${varName} cannot be an empty string or string with just spaces`);
         }
 
         return strVal;
@@ -142,7 +142,7 @@ validateBoolean (value, fieldName) {
         // Check if email address is valid using Regex
         let emailRegexValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegexValid.test(email)) {
-            throw `Error: The ${varName} you provided: ${email} is not valid :(`;
+            throw new Error (`Error: The ${varName} you provided: ${email} is not valid :(`);
         }
 
         return email;
@@ -156,20 +156,20 @@ validateBoolean (value, fieldName) {
         // Check if date is valid using Regex
         let dateRegexValid = /^\d{2}\/\d{2}\/\d{4}$/;
         if (!dateRegexValid.test(dateFormat)) {
-            throw `Error: The date format you provided: ${dateFormat} is not valid :(`;
+            throw new Error (`Error: The date format you provided: ${dateFormat} is not valid :(`);
         }
 
         // Split date into three parts
         let splitDate = dateFormat.split("/");
         if (splitDate.length !== 3) {
-            throw "Oh no! The date must be in mm/dd/yyyy format :(";
+            throw new Error ("Oh no! The date must be in mm/dd/yyyy format :(");
         }
 
         let [dateMonth, dateDay, dateYear] = splitDate;
 
         // Ensure the month and day only contain 2 chars, and year only contains 4
         if (dateMonth.length !== 2 || dateDay.length !== 2 || dateYear.length !== 4) {
-            throw "Oh no! The month, day, and/or year is not valid format :(";
+            throw new Error ("Oh no! The month, day, and/or year is not valid format :(");
         }
 
         // Use parseInt to convert to int nums
@@ -184,12 +184,12 @@ validateBoolean (value, fieldName) {
             || isNaN(numDay)
             || typeof numYear !== "number"
             || isNaN(numYear)) {
-            throw "Oh no! The date contains invalid numbers :(";
+            throw new Error ("Oh no! The date contains invalid numbers :(");
         }
 
         // Ensure the range of the month is between 1-12
         if (numMonth < 1 || numMonth > 12) {
-            throw "Oh no! The month must be valid :(";
+            throw new Error ("Oh no! The month must be valid :(");
         }
 
         // Find the max date day of each month
@@ -218,7 +218,7 @@ validateBoolean (value, fieldName) {
 
         // Ensure the day falls within the appropriate month
         if (numDay < 1 || numDay > monthMaxDay) {
-            throw "Oh no! The day must be valid and fall within the appropriate month :(";
+            throw new Error ("Oh no! The day must be valid and fall within the appropriate month :(");
         }
 
         // Ensure the year is within the range 1900 and current year + 2
@@ -226,7 +226,7 @@ validateBoolean (value, fieldName) {
         let currentYear = currentDate.getFullYear();
         let theLatestYear = currentYear + 2;
         if (numYear < 1900 || numYear > theLatestYear) {
-            throw "Oh no! The year falls out of range :(";
+            throw new Error ("Oh no! The year falls out of range :(");
         }
 
         return dateFormat;
@@ -236,11 +236,11 @@ validateBoolean (value, fieldName) {
 
         // Validations
         if (!activityLevel) {
-            throw `Error: ${varName} is required`;
+            throw new Error (`Error: ${varName} is required`);
         }
 
         if (typeof activityLevel !== "string") {
-            throw `Error: ${varName} must be a string`;
+            throw new Error (`Error: ${varName} must be a string`);
         }
 
         activityLevel = activityLevel.trim().toLowerCase();
@@ -248,7 +248,7 @@ validateBoolean (value, fieldName) {
         const allowedLevels = ["sedentary", "light", "moderate", "active", "very_active"];
 
         if (!allowedLevels.includes(activityLevel)) {
-            throw `Error: ${varName} must be one of: ${allowedLevels.join(", ")}`;
+            throw new Error (`Error: ${varName} must be one of: ${allowedLevels.join(", ")}`);
         }
 
         return activityLevel;
@@ -256,11 +256,11 @@ validateBoolean (value, fieldName) {
 
     checkDietGoal(dietGoal, varName) {
         if (!dietGoal) {
-            throw `Error: ${varName} is required`;
+            throw new Error (`Error: ${varName} is required`);
         }
 
         if (typeof dietGoal !== "string") {
-            throw `Error: ${varName} must be a string`;
+            throw new Error (`Error: ${varName} must be a string`);
         }
 
         dietGoal = dietGoal.trim().toLowerCase();
@@ -268,7 +268,7 @@ validateBoolean (value, fieldName) {
         const allowedGoals = ["lose", "maintain", "gain"];
 
         if (!allowedGoals.includes(dietGoal)) {
-            throw `Error: ${varName} must be one of: ${allowedGoals.join(", ")}`;
+            throw new Error (`Error: ${varName} must be one of: ${allowedGoals.join(", ")}`);
         }
 
         return dietGoal;

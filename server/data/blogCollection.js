@@ -52,22 +52,20 @@ export const createBlog = async (userId, title, content, postType) => {
         throw new Error (e);
     }
 
-    try {
-        const usersCollection = await users();
-        let user = await usersCollection.getUserById(userId);
-        if(!user) throw 'A user with this ID does not exist.';
-    } catch (e) {
-        throw new Error (e);
-    }
+    const usersCollection = await users();
+    let user = await usersCollection.getUserById(userId);
+    if(!user) throw new Error ('A user with this ID does not exist.');
 
-    let date = new Date().toISOString();
+    //create the date and format it as MM/DD/YYYY
+    let date = new Date(); 
+    let dateStr = `${date.toLocaleString('default', {month: '2-digit'})}/${date.toLocaleString('default', {day: '2-digit'})}/${date.getFullYear()}`;
     const newBlog = {
         user_id: userId,
         title: title,
         content: content, 
         post_type: postType,
-        created_at: date,
-        updated_at: date
+        created_at: dateStr,
+        updated_at: dateStr
     };
 
     const blogsCollection = await blogs();
@@ -95,7 +93,7 @@ export const updateBlog = async (id, userId, updateInfo) => {
     blog = await blogsCollection.findOne({_id: new ObjectId(id)});     
 
     if(blog){
-        if(blog.user_id.toString() !== userId) throw "Edits can only be made by the user who created this post.";
+        if(blog.user_id.toString() !== userId) throw new Error ("Edits can only be made by the user who created this post.");
         //updateable fields: title, content, post_type, updated_at
         try {
             if(updateInfo.title){
@@ -114,7 +112,10 @@ export const updateBlog = async (id, userId, updateInfo) => {
         throw new Error (`Could not find blog post`);
     }
 
-    blog.updated_at = new Date().toISOString();
+    //create the date and format it as MM/DD/YYYY
+    let date = new Date(); 
+    let dateStr = `${date.toLocaleString('default', {month: '2-digit'})}/${date.toLocaleString('default', {day: '2-digit'})}/${date.getFullYear()}`;
+    blog.updated_at = dateStr;
 
     await blogsCollection.updateOne({_id: new ObjectId(id)}, {"$set": blog});
     const update = await blogsCollection.findOne({_id: new ObjectId(id)});
@@ -132,7 +133,7 @@ export const deleteBlog = async (id, userId) => {
 
     const blogsCollection = await blogs();
     let blog = await blogsCollection.findOne({_id: new ObjectId(id)});
-    if(blog.user_id.toString() !== userId) throw "Only the user who created this post can delete it.";
+    if(blog.user_id.toString() !== userId) throw new Error ("Only the user who created this post can delete it.");
 
     blog = await blogsCollection.findOneAndDelete({_id: new ObjectId(id)});
 
