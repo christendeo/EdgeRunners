@@ -1,42 +1,73 @@
 // User Collection CRUD
 import helpers from "../helpers/serverHelpers.js";
+
+// Function to auto compute target calories based on user profile
+import {computeTargetCaloriesFromProfile} from "../helpers/targetHelpers.js";
 import {users} from "../config/mongoCollections.js";
 import {ObjectId} from "mongodb";
+import bcrypt from "bcrypt";
 
 // Create user function
 export const addUser = async (
-    first_name,
-    last_name,
-    email,
-    date_of_birth,
-    height,
-    weight,
-    activity_level,
-    diet_goal,
-    target_calories
+    userFirstName,
+    userLastName,
+    userEmail,
+    userPassword,
+    userSex,
+    userDOB,
+    userHeight,
+    userWeight,
+    userActivityLevel,
+    userDietGoal
 ) => {
 
     // Validation checks
-    first_name = helpers.checkName(first_name, "First Name");
-    last_name = helpers.checkName(last_name, "Last Name");
-    email = helpers.checkEmailAddress(email, "Email");
-    date_of_birth = helpers.checkDateFormat(date_of_birth, "Date of Birth");
-    activity_level = helpers.checkActivityLevel(activity_level, "Activity Level");
-    diet_goal = helpers.checkDietGoal(diet_goal, "Diet Goal");
+    userFirstName = helpers.checkName(userFirstName, "First Name");
+    userLastName = helpers.checkName(userLastName, "Last Name");
+    userEmail = helpers.checkEmailAddress(userEmail, "Email");
+    userPassword = helpers.checkPassword(userPassword, "Password");
+    userSex = helpers.checkSex(userSex, "Sex");
+    userDOB = helpers.checkDateFormat(userDOB, "Date of Birth");
+    userHeight = helpers.checkHeight(userHeight, "Height");
+    userWeight = helpers.checkWeight(userWeight, "Weight");
+    userActivityLevel = helpers.checkActivityLevel(userActivityLevel, "Activity Level");
+    userDietGoal = helpers.checkDietGoal(userDietGoal, "Diet Goal");
+
+    // Build profile for calculation
+    const profileForCalculation = {
+        sex: userSex,
+        date_of_birth: userDOB,
+        height: userHeight,
+        weight: userWeight,
+        activity_level: userActivityLevel,
+        diet_goal: userDietGoal
+    };
+
+    let autoTargetCalories = computeTargetCaloriesFromProfile(profileForCalculation);
+
+    if (autoTargetCalories === null) {
+        throw new Error ("Oh no! Not enough information to compute target calories :(");
+    }
 
     const userCollection = await users();
 
+    // For password hashing
+    let saltRounds = 10;
+    let passwordHash = await bcrypt.hash(userPassword, saltRounds);
+
     // Store fields
     const newUser = {
-        first_name: first_name,
-        last_name: last_name,
-        email: email,
-        date_of_birth: date_of_birth,
-        height: height,
-        weight: weight,
-        activity_level: activity_level,
-        diet_goal: diet_goal,
-        target_calories: target_calories,
+        first_name: userFirstName,
+        last_name: userLastName,
+        email: userEmail,
+        password_hash: passwordHash,
+        sex: userSex,
+        date_of_birth: userDOB,
+        height: userHeight,
+        weight: userWeight,
+        activity_level: userActivityLevel,
+        diet_goal: userDietGoal,
+        target_calories: autoTargetCalories,
         createdAt: new Date(),
         updatedAt: new Date()
     };
@@ -44,7 +75,7 @@ export const addUser = async (
     const insertUserInfo = await userCollection.insertOne(newUser);
 
     if (!insertUserInfo.acknowledged || !insertUserInfo.insertedId) {
-        throw "Oh no! User could not be added :(";
+        throw new Error ("Oh no! User could not be added :(");
     }
 
     const newUserId = insertUserInfo.insertedId.toString();
@@ -66,22 +97,30 @@ export const getUserById = async (userId) => {
     );
 
     if (!currentUser) {
-        throw "Oh no! There is no user with that ID :(";
+        throw new Error ("Oh no! There is no user with that ID :(");
     }
 
     currentUser._id = currentUser._id.toString();
     return currentUser;
 };
 
-// Edit user (partial update)
-// Edit user (partial update)
+// Edit user profile (partial update)
 export const editUser = async (userId, updatedUser) => {
 
     // Validation check
     userId = helpers.checkId(userId, "User ID");
 
     if (!updatedUser || typeof updatedUser !== "object" || Object.keys(updatedUser).length === 0) {
-        throw "Oh no! You need to provide at least one field to update :(";
+        throw new Error ("Oh no! You need to provide at least one field to update :(");
+    }
+
+    const userCollection = await users();
+    const currentUser = await userCollection.findOne(
+        { _id: new ObjectId(userId) }
+    );
+
+    if (!currentUser) {
+        throw new Error ("Oh no! User could not be updated or does not exist :(");
     }
 
     const updatedUserData = {};
@@ -98,16 +137,28 @@ export const editUser = async (userId, updatedUser) => {
         updatedUserData.email = helpers.checkEmailAddress(updatedUser.email, "Email");
     }
 
+    // For changing passwords
+    if (updatedUser.password !== undefined) {
+        const checkedPassword = helpers.checkPassword(updatedUser.password, "Password");
+        const saltRounds = 10;
+        const passwordHash = await bcrypt.hash(checkedPassword, saltRounds);
+        updatedUserData.password_hash = passwordHash;
+    }
+
+    if (updatedUser.sex !== undefined) {
+        updatedUserData.sex = helpers.checkSex(updatedUser.sex, "Sex");
+    }
+
     if (updatedUser.date_of_birth !== undefined) {
         updatedUserData.date_of_birth = helpers.checkDateFormat(updatedUser.date_of_birth, "Date of Birth");
     }
 
     if (updatedUser.height !== undefined) {
-        updatedUserData.height = updatedUser.height;
+        updatedUserData.height = helpers.checkHeight(updatedUser.height, "Height");
     }
 
     if (updatedUser.weight !== undefined) {
-        updatedUserData.weight = updatedUser.weight;
+        updatedUserData.weight = helpers.checkWeight(updatedUser.weight);
     }
 
     if (updatedUser.activity_level !== undefined) {
@@ -124,7 +175,56 @@ export const editUser = async (userId, updatedUser) => {
 
     updatedUserData.updatedAt = new Date();
 
-    const userCollection = await users();
+    // Build merged profile for auto target calculation
+    const mergedProfile = {};
+
+    // sex
+    if (updatedUserData.sex !== undefined) {
+        mergedProfile.sex = updatedUserData.sex;
+    } else {
+        mergedProfile.sex = currentUser.sex;
+    }
+
+    // date_of_birth
+    if (updatedUserData.date_of_birth !== undefined) {
+        mergedProfile.date_of_birth = updatedUserData.date_of_birth;
+    } else {
+        mergedProfile.date_of_birth = currentUser.date_of_birth;
+    }
+
+    // height
+    if (updatedUserData.height !== undefined) {
+        mergedProfile.height = updatedUserData.height;
+    } else {
+        mergedProfile.height = currentUser.height;
+    }
+
+    // weight
+    if (updatedUserData.weight !== undefined) {
+        mergedProfile.weight = updatedUserData.weight;
+    } else {
+        mergedProfile.weight = currentUser.weight;
+    }
+
+    // activity_level
+    if (updatedUserData.activity_level !== undefined) {
+        mergedProfile.activity_level = updatedUserData.activity_level;
+    } else {
+        mergedProfile.activity_level = currentUser.activity_level;
+    }
+
+    // diet_goal
+    if (updatedUserData.diet_goal !== undefined) {
+        mergedProfile.diet_goal = updatedUserData.diet_goal;
+    } else {
+        mergedProfile.diet_goal = currentUser.diet_goal;
+    }
+
+    let autoTargetCalories = computeTargetCaloriesFromProfile(mergedProfile);
+
+    if (autoTargetCalories !== null) {
+        updatedUserData.target_calories = autoTargetCalories;
+    }
 
     // Store updated info
     const updateResult = await userCollection.updateOne(
@@ -133,7 +233,7 @@ export const editUser = async (userId, updatedUser) => {
     );
 
     if (!updateResult.matchedCount || updateResult.matchedCount === 0) {
-        throw "Oh no! User could not be updated or does not exist :(";
+        throw new Error ("Oh no! User could not be updated or does not exist :(");
     }
 
     const updatedDoc = await getUserById(userId);
