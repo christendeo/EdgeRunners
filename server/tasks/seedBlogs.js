@@ -8,7 +8,7 @@ export const seedBlogs = async () => {
     const blogsCollection = await blogs();
 
     //add a user
-    let user = await usersCollection.insertOne('Jane', 'Doe', 'janedoe@gmail.com', '01/01/1999', 65, 140, 'light', 'maintain', 2000);
+    let user = await usersCollection.insertOne('Jane', 'Doe', 'janedoe@gmail.com', 'JaneDoe1!', 'female', '01/01/1999', 200, 200, 'light', 'maintain');
     if(!user) throw new Error("Error running user creation in seedBlogs.js: " + error.message);
 
     await blogsCollection.insertMany([
