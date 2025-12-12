@@ -147,9 +147,6 @@ const exportedMethods = {
 
         }
 
-
-
-
         return str.trim();
     },
 
@@ -173,8 +170,6 @@ const exportedMethods = {
 
         return value;
     },
-
-
 
     checkEmailAddress(email, varName) {
 
@@ -382,9 +377,9 @@ const exportedMethods = {
     //function to validate user inputed appropriate post type for blogs
     validatePostType(str) {
         const PostType = {
-            COMMENT: 'comment',
-            REVIEW: 'review',
-            PROGRESS: 'progress'
+            COMMENT: 'Comment',
+            REVIEW: 'Review',
+            PROGRESS: 'Progress Update'
         };
         str = checkString(str, 'Post Type');
         switch (str){
