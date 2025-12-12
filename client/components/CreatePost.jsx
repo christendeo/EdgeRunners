@@ -1,7 +1,7 @@
 import {useMutation} from '@apollo/client/react';
 import queries from '../queries/blogQueries.js';
 
-//component for creating blog posts with react modal
+//component for creating blog posts
 export default function CreatePost (props) {
     const [addBlog] = useMutation(queries.CREATE_BLOG, {
         update(cache, {data: addBlog}) {
