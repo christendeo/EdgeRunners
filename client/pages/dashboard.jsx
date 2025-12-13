@@ -1,96 +1,77 @@
-// Dispaly user dashboard
-// client/pages/dashboard.jsx
-import { useEffect, useState } from "react";
+// Display user dashboard
+import {useContext, useEffect} from "react";
+import {useRouter} from "next/router";
 import Link from "next/link";
 
+// Utilize userAuthContext
+import {AuthContext} from "../lib/userAuthContext";
+
 export default function DashboardPage() {
-    const [user, setUser] = useState(null);
-    const [loaded, setLoaded] = useState(false);
+    const router = useRouter();
+    const userAuth = useContext(AuthContext);
 
+    // Ensure user is actually logged in
     useEffect(() => {
-        if (typeof window !== "undefined") {
-            const stored = window.localStorage.getItem("fuelmeUser");
-            if (stored) {
-                try {
-                    const parsed = JSON.parse(stored);
-                    setUser(parsed);
-                } catch (e) {
-                    console.log(e);
-                }
+        if (userAuth.authLoaded) {
+            if (!userAuth.user) {
+                router.push("/login");
             }
-            setLoaded(true);
         }
-    }, []);
+    }, [userAuth.authLoaded, userAuth.user, router]);
 
-    if (!loaded) {
+    if (!userAuth.authLoaded) {
         return (
             <div className="card">
-                <h1>Dashboard</h1>
+                <h1>User Dashboard</h1>
                 <p>Loading...</p>
             </div>
         );
     }
 
-    if (!user) {
+    // If user is not logged in
+    if (!userAuth.user) {
         return (
             <div className="card">
-                <h1>Dashboard</h1>
-                <p>You are not logged in.</p>
+                <h1>User Dashboard</h1>
+                <p>Oh no! You are not logged in.</p>
                 <p>
-                    <Link href="/login">Go to login</Link>
+                    <Link href="/login">Login Here</Link>
                 </p>
             </div>
         );
     }
 
+    const currentUser = userAuth.user;
+
+    // Display page
     return (
-        <div className="card">
-            <h1>Hello, {user.first_name}</h1>
-            <p style={{ marginBottom: "1rem" }}>
-                Here is a quick overview of your profile and daily target.
-            </p>
+        <div>
+            <h1>Hello, {currentUser.first_name}</h1>
 
-            <section style={{ marginBottom: "1rem" }}>
-                <h2 style={{ fontSize: "1.1rem" }}>Profile</h2>
-                <p>Email: {user.email}</p>
-                <p>Sex: {user.sex}</p>
-                <p>Date of Birth: {user.date_of_birth}</p>
-            </section>
+            <h2>Profile Information</h2>
+            <div>Email: {currentUser.email}</div>
+            <div>Sex: {currentUser.sex}</div>
+            <div>DOB: {currentUser.date_of_birth}</div>
 
-            <section style={{ marginBottom: "1rem" }}>
-                <h2 style={{ fontSize: "1.1rem" }}>Body & Activity</h2>
-                <p>Height: {user.height} cm</p>
-                <p>Weight: {user.weight} kg</p>
-                <p>Activity Level: {user.activity_level}</p>
-                <p>Diet Goal: {user.diet_goal}</p>
-            </section>
+            <h2>Goals</h2>
+            <div>Diet Goal: {currentUser.diet_goal}</div>
+            <div>Activity Level: {currentUser.activity_level}</div>
+            <div>Target Calories: {currentUser.target_calories}</div>
 
-            <section style={{ marginBottom: "1rem" }}>
-                <h2 style={{ fontSize: "1.1rem" }}>Daily Targets</h2>
-                <p>Target Calories: {user.target_calories} kcal</p>
-                <p style={{ fontSize: "0.9rem", color: "#9ca3af" }}>
-                    Your daily calorie target is calculated based on your height, weight,
-                    sex, age, activity level, and diet goal.
-                </p>
-            </section>
+            <h2>Quick Links</h2>
+            <div><Link href="/foods">Foods</Link></div>
+            <div><Link href="/meals">Meals</Link></div>
+            <Link href="/community/allPosts">Community</Link>
 
-            <section>
-                <h2 style={{ fontSize: "1.1rem" }}>Next Steps</h2>
-                <ul style={{ paddingLeft: "1.2rem", marginTop: "0.5rem" }}>
-                    <li>
-                        <Link href="/foods">Browse foods</Link>
-                    </li>
-                    <li>
-                        <Link href="/meals">Build or view meals</Link>
-                    </li>
-                    <li>
-                        <Link href="/logs">Log today&apos;s food intake</Link>
-                    </li>
-                    <li>
-                        <Link href="/community">Visit the community/blogs</Link>
-                    </li>
-                </ul>
-            </section>
+            <button
+                type="button"
+                onClick={() => {
+                    userAuth.logout();
+                    router.push("/login");
+                }}
+            >
+                Logout
+            </button>
         </div>
     );
 }

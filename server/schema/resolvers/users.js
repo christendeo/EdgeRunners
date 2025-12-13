@@ -75,8 +75,7 @@ const userResolvers = {
                 args.height,
                 args.weight,
                 args.activity_level,
-                args.diet_goal,
-                args.target_calories
+                args.diet_goal
             );
 
             return {
@@ -140,10 +139,6 @@ const userResolvers = {
 
             if (args.diet_goal !== undefined) {
                 userInput.diet_goal = args.diet_goal;
-            }
-
-            if (args.target_calories !== undefined) {
-                userInput.target_calories = args.target_calories;
             }
 
             const updatedUser = await editUser(userId, userInput);
