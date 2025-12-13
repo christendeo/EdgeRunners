@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {useMutation} from '@apollo/client/react';
-import {useRouter} from 'next/router'
+import {redirect} from 'next/navigation';
 import ReactModal from 'react-modal';
 import queries from '../queries/blogQueries.js';
 
@@ -21,12 +21,10 @@ const customStyles = {
 
 //component for deleting blog posts with react modal
 export default function DeletePost(props){
-  const router = useRouter();
-
   const [showDeleteModal, setShowDeleteModal] = useState(props.isOpen);
   const [blog, setBlog] = useState(props.blog);
 
-  const [removeBlog] = useMutation(queries.DELETE_BLOG, {
+  const [removeBlog, {data}] = useMutation(queries.DELETE_BLOG, {
     update(cache) {
       cache.modify({
         fields: {
@@ -48,7 +46,7 @@ export default function DeletePost(props){
 
   //redirects user to an existing page after deleting their post
   const handleClick = () => {
-    router.push('community/allposts');
+    redirect('community/allposts');
   }
 
   return (
@@ -68,7 +66,7 @@ export default function DeletePost(props){
             removeBlog({
               variables: {
                 "_id": blog._id,
-                "user_id": props.user_id
+                "user_id": blog.user_id
               }
             });
             setShowDeleteModal(false);

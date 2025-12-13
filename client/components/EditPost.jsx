@@ -38,7 +38,7 @@ export default function EditPost(props){
         editBlog({
             variables: {
                 '_id': blog._id,
-                'user_id': props.user_id,
+                'user_id': blog.user_id,
                 'title': title.value,
                 'content': content.value,
                 'post_type': postType.value
