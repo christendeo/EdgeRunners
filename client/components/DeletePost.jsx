@@ -67,7 +67,8 @@ export default function DeletePost(props){
             e.preventDefault();
             removeBlog({
               variables: {
-                "_id": blog._id
+                "_id": blog._id,
+                "user_id": props.user_id
               }
             });
             setShowDeleteModal(false);
