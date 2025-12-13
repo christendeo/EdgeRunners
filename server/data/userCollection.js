@@ -258,3 +258,84 @@ export const getAllUsers = async () => {
 
     return allUsers;
 };
+
+// Authenticate user for login purposes
+export const loginUser = async (email, password) => {
+
+    // Validate inputs
+    email = helpers.checkEmailAddress(email, "Email");
+    password = helpers.checkPassword(password, "Password");
+
+    const userCollection = await users();
+
+    // Find user by email (case-insensitive)
+    const existingUser = await userCollection.findOne({
+        email: email.toLowerCase()
+    });
+
+    if (!existingUser) {
+        throw new Error("Oh no! Either the email or password is incorrect :(");
+    }
+
+    const passwordsMatch = await bcrypt.compare(password, existingUser.password_hash);
+
+    if (!passwordsMatch) {
+        throw new Error("Oh no! Either the email or password is incorrect :(");
+    }
+
+    // Convert _id to string for GraphQL
+    existingUser._id = existingUser._id.toString();
+
+    return existingUser;
+};
+
+// Reset password by email
+export const resetPassword = async (email, newPassword) => {
+
+    // Validation checks
+    email = helpers.checkEmailAddress(email, "Email");
+    newPassword = helpers.checkPassword(newPassword, "New Password");
+
+    const userCollection = await users();
+
+    // Find the user by email
+    const existingUser = await userCollection.findOne(
+        { email: email }
+    );
+
+    if (!existingUser) {
+        throw new Error("Oh no! There is no account with that email :(");
+    }
+
+    // Prevent using the same password again
+    const isSameAsOld = await bcrypt.compare(newPassword, existingUser.password_hash);
+
+    if (isSameAsOld) {
+        throw new Error("Oh no! New password must be different from your old password :(");
+    }
+
+    const saltRounds = 10;
+    const newHash = await bcrypt.hash(newPassword, saltRounds);
+
+    // Use updateOne and check matchedCount / modifiedCount
+    const updateResult = await userCollection.updateOne(
+        { _id: existingUser._id },
+        {
+            $set: {
+                password_hash: newHash,
+                updatedAt: new Date()
+            }
+        }
+    );
+
+    if (!updateResult.matchedCount || updateResult.matchedCount === 0) {
+        throw new Error("Oh no! Password could not be reset :(");
+    }
+
+    // It matched, but if modifiedCount is 0, it means the hash was the same
+    if (!updateResult.modifiedCount || updateResult.modifiedCount === 0) {
+        throw new Error("Oh no! Password could not be reset, please try a different password :(");
+    }
+
+    return true;
+};

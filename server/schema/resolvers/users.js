@@ -3,7 +3,9 @@ import {
     addUser,
     getUserById,
     getAllUsers,
-    editUser
+    editUser,
+    loginUser as loginUserData,
+    resetPassword as resetPasswordData
 } from "../../data/userCollection.js";
 import redis from "../../config/redisConnection.js"
 
@@ -161,6 +163,40 @@ const userResolvers = {
                 createdAt: updatedUser.createdAt,
                 updatedAt: updatedUser.updatedAt
             };
+        },
+
+        // Allow user to login
+        loginUser: async (_, args) => {
+            const loggedInUser = await loginUserData(
+                args.email,
+                args.password
+            );
+
+            return {
+                _id: loggedInUser._id,
+                first_name: loggedInUser.first_name,
+                last_name: loggedInUser.last_name,
+                email: loggedInUser.email,
+                sex: loggedInUser.sex,
+                date_of_birth: loggedInUser.date_of_birth,
+                height: loggedInUser.height,
+                weight: loggedInUser.weight,
+                activity_level: loggedInUser.activity_level,
+                diet_goal: loggedInUser.diet_goal,
+                target_calories: loggedInUser.target_calories,
+                createdAt: loggedInUser.createdAt,
+                updatedAt: loggedInUser.updatedAt
+            };
+        },
+
+        // Allow user to reset password
+        resetPassword: async (_, args) => {
+            const didReset = await resetPasswordData(
+                args.email,
+                args.newPassword
+            );
+
+            return didReset;
         }
     }
 };

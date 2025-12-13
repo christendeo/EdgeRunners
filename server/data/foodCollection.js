@@ -48,8 +48,8 @@ export const updateFood = async(foodId, updatedFoodData) => {
 
     if (!existingFood) {
         throw new Error(`Could not update food with ID of ${id}`);
-    }
-    else {
+    }   
+    else {    
         if (updatedFoodData.name) {
             updatedFood.name = validateString(updatedFoodData.name, 'name');
         }
