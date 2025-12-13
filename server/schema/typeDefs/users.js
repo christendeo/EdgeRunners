@@ -50,6 +50,16 @@ extend type Mutation {
         activity_level: String,
         diet_goal: String
     ): User
+
+    loginUser(
+        email: String!,
+        password: String!
+    ): User
+
+    resetPassword(
+        email: String!,
+        newPassword: String!
+    ): Boolean
 }
 `;
 
