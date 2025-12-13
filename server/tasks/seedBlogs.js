@@ -1,6 +1,7 @@
 import dbConnection from '../config/mongoConnection.js';
-import {users, blogs} from '../config/mongoCollections.js';
-import {ObjectId} from "mongodb";
+import {blogs} from '../config/mongoCollections.js';
+import { addUser } from '../data/userCollection.js';
+
 
 export const seedBlogs = async () => {
     const db = await dbConnection();
@@ -8,8 +9,12 @@ export const seedBlogs = async () => {
     const blogsCollection = await blogs();
 
     //add a user
-    let user = await usersCollection.insertOne('Jane', 'Doe', 'janedoe@gmail.com', 'JaneDoe1!', 'female', '01/01/1999', 200, 200, 'light', 'maintain');
-    if(!user) throw new Error("Error running user creation in seedBlogs.js: " + error.message);
+    let user;
+    try {
+            user = await addUser('Jane', 'Doe', 'janedoe@gmail.com', 'JaneDoe1!', 'female', '01/01/1999', 200, 200, 'light', 'maintain');
+    } catch (error) {
+            if(!user) throw new Error("Error running user creation in seedBlogs.js: " + error.message);
+    }
 
     await blogsCollection.insertMany([
         {

@@ -1,0 +1,2 @@
+
+//displays individual blog pages
