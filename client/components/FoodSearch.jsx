@@ -15,15 +15,12 @@ const SEARCH_FOODS = gql`
             foods {
                 _id
             name
-            serving_size
-            serving_unit
             calories
             protein
             carbs
             fat 
             fiber 
-            is_public 
-            created_at
+            
             }
             total
             page 
@@ -59,28 +56,34 @@ export default function FoodSearch() {
     
     const [searchFoods, { loading, error, data }] = useLazyQuery(SEARCH_FOODS);
 
-    const buildVariables = (pageNum) => ({
-    filters: {
-        name: name || null,
-        minCalories: filters.minCalories ? parseFloat(filters.minCalories) : null,
-        maxCalories: filters.maxCalories ? parseFloat(filters.maxCalories) : null,
-        minProtein: filters.minProtein ? parseFloat(filters.minProtein) : null,
-        maxProtein: filters.maxProtein ? parseFloat(filters.maxProtein) : null,
-        minCarbs: filters.minCarbs ? parseFloat(filters.minCarbs) : null,
-        maxCarbs: filters.maxCarbs ? parseFloat(filters.maxCarbs) : null,
-        minFat: filters.minFat ? parseFloat(filters.minFat) : null,
-        maxFat: filters.maxFat ? parseFloat(filters.maxFat) : null,
-        minFiber: filters.minFiber ? parseFloat(filters.minFiber) : null,
-        maxFiber: filters.maxFiber ? parseFloat(filters.maxFiber) : null
-    },
-    page: pageNum,
-    limit: 10
-    });
+    const buildVariables = (pageNum) => {
+    const builtFilters = {};
+    
+    if (name) builtFilters.name = name;
+    if (filters.minCalories) builtFilters.minCalories = parseFloat(filters.minCalories);
+    if (filters.maxCalories) builtFilters.maxCalories = parseFloat(filters.maxCalories);
+    if (filters.minProtein) builtFilters.minProtein = parseFloat(filters.minProtein);
+    if (filters.maxProtein) builtFilters.maxProtein = parseFloat(filters.maxProtein);
+    if (filters.minCarbs) builtFilters.minCarbs = parseFloat(filters.minCarbs);
+    if (filters.maxCarbs) builtFilters.maxCarbs = parseFloat(filters.maxCarbs);
+    if (filters.minFat) builtFilters.minFat = parseFloat(filters.minFat);
+    if (filters.maxFat) builtFilters.maxFat = parseFloat(filters.maxFat);
+    if (filters.minFiber) builtFilters.minFiber = parseFloat(filters.minFiber);
+    if (filters.maxFiber) builtFilters.maxFiber = parseFloat(filters.maxFiber);
+
+    return {
+        filters: builtFilters,
+        page: pageNum,
+        limit: 10
+    };
+};
 
 
     const handleSearch = () => {
-        setPage(1);
-        searchFoods({ variables: buildVariables(1) });
+        const vars = buildVariables(1);
+    console.log('Sending variables:', vars);
+    setPage(1);
+    searchFoods({ variables: vars });
     };
 
     useEffect(() => {
@@ -89,7 +92,7 @@ export default function FoodSearch() {
         }
     }, [page]);
 
-   
+   console.log('Response data:', data);
 
     return (
         <div>
