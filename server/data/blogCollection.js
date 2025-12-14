@@ -2,7 +2,7 @@
 import {ObjectId} from 'mongodb';
 import { blogs } from '../config/mongoCollections.js';
 import { users } from '../config/mongoCollections.js';
-import * as helpers from '../helpers/serverHelpers.js'
+import helpers from '../helpers/serverHelpers.js'
 
 export const getAllBlogs = async () => {
     const blogsCollection = await blogs();
@@ -27,7 +27,7 @@ export const getBlogById = async (id) => {
         throw new Error (e);
     }
     const blogsCollection = await blogs();
-    const blog = await blogsCollection.find({_id: new ObjectId(id)});
+    const blog = await blogsCollection.findOne({_id: new ObjectId(id)});
 
     if(!blog){
         throw new Error ('Blog Post Not Found');

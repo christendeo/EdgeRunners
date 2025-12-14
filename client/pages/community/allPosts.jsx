@@ -12,7 +12,7 @@ export default function AllPosts() {
         <div>
             <h1>Community Posts</h1>
             {posts.map((post) => {
-                return(<Link href={`community/${post._id}`}>{post.title}</Link>);
+                return(<Link href={`/community/${post._id}`}>{post.title}</Link>);
             })}
         </div>
         ); 
