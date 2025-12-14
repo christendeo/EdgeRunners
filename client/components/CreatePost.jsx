@@ -55,7 +55,6 @@ export default function CreatePost (props) {
                 <div className='form-group'>
                     <label>
                         Post Type:
-                        <br />
                         <select id='postType'>
                             <option key='progress' value='PROGRESS'>Progress Update</option>
                             <option key='review' value='REVIEW'>Review</option>
