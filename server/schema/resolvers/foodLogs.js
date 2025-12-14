@@ -2,7 +2,7 @@ import {GraphQLError} from 'graphql';
 import * as foodLogs from '../../data/foodLogCollection.js';
 import { getCache, setCache, deleteCache, } from '../../config/redisConnection.js';
 
-const TEST_USER_ID = "693795fa9dc06d59f69c8b46"; //testing without GraphQL context auth system 
+const TEST_USER_ID = "693e185148537db1fa2c23e9"; //testing without GraphQL context auth system 
 
 export const resolvers = {
     Query: {
