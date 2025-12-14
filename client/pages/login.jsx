@@ -1,8 +1,12 @@
 // User login page
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import {gql} from "@apollo/client";
 import {useMutation} from "@apollo/client/react";
 import {useRouter} from "next/router";
+import Link from "next/link";
+
+// Utilize userAuthHelpers
+import {AuthContext} from "../lib/userAuthContext";
 
 // Login user using authentication. Show all fields
 const LOGIN_USER = gql`
@@ -23,10 +27,11 @@ const LOGIN_USER = gql`
     }
 `;
 
-
+// Login details
 const LoginPage = () => {
 
     const router = useRouter();
+    const userAuth = useContext(AuthContext);
 
     const [userEmailAddress, setEmail] = useState("");
     const [userPassword, setPassword] = useState("");
@@ -50,14 +55,11 @@ const LoginPage = () => {
             // If user logs in successfully or not
             if (data && data.loginUser) {
                 const userData = data.loginUser;
-                localStorage.setItem("fuelme_user_id", userData._id);
-                localStorage.setItem("fuelme_user_name", userData.first_name);
 
-                // Store full user for the dashboard
-                localStorage.setItem("fuelmeUser", JSON.stringify(userData));
-
+                userAuth.login(userData);
                 router.push("/dashboard");
             }
+
         } catch (e) {
 
             // Login failed
@@ -102,6 +104,12 @@ const LoginPage = () => {
                 <button type="submit" disabled={loading}>
                     {loading ? "Logging in..." : "Log In"}
                 </button>
+
+                {/*Forget password option*/}
+                <div>
+                    <Link href="/forgot-password">Forgot Password?</Link>
+                </div>
+
             </form>
         </div>
     );

@@ -1,4 +1,4 @@
-import FoodSearch from '../../src/components/FoodSearch';
+import FoodSearch from '../../components/FoodSearch';
 
 export default function FoodsPage() {
     return (

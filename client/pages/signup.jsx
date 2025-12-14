@@ -1,8 +1,9 @@
 // User account creation
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import {gql} from "@apollo/client";
 import {useMutation} from "@apollo/client/react";
 import {useRouter} from "next/router";
+import {AuthContext} from "../lib/userAuthContext";
 
 // Create user using user mutations
 const ADD_USER = gql`
@@ -34,6 +35,12 @@ const ADD_USER = gql`
             first_name
             last_name
             email
+            sex
+            date_of_birth
+            height
+            weight
+            activity_level
+            diet_goal
             target_calories
         }
     }
@@ -41,6 +48,7 @@ const ADD_USER = gql`
 
 const SignupPage = () => {
 
+    const userAuth = useContext(AuthContext);
     const [formData, setFormData] = useState({
         first_name: "",
         last_name: "",
@@ -104,9 +112,10 @@ const SignupPage = () => {
 
             // If successful, redirect to login
             if (data && data.addUser) {
-                setSuccessMessage("Yay! Your account has been created :D");
-                router.push("/login");
+                userAuth.login(data.addUser);
+                router.push("/dashboard");
             }
+
         } catch (e) {
 
             // Signup failed
