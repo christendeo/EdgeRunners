@@ -97,13 +97,13 @@ export const getUserById = async (userId) => {
     );
 
     if (!currentUser) {
+
         throw new Error ("Oh no! There is no user with that ID :(");
     }
 
     currentUser._id = currentUser._id.toString();
     return currentUser;
 };
-
 // Edit user profile (partial update)
 export const editUser = async (userId, updatedUser) => {
 
