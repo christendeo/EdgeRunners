@@ -4,7 +4,7 @@ import {redirect} from 'next/navigation';
 import ReactModal from 'react-modal';
 import queries from '../queries/blogQueries.js';
 
-ReactModal.setAppElement('#root');
+//ReactModal.setAppElement('#__next');
 const customStyles = {
   content: {
     top: '50%',

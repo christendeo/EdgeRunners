@@ -1,25 +1,28 @@
 import {useQuery} from '@apollo/client/react';
-import queries from '../queries/blogQueries.js';
-import DeletePost from '@/components/DeletePost.jsx';
+import Link from 'next/link';
+import queries from '@/queries/blogQueries.js';
+
 //displays all blog posts in a user's feed
-export default function AllPosts(props) {
-    const posts = props.getAllBlogs;
-console.log(posts);
-    return (
+export default function AllPosts() {
+    const {loading, error, data} = useQuery(queries.GET_BLOGS);
+
+    if (data){
+        const posts = data.blogs;
+       return (
         <div>
-            <h1>All Posts</h1>
+            <h1>Community Posts</h1>
             {posts.map((post) => {
-                return (
-                    <p>{post.title}</p>
-                );
+                return(<Link href={`community/${post._id}`}>{post.title}</Link>);
             })}
         </div>
-    );
+        ); 
+    }
+    else if (loading) {
+        return (<div>Loading...</div>);
+    }
+    else if (error) {
+         return (<div>{error.message}</div>);
+    }
+
 }
 
-export async function getServerSideProps(context) {
-    const {loading, error, data} = useQuery(queries.GET_BLOGS, {fetchPolicy: 'cache-and-network'});
-    if(data){
-        return {props: data.getAllBlogs};
-    }
-}
