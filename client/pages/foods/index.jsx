@@ -1,11 +1,13 @@
 import FoodSearch from '../../components/FoodSearch';
+import CreateFood from '../../components/CreateFood.jsx';
 
 export default function FoodsPage() {
     return (
         <div>
             <h1>Food Search</h1>
             <FoodSearch />
-            <p>Search and filter foods here</p>
+            <CreateFood />
+            <p>Search and filter foods here, or add your own!</p>
         </div>
     );
 }
