@@ -45,7 +45,7 @@ const transformFood = (usdaFood) => {
     };
 };
 
-const seedFoods = async () => {
+export const seedFoods = async () => {
     try {
         await createIndex();
 

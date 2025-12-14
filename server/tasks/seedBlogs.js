@@ -1,11 +1,10 @@
-import dbConnection from '../config/mongoConnection.js';
+import {dbConnection} from '../config/mongoConnection.js';
 import {blogs} from '../config/mongoCollections.js';
 import { addUser } from '../data/userCollection.js';
 
 
 export const seedBlogs = async () => {
     const db = await dbConnection();
-    const usersCollection = await users();
     const blogsCollection = await blogs();
 
     //add a user
