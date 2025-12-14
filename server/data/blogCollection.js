@@ -7,9 +7,16 @@ import * as helpers from '../helpers/serverHelpers.js'
 export const getAllBlogs = async () => {
     const blogsCollection = await blogs();
     const blogList = await blogsCollection.find({}).toArray();
+
     if(!blogList){
         throw new Error ("Blogs could not be found");
     }
+
+    blogList.map((blog) => {
+        blog._id = blog._id.toString();
+        return blog;
+    });
+
     return blogList;
 }
 
@@ -21,9 +28,13 @@ export const getBlogById = async (id) => {
     }
     const blogsCollection = await blogs();
     const blog = await blogsCollection.find({_id: new ObjectId(id)});
+
     if(!blog){
         throw new Error ('Blog Post Not Found');
     }
+
+    blog._id = blog._id.toString();
+
     return blog;
 }
 
@@ -35,9 +46,16 @@ export const getBlogsByUserId = async (userId) => {
     }
     const blogsCollection = await blogs();
     const userBlogs = await blogsCollection.find({user_id: new ObjectId(userId)}).toArray();
+
     if(!userBlogs){
         throw new Error("posts could not be found");
     }
+
+    userBlogs.map((blog) => {
+        blog._id = blog._id.toString();
+        return blog;
+    });
+
     return userBlogs;
 }
 
@@ -75,7 +93,10 @@ export const createBlog = async (userId, title, content, postType) => {
         throw new Error ('Could not add new blog post');
     }
 
-    return await blogsCollection.findOne({_id: blog.insertedId});
+    const getBlog = await blogsCollection.findOne({_id: blog.insertedId});
+    getBlog._id = getBlog._id.toString();
+
+    return getBlog;
 }
 
 //takes in the objectID of the blog post and an object updateInfo containing any fields that may be updated
@@ -119,6 +140,7 @@ export const updateBlog = async (id, userId, updateInfo) => {
 
     await blogsCollection.updateOne({_id: new ObjectId(id)}, {"$set": blog});
     const update = await blogsCollection.findOne({_id: new ObjectId(id)});
+    update._id = update._id.toString();
 
     return update;
 }
@@ -140,5 +162,8 @@ export const deleteBlog = async (id, userId) => {
     if(!blog){
         throw new Error (`Could not delete blog post`);
     }
+
+    blog._id = blog._id.toString();
+    
     return blog;
 }

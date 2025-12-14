@@ -7,7 +7,8 @@
   "type": "module",
   "main": "node app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "seed": "node ./tasks/index.js"
   },
   "dependencies": {
     "@apollo/server": "^5.1.0",

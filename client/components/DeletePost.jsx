@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {useMutation} from '@apollo/client/react';
-import {useRouter} from 'next/router'
+import {redirect} from 'next/navigation';
 import ReactModal from 'react-modal';
 import queries from '../queries/blogQueries.js';
 
@@ -21,13 +21,21 @@ const customStyles = {
 
 //component for deleting blog posts with react modal
 export default function DeletePost(props){
-  const router = useRouter();
-
   const [showDeleteModal, setShowDeleteModal] = useState(props.isOpen);
   const [blog, setBlog] = useState(props.blog);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const [removeBlog] = useMutation(queries.DELETE_BLOG, {
-    update(cache) {
+  const [removeBlog, {error}] = useMutation(queries.DELETE_BLOG, {
+    onCompleted: () => { //fires upon successful completion of the mutation
+      setShowDeleteModal(false);
+      alert('Your post has been deleted');
+      props.handleClose();
+      redirect('community/allposts');
+    },
+    onError: () => { //fires when an error is returned
+      setErrorMessage(error.message);
+    },
+    update(cache) { //update cache upon successful mutation
       cache.modify({
         fields: {
           blogs(existingBlogs, {readField}) {
@@ -46,11 +54,6 @@ export default function DeletePost(props){
     props.handleClose();
   };
 
-  //redirects user to an existing page after deleting their post
-  const handleClick = () => {
-    router.push('community/allposts');
-  }
-
   return (
     <div>
       <ReactModal
@@ -60,6 +63,9 @@ export default function DeletePost(props){
         style={customStyles}
       >
         <p>Are you sure you want to delete this post?</p>
+        {error && (
+          <p>An error has occured. {errorMessage}</p>
+        )}
         <form
           className='form'
           id='delete-blog-post'
@@ -67,13 +73,10 @@ export default function DeletePost(props){
             e.preventDefault();
             removeBlog({
               variables: {
-                "_id": blog._id
+                "_id": blog._id,
+                "user_id": props.user_id
               }
             });
-            setShowDeleteModal(false);
-            alert('Your post has been deleted');
-            props.handleClose();
-            handleClick();
           }}
         >
           <button type='submit'>Delete Post</button>
@@ -82,5 +85,4 @@ export default function DeletePost(props){
       </ReactModal>
     </div>
   );
-
 }
