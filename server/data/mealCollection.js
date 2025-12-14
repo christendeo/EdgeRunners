@@ -38,16 +38,10 @@ const checkFoodArray = async (foodArray) => {
 
 	const foodCollection = await foods();
 	for (const foodItem of foodArray) {
-		let foodId;
-		try {
-			foodId = helpers.checkId(foodItem.food_id, 'Food ID');
-		} catch (e) {
-			throw new Error(e);
-		}
-
+		const foodId = helpers.checkId(foodItem.food_id, 'Food ID');
 		const food = await foodCollection.findOne({ _id: new ObjectId(foodId) });
 		if (!food) {
-			throw new Error(`Food ${foodId} does not exist`);
+			throw new Error(`Food ${foodId} not found`);
 		}
 
 		// TODO: Should this be integer? Or should we allow like half a food? This needs more validation
@@ -72,14 +66,10 @@ export const getAllPublicMeals = async () => {
 
 	return allPublicMeals;
 };
-
+ 
 /** Returns a meal given its meal ID. */
 export const getMealById = async (mealId) => {
-	try {
-		mealId = helpers.checkId(mealId, "Meal ID");
-	} catch (e) {
-		throw new Error(e);
-	}
+	mealId = helpers.checkId(mealId, "Meal ID");
 
 	const mealCollection = await meals();
 	const meal = await mealCollection.findOne({ _id: new ObjectId(mealId) });
@@ -93,26 +83,19 @@ export const getMealById = async (mealId) => {
 
 /** Returns all meals made by a user given their ID. */
 export const getMealsByUser = async (userId) => {
-	try {
-		userId = helpers.checkId(userId, "User ID");
-	} catch (e) {
-		throw new Error(e);
-	}
+	userId = helpers.checkId(userId, "User ID");
 
 	const mealCollection = await meals();
 	const userMeals = await mealCollection.find({ user_id: new ObjectId(userId) }).sort({ created_at: -1 }).toArray();
+
 	return userMeals;
 };
 
 /** Add a meal to a user given its name, array of foods, and public setting. */
 export const addMeal = async (userId, name, foodArray, is_public = false) => {
 	// Validate meal inputs
-	try {
-		userId = helpers.checkId(userId, 'User ID');
-		name = helpers.checkString(name, 'Meal Name');
-	} catch (e) {
-		throw new Error(e);
-	}
+	userId = helpers.checkId(userId, 'User ID');
+	name = helpers.checkString(name, 'Meal Name');
 
 	await checkFoodArray(foodArray);
 
@@ -144,11 +127,7 @@ export const addMeal = async (userId, name, foodArray, is_public = false) => {
 
 export const updateMeal = async (mealId, updateData) => {
 	// Validate meal
-	try {
-		mealId = helpers.checkId(mealId, "Meal ID");
-	} catch (e) {
-		throw new Error(e);
-	}
+	mealId = helpers.checkId(mealId, "Meal ID");
 
 	const mealCollection = await meals();
 	const mealObjectId = new ObjectId(mealId);
@@ -162,11 +141,7 @@ export const updateMeal = async (mealId, updateData) => {
 	const updatedMeal = {};
 
 	if (updateData.name !== undefined) {
-		try {
-			updatedMeal.name = helpers.checkString(updateData.name, "Meal Name");
-		} catch (e) {
-			throw new Error(e);
-		}
+		updatedMeal.name = helpers.checkString(updateData.name, "Meal Name");
 	}
 
 	if (updateData.is_public !== undefined) {
@@ -175,6 +150,7 @@ export const updateMeal = async (mealId, updateData) => {
 
 	if (updateData.foods !== undefined) {
 		await checkFoodArray(updateData.foods);
+		const totals = await calculateMealTotals(updateData.foods);
 
 		updatedMeal.foods = updateData.foods.map(item => ({
 			food_id: new ObjectId(item.food_id),
@@ -182,7 +158,6 @@ export const updateMeal = async (mealId, updateData) => {
 			serving_unit: item.serving_unit || "serving"
 		}));
 
-		const totals = await calculateMealTotals(updatedMeal.foods);
 		Object.assign(updatedMeal, totals);
 	}
 
@@ -204,11 +179,7 @@ export const updateMeal = async (mealId, updateData) => {
 };
 
 export const deleteMeal = async (mealId) => {
-	try {
-		mealId = helpers.checkId(mealId, "Meal ID");
-	} catch (e) {
-		throw new Error(e);
-	}
+	mealId = helpers.checkId(mealId, "Meal ID");
 
 	const mealCollection = await meals();
 	const mealObjectId = new ObjectId(mealId);
