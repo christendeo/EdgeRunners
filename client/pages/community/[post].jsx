@@ -1,4 +1,3 @@
-
 //displays individual blog pages
 export default function Post() {
     return (
