@@ -13,10 +13,17 @@ export default function Layout( {children} ) {
     const currentUser = userAuth.user;
     const authLoaded = userAuth.authLoaded;
 
+    // Dynamically make FuelMe go to dashboard when logged in
+    let homeLink = "/";
+
+    if (authLoaded && currentUser) {
+        homeLink = "/dashboard";
+    }
+
     return (
         <div>
             <header>
-                <Link href="/">FuelMe</Link>
+                <Link href={homeLink}>FuelMe</Link>
 
                 {/*Navigation bar, can be reused across all our pages*/}
                 <div>
@@ -41,6 +48,7 @@ export default function Layout( {children} ) {
                     {authLoaded && currentUser && (
                         <div>
                             <Link href="/dashboard">Dashboard</Link>{" "}
+                            <Link href="/profile">Profile</Link>{" "}
                             <button
                                 type="button"
                                 onClick={() => {

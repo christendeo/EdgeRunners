@@ -5,7 +5,7 @@ import {
     getAllUsers,
     editUser,
     loginUser as loginUserData,
-    resetPassword as resetPasswordData
+    changePassword as resetPasswordData
 } from "../../data/userCollection.js";
 import redis from "../../config/redisConnection.js"
 
@@ -184,14 +184,15 @@ const userResolvers = {
             };
         },
 
-        // Allow user to reset password
-        resetPassword: async (_, args) => {
-            const didReset = await resetPasswordData(
-                args.email,
+        // Allow user to change password
+        changePassword: async (_, args) => {
+            const updatedUser = await resetPasswordData(
+                args._id,
+                args.oldPassword,
                 args.newPassword
             );
 
-            return didReset;
+            return updatedUser;
         }
     }
 };
