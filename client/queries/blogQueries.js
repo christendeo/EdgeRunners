@@ -3,7 +3,7 @@ import {gql} from '@apollo/client';
 
 const GET_BLOGS = gql`
     query {
-        getAllBlogs {
+        blogs {
             _id
             user_id
             title

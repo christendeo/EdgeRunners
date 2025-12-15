@@ -73,5 +73,3 @@ export const seedFoods = async () => {
         await client.close();
     }
 };
-
-seedFoods();

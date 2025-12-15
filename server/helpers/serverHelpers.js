@@ -62,7 +62,6 @@ const exportedMethods = {
     },
 
     checkString(strVal, varName) {
-
         // Check if a string is provided
         if (!strVal) {
             throw new Error (`Error: You must supply a ${varName}!`);

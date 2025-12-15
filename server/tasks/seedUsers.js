@@ -96,10 +96,3 @@ export async function userSeed() {
         console.log("\nFinished seeding users collection! :)");
     }
 }
-
-// Run seed directly with node seedUsers.js
-try {
-    await userSeed();
-} catch (e) {
-    console.log(e);
-}

@@ -1,9 +1,10 @@
-import {useState} from 'react';
+import {useState, useContext} from 'react';
 import {useMutation} from '@apollo/client/react';
 import ReactModal from 'react-modal';
 import queries from '../queries/blogQueries.js';
+import {AuthContext} from "../lib/userAuthContext";
 
-ReactModal.setAppElement('#root');
+ReactModal.setAppElement('#__next');
 const customStyles = {
   content: {
     top: '50%',
@@ -22,10 +23,27 @@ const customStyles = {
 export default function EditPost(props){
     const [showEditModal, setShowEditModal] = useState(props.isOpen);
     const [blog, setBlog] = useState(props.blog);
+    const [errorMessage, setErrorMessage] = useState(null);
 
-    const [editBlog] = useMutation(queries.UPDATE_BLOG);
+    const userAuth = useContext(AuthContext);
 
-    let title, content, postType;
+    const [formData, setFormData] = useState({
+        title: blog.title,
+        content: blog.content,
+        postType: blog.post_type
+    });
+
+    const [editBlog] = useMutation(queries.UPDATE_BLOG, {
+        onCompleted: () => {
+            setShowEditModal(false);
+            alert('Your blog post has been updated');
+            props.handleClose();
+        },
+        onError: (error) => {
+            setErrorMessage(error.message);
+        }
+    });
+
 
     const handleCloseEditModal = () => {
         setShowEditModal(false);
@@ -33,25 +51,25 @@ export default function EditPost(props){
         props.handleClose();
     };
 
+    const handleChange = (e) => {
+        const {name, value} = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        editBlog({
-            variables: {
-                '_id': blog._id,
-                'user_id': blog.user_id,
-                'title': title.value,
-                'content': content.value,
-                'post_type': postType.value
-            }
-        });
-
-        title.value = '';
-        content.value = '';
-        postType.value = '1';
-
-        setShowEditModal(false);
-        alert('Your blog post has been updated');
-        props.handleClose();
+            editBlog({
+                variables: {
+                    _id: blog._id,
+                    user_id: userAuth.user._id,
+                    title: formData.title,
+                    content: formData.content,
+                    post_type: formData.postType
+                }
+            });
     };
 
     return (
@@ -67,16 +85,19 @@ export default function EditPost(props){
                     id='edit-blog-post'
                     onSubmit={handleSubmit}
                 >
+                    {errorMessage && (
+                        <p>An error has occured. {errorMessage}</p>
+                    )}
                     <div className='form-group'>
                         <label>
                             Title:
                             <br />
-                            <input 
-                                ref={(node) => {
-                                    title = node;
-                                }}
-                                defaultValue={blog.title}
-                                autoFocus={true}
+                            <input
+                                type='text' 
+                                name='title'
+                                value={formData.title}
+                                onChange={handleChange} 
+                                required 
                             />
                         </label>
                     </div>
@@ -84,30 +105,15 @@ export default function EditPost(props){
                         <label>
                             Type your post here:
                             <br />
-                            <input 
-                                ref={(node) => {
-                                    content = node;
-                                }}
-                                defaultValue={blog.content}
+                            <input
+                                type="text" 
+                                name='content'
+                                value={formData.content}
+                                onChange={handleChange}
+                                required 
                             />
                         </label>
                     </div>
-                    <div className='form-group'>
-                        <label>
-                            Post Type:
-                            <select 
-                                id='postType'
-                                defaultValue={blog.post_type}
-                                ref={(node) => {
-                                    postType = node;
-                                }}
-                            >
-                                <option key='progress' value='PROGRESS'>Progress Update</option>
-                                <option key='review' value='REVIEW'>Review</option>
-                                <option key='comment' value='COMMENT'>Comment</option>
-                            </select>
-                        </label>
-                </div>
                 <button type='submit'>Update Post</button>
                 </form>
                 <button onClick={handleCloseEditModal}>Cancel</button> 
