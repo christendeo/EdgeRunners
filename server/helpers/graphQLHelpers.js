@@ -7,7 +7,7 @@ export const throwGraphQLError = (message, code) => {
 	});
 };
 
-const validateString = (str, fieldName, minLength = 2, maxLength = 100) => {
+export const validateString = (str, fieldName, minLength = 2, maxLength = 100) => {
     if (!str || typeof str !== 'string') {
 		throwGraphQLError(`${fieldName} must be a string`, 'BAD_USER_INPUT');
 	}
@@ -34,7 +34,7 @@ const validateString = (str, fieldName, minLength = 2, maxLength = 100) => {
     return str;
 };
 
-const validateEmail = (email) => {
+export const validateEmail = (email) => {
     if (!email || typeof email !== 'string') {
         throwGraphQLError('Email must be a non-empty string', 'BAD_USER_INPUT');
     }
@@ -52,7 +52,7 @@ const validateEmail = (email) => {
     return trimmed;
 };
 
-const validateDate = (date, fieldName) => {
+export const validateDate = (date, fieldName) => {
     if (!date || typeof date !== 'string' || date.trim().length === 0) {
 		throwGraphQLError(`${fieldName} must be a non-empty string`, 'BAD_USER_INPUT');
     }
@@ -71,7 +71,7 @@ const validateDate = (date, fieldName) => {
 	return date.trim(); 
 };
 
-const validateNumber = (value, fieldName, min = 0, max = null) => {
+export const validateNumber = (value, fieldName, min = 0, max = null) => {
     if (typeof value !== 'number' || isNaN(value)) {
         throwGraphQLError(`${fieldName} must be a valid number`, 'BAD_USER_INPUT');
     }

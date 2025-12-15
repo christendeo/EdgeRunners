@@ -5,6 +5,10 @@ import { ObjectId } from 'mongodb';
 // Validation will be in routes
 // What happens if a meal's total calories, protein, etc. change after being stored in the database?
 
+const round = (num) => {
+	return parseFloat(num.toFixed(2));
+};
+
 /** Get total calories, protein, carbs, fat, and fiber for all food in an array. */
 const calculateMealTotals = async (foodsArray) => {
 	let total_calories = 0;
@@ -29,7 +33,13 @@ const calculateMealTotals = async (foodsArray) => {
 		total_fiber += (food.fiber || 0) * multiplier;
 	}
 
-	return { total_calories, total_protein, total_carbs, total_fat, total_fiber };
+	return {
+		total_calories: round(total_calories),
+		total_protein: round(total_protein),
+		total_carbs: round(total_carbs),
+		total_fat: round(total_fat),
+		total_fiber: round(total_fiber)
+	};
 };
 
 const checkFoodArray = async (foodArray) => {
