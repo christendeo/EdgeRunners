@@ -56,10 +56,11 @@ extend type Mutation {
         password: String!
     ): User
 
-    resetPassword(
-        email: String!,
+    changePassword(
+        _id: String!,
+        oldPassword: String!,
         newPassword: String!
-    ): Boolean
+    ): User
 }
 `;
 
