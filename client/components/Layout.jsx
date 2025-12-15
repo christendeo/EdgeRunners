@@ -20,6 +20,13 @@ export default function Layout( {children} ) {
     const currentUser = userAuth.user;
     const authLoaded = userAuth.authLoaded;
 
+    // Dynamically make FuelMe go to dashboard when logged in
+    let homeLink = "/";
+
+    if (authLoaded && currentUser) {
+        homeLink = "/dashboard";
+    }
+
     return (
         <>
         <div className={NimbusFont.className}>

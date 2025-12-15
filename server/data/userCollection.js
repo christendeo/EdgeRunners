@@ -33,6 +33,18 @@ export const addUser = async (
     userActivityLevel = helpers.checkActivityLevel(userActivityLevel, "Activity Level");
     userDietGoal = helpers.checkDietGoal(userDietGoal, "Diet Goal");
 
+    // Check for unique email address (if account exists)
+    userEmail = userEmail.toLowerCase();
+    const userCollection = await users();
+
+    const existingUser = await userCollection.findOne({
+        email: userEmail
+    });
+
+    if (existingUser) {
+        throw new Error("Oh no! An account with that email already exists :(");
+    }
+
     // Build profile for calculation
     const profileForCalculation = {
         sex: userSex,
@@ -48,8 +60,6 @@ export const addUser = async (
     if (autoTargetCalories === null) {
         throw new Error ("Oh no! Not enough information to compute target calories :(");
     }
-
-    const userCollection = await users();
 
     // For password hashing
     let saltRounds = 10;
@@ -134,7 +144,21 @@ export const editUser = async (userId, updatedUser) => {
     }
 
     if (updatedUser.email !== undefined) {
-        updatedUserData.email = helpers.checkEmailAddress(updatedUser.email, "Email");
+
+        // Check for duplicate email address
+        let newEmail = helpers.checkEmailAddress(updatedUser.email, "Email");
+        newEmail = newEmail.toLowerCase();
+
+        const emailTaken = await userCollection.findOne({
+            email: newEmail,
+            _id: { $ne: new ObjectId(userId) }
+        });
+
+        if (emailTaken) {
+            throw new Error("Oh no! That email is already being used by another user :(");
+        }
+
+        updatedUserData.email = newEmail;
     }
 
     // For changing passwords
@@ -289,53 +313,69 @@ export const loginUser = async (email, password) => {
     return existingUser;
 };
 
-// Reset password by email
-export const resetPassword = async (email, newPassword) => {
+// Change password when user is logged in
+export const changePassword = async (
+    userId,
+    oldPassword,
+    newPassword
+) => {
 
     // Validation checks
-    email = helpers.checkEmailAddress(email, "Email");
+    userId = helpers.checkId(userId, "User ID");
+    oldPassword = helpers.checkPassword(oldPassword, "Old Password");
     newPassword = helpers.checkPassword(newPassword, "New Password");
+
+    if (oldPassword === newPassword) {
+        throw new Error("Oh no! New password must be different from old password :(");
+    }
 
     const userCollection = await users();
 
-    // Find the user by email
-    const existingUser = await userCollection.findOne(
-        { email: email }
+    const currentUser = await userCollection.findOne(
+        { _id: new ObjectId(userId) }
     );
 
-    if (!existingUser) {
-        throw new Error("Oh no! There is no account with that email :(");
+    if (!currentUser) {
+        throw new Error("Oh no! User does not exist :(");
     }
 
-    // Prevent using the same password again
-    const isSameAsOld = await bcrypt.compare(newPassword, existingUser.password_hash);
+    // Compare old password
+    const passwordMatches = await bcrypt.compare(
+        oldPassword,
+        currentUser.password_hash
+    );
 
-    if (isSameAsOld) {
-        throw new Error("Oh no! New password must be different from your old password :(");
+    if (!passwordMatches) {
+        throw new Error("Oh no! Old password is incorrect :(");
     }
 
-    const saltRounds = 10;
-    const newHash = await bcrypt.hash(newPassword, saltRounds);
+    // Hash new password
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
 
-    // Use updateOne and check matchedCount / modifiedCount
-    const updateResult = await userCollection.updateOne(
-        { _id: existingUser._id },
+    const updatedInfo = await userCollection.findOneAndUpdate(
+        { _id: new ObjectId(userId) },
         {
             $set: {
-                password_hash: newHash,
+                password_hash: newPasswordHash,
                 updatedAt: new Date()
             }
-        }
+        },
+        { returnDocument: "after" }
     );
 
-    if (!updateResult.matchedCount || updateResult.matchedCount === 0) {
-        throw new Error("Oh no! Password could not be reset :(");
+    let updatedDoc = null;
+
+    if (updatedInfo && updatedInfo.value) {
+        updatedDoc = updatedInfo.value;
+    } else {
+        updatedDoc = updatedInfo;
     }
 
-    // It matched, but if modifiedCount is 0, it means the hash was the same
-    if (!updateResult.modifiedCount || updateResult.modifiedCount === 0) {
-        throw new Error("Oh no! Password could not be reset, please try a different password :(");
+    // If the password fails to update
+    if (!updatedDoc) {
+        throw new Error("Oh no! Password could not be updated :(");
     }
 
-    return true;
+    updatedDoc._id = updatedDoc._id.toString();
+    return updatedDoc;
 };
