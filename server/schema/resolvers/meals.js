@@ -6,7 +6,7 @@ const PUBLIC_MEALS_TTL = 600;
 const MEAL_TTL = 600;
 const USER_MEALS_TTL = 300;
 
-const TEST_USER_ID = "69404c934955870e005407ee"; // Same as food logs
+const TEST_USER_ID = "693e185148537db1fa2c23e9"; // Same as food logs
 
 export const resolvers = {
 	// Query results are cached and only fetched if needed
