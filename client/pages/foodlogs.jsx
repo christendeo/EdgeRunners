@@ -276,7 +276,7 @@ export default function FoodLogs() {
             {/* Add meal modal */}
             {isUpdatelogOpen && (
                 <AddFoodLog
-                    meals={mealsData?.getUserMeals || []}
+                    meals={mealsData?.getMealsByUser || []}
                     onClose={() => setIsUpdateLogOpen(false)}
                     refetch={refetch}
                 />
@@ -286,7 +286,7 @@ export default function FoodLogs() {
             {updatingLog && (
                 <UpdateFoodLog
                     log={updatingLog}
-                    meals={mealsData?.getUserMeals || []}
+                    meals={mealsData?.getMealsByUser || []}
                     onClose={() => setupdatingLog(null)}
                     refetch={refetch}
                 />
