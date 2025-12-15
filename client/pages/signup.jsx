@@ -139,6 +139,7 @@ const SignupPage = () => {
                     <input
                         type="text"
                         name="first_name"
+                        placeholder="Enter First Name"
                         value={formData.first_name}
                         onChange={handleChange}
                         required
@@ -150,6 +151,7 @@ const SignupPage = () => {
                     <input
                         type="text"
                         name="last_name"
+                        placeholder="Enter Last Name"
                         value={formData.last_name}
                         onChange={handleChange}
                         required
@@ -157,10 +159,11 @@ const SignupPage = () => {
                 </div>
 
                 <div className="form-row">
-                    <label>Email</label>
+                    <label>Email Address</label>
                     <input
                         type="email"
                         name="email"
+                        placeholder="Enter Email Address"
                         value={formData.email}
                         onChange={handleChange}
                         required
@@ -172,6 +175,7 @@ const SignupPage = () => {
                     <input
                         type="password"
                         name="password"
+                        placeholder="Enter Password"
                         value={formData.password}
                         onChange={handleChange}
                         required
@@ -195,7 +199,7 @@ const SignupPage = () => {
                     <input
                         type="text"
                         name="date_of_birth"
-                        placeholder="01/01/1995"
+                        placeholder="Enter DOB"
                         value={formData.date_of_birth}
                         onChange={handleChange}
                         required
@@ -208,6 +212,7 @@ const SignupPage = () => {
                         type="number"
                         step="0.1"
                         name="height"
+                        placeholder="Enter Height"
                         value={formData.height}
                         onChange={handleChange}
                         required
@@ -220,6 +225,7 @@ const SignupPage = () => {
                         type="number"
                         step="0.1"
                         name="weight"
+                        placeholder="Enter Weight"
                         value={formData.weight}
                         onChange={handleChange}
                         required
@@ -245,6 +251,7 @@ const SignupPage = () => {
                     <label>Goal</label>
                     <select
                         name="diet_goal"
+                        placeholder="Enter Goal"
                         value={formData.diet_goal}
                         onChange={handleChange}
                     >

@@ -1,4 +1,5 @@
 import * as foodData from '../../data/foodCollection.js';
+import * as userData from '../../data/userCollection.js';
 import { searchFoods } from '../../data/foodSearch.js'
 import {GraphQLError} from 'graphql';
 import { getCache, setCache, deleteCache, } from '../../config/redisConnection.js';
@@ -28,6 +29,21 @@ export const resolvers = {
             }
         await setCache(cacheKey, food);
         return food;
+        },
+        getFoodsByUser: async(_, args) => {
+            const cacheKey = `userFoods:${args._id}`;
+
+            const cached = await getCache(cacheKey);
+            if (cached) {
+                console.log('Cache hit for: ', cacheKey);
+                return cached;
+            }
+            console.log('Cahe miss for: ', cacheKey);
+
+            const userFoods = await foodData.getFoodsByUser(args._id);
+
+            await setCache(cacheKey, userFoods);
+            return userFoods;
         },
         foods: async () => {
              const cacheKey = 'allFoods';
@@ -112,6 +128,15 @@ export const resolvers = {
             return removedFood;
 
 
+        }
+    },
+
+    Food: {
+        added_by: async (parent) => {
+            if (!parent.added_by) return null;
+
+            const user = await userData.getUserById(parent.added_by);
+            return user;
         }
     }
 }

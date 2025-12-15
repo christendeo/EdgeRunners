@@ -7,11 +7,24 @@ import {startStandaloneServer} from '@apollo/server/standalone';
 import typeDefs from './schema/typeDefs/index.js';
 import resolvers from './schema/resolvers/index.js';
 import redisClient, {connectRedis} from "./config/redisConnection.js";
+import {users} from "./config/mongoCollections.js";
+
+// Create user indexes once at startup
+const ensureUserIndexes = async () => {
+    const userCollection = await users();
+    await userCollection.createIndex(
+        { email: 1 },
+        { unique: true }
+    );
+};
 
 async function start() {
 
     // Connect to Redis
     await connectRedis();
+
+    // Ensure user indexes (Mongo)
+    await ensureUserIndexes();
 
     let redisStatus = "Not Connected";
     if (redisClient && redisClient.isOpen) {

@@ -78,9 +78,10 @@ const LoginPage = () => {
 
             <form onSubmit={handleSubmit} className="form-card">
                 <div className="form-row">
-                    <label>Email</label>
+                    <label>Email Address</label>
                     <input
                         type="email"
+                        placeholder="Enter Email Address"
                         value={userEmailAddress}
                         onChange={(e) => {
                             setEmail(e.target.value);
@@ -93,6 +94,7 @@ const LoginPage = () => {
                     <label>Password</label>
                     <input
                         type="password"
+                        placeholder="Enter Password"
                         value={userPassword}
                         onChange={(e) => {
                             setPassword(e.target.value);
@@ -104,12 +106,6 @@ const LoginPage = () => {
                 <button type="submit" disabled={loading}>
                     {loading ? "Logging in..." : "Log In"}
                 </button>
-
-                {/*Forget password option*/}
-                <div>
-                    <Link href="/forgot-password">Forgot Password?</Link>
-                </div>
-
             </form>
         </div>
     );
