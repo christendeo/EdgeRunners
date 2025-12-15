@@ -2,8 +2,9 @@
 import {useContext, useEffect, useState, useRef} from "react";
 import {useRouter} from "next/router";
 import localFont from 'next/font/local';
-import {useQuery} from "@apollo/client/react";
-import FoodLogMenu from "../components/FoodLogMenu.jsx";
+import {useQuery, useMutation} from "@apollo/client/react";
+import AddFoodLog from "../components/AddFoodLog.jsx";
+import UpdateFoodLog from "../components/UpdateFoodLog.jsx";
 import {AuthContext} from "../lib/userAuthContext";
 
 const NimbusFont = localFont({ 
@@ -12,7 +13,9 @@ const NimbusFont = localFont({
 });
 
 import { 
-    GET_RANGED_FOOD_LOGS, 
+    GET_RANGED_FOOD_LOGS,
+    UPDATE_FOOD_LOG,
+    REMOVE_FOOD_LOG,
 } from "../queries/foodLogQueries";
 
 import { GET_USER_MEALS } from "../queries/mealQueries";
@@ -21,23 +24,12 @@ export default function FoodLogs() {
     const router = useRouter();
     const userAuth = useContext(AuthContext);
     const [isUpdatelogOpen, setIsUpdateLogOpen] = useState(false);
-    const [viewMode, setViewMode] = useState('week'); // 'day', 'week', 'month'
+    const [viewMode, setViewMode] = useState('week');
     const [showViewDropdown, setShowViewDropdown] = useState(false);
-    const [dateOffset, setDateOffset] = useState(0); // Track how many periods back/forward
+    const [dateOffset, setDateOffset] = useState(0);
+    const [updatingLog, setupdatingLog] = useState(null);
     
     const viewDropdownRef = useRef(null);
-    
-    // Close dropdowns when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (viewDropdownRef.current && !viewDropdownRef.current.contains(event.target)) {
-                setShowViewDropdown(false);
-            }
-        };
-        
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
     
     // Helper to convert YYYY-MM-DD to MM/DD/YYYY
     const formatDateForQuery = (dateString) => {
@@ -126,7 +118,8 @@ export default function FoodLogs() {
     }, [viewMode]);
     
     const { data: mealsData, loading: mealsLoading } = useQuery(GET_USER_MEALS);
-    
+    const [removeLog] = useMutation(REMOVE_FOOD_LOG);
+  
     const { data: logsData, loading: logsLoading, refetch } = useQuery(GET_RANGED_FOOD_LOGS, {
         variables: { startDate, endDate }
     });
@@ -137,17 +130,26 @@ export default function FoodLogs() {
         }
     }, [userAuth.authLoaded, userAuth.user, router]); 
 
+    const handleDeleteLog = async (logId) => {
+        try {
+            await removeLog({
+                variables: { logId }
+            });
+            // Refetch logs after deletion
+            refetch();
+        } catch (e) {
+            console.error("Error deleting log:", e);
+        }
+    };
+
     const currentUser = userAuth.user;
-    
-    console.log("User meals data:", mealsData);
-    console.log("Food logs data:", logsData);
     
     return (
         <>
             <div className="mx-4 mt-8">
                 {/* Header with title and add button */}
                 <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 -mb-3">
                         <h1 className={`text-4xl ${NimbusFont.className}`}>
                             {currentUser?.first_name ? currentUser.first_name + "'s" : ""} Logs
                         </h1>
@@ -225,7 +227,7 @@ export default function FoodLogs() {
                         className="cursor-pointer text-lg px-4 py-2 bg-gradient-to-b from-[#73AF6F] to-[#007E6E] text-white rounded-lg hover:opacity-90 transition-all"
                         onClick={() => setIsUpdateLogOpen(true)}
                     >
-                        Add Meal +
+                        Update Log +
                     </button>
                 </div>
 
@@ -247,6 +249,21 @@ export default function FoodLogs() {
                                     </div>
                                     <p className="mt-2 text-sm">Meals: {log.meals_logged?.length || 0}</p>
                                     {log.notes && <p className="mt-2 text-sm italic">{log.notes}</p>}
+                                    
+                                    <div className="mt-3 flex gap-2">
+                                        <button 
+                                            className="cursor-pointer bg-gradient-to-b from-[#73AF6F] to-[#007E6E] text-white rounded-lg px-3 py-1 hover:opacity-90 transition-all"
+                                            onClick={() => setupdatingLog(log)}
+                                        >
+                                            Update
+                                        </button>
+                                        <button 
+                                            className="cursor-pointer border border-red-500 text-red-500 rounded-lg px-3 py-1 hover:opacity-80 transition-all"
+                                            onClick={() => handleDeleteLog(log._id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -258,9 +275,19 @@ export default function FoodLogs() {
 
             {/* Add meal modal */}
             {isUpdatelogOpen && (
-                <FoodLogMenu
+                <AddFoodLog
                     meals={mealsData?.getUserMeals || []}
                     onClose={() => setIsUpdateLogOpen(false)}
+                    refetch={refetch}
+                />
+            )}
+
+            {/* Edit meal modal */}
+            {updatingLog && (
+                <UpdateFoodLog
+                    log={updatingLog}
+                    meals={mealsData?.getUserMeals || []}
+                    onClose={() => setupdatingLog(null)}
                     refetch={refetch}
                 />
             )}

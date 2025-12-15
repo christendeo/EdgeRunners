@@ -14,24 +14,14 @@ export const resolvers = {
             // }
 
             try {
-                const cacheKey = `foodLogs:${context.user ? context.user.id : TEST_USER_ID}:${startDate}:${endDate}`;
-                const cached = await getCache(cacheKey);
-                
-                if (cached) {
-                    console.log("Cache hit:", cacheKey);
-                    return cached;
-                } 
-                else {
+                //decided no caching for ranged queries - they change frequently with add/update/delete
                 const logs = await foodLogs.getRangedFoodlogs(
                     context.user ? context.user.id : TEST_USER_ID,
                     startDate,
                     endDate
                 );
 
-                await setCache(cacheKey, logs, 300);
-
                 return logs;
-                }
 
             } catch (e) {
                 throw new GraphQLError(e.message, {
@@ -127,10 +117,8 @@ export const resolvers = {
                     input.notes
                 );
 
-                //invalidate relevant caches
-                const dateKey = input.date.split('T')[0]; //extracts just the date portion (YYYY-MM-DD) from the full ISO timestamp.
+                //invalidate today's cache only (ranged queries no longer cached)
                 await deleteCache(`foodLog:${context.user ? context.user.id : TEST_USER_ID}:today`);
-                await deleteCache(`foodLogs:${context.user ? context.user.id : TEST_USER_ID}:*`); // Pattern delete if supported
 
                 return result;
             } catch (e) {
@@ -156,7 +144,6 @@ export const resolvers = {
 
                 await deleteCache(`foodLog:${logId}`);
                 await deleteCache(`foodLog:${context.user ? context.user.id : TEST_USER_ID}:today`);
-                await deleteCache(`foodLogs:${context.user ? context.user.id : TEST_USER_ID}:*`);
 
                 return result;
             } catch (e) {
@@ -182,7 +169,6 @@ export const resolvers = {
                 //invalidate caches
                 await deleteCache(`foodLog:${logId}`);
                 await deleteCache(`foodLog:${context.user ? context.user.id : TEST_USER_ID}:today`);
-                await deleteCache(`foodLogs:${context.user ? context.user.id : TEST_USER_ID}:*`);
 
                 return result;
             } catch (e) {
