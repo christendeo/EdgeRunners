@@ -27,9 +27,23 @@ export default function EditPost(props){
 
     const userAuth = useContext(AuthContext);
 
-    const [editBlog] = useMutation(queries.UPDATE_BLOG);
+    const [formData, setFormData] = useState({
+        title: blog.title,
+        content: blog.content,
+        postType: blog.post_type
+    });
 
-    let title, content, postType;
+    const [editBlog] = useMutation(queries.UPDATE_BLOG, {
+        onCompleted: () => {
+            setShowEditModal(false);
+            alert('Your blog post has been updated');
+            props.handleClose();
+        },
+        onError: (error) => {
+            setErrorMessage(error.message);
+        }
+    });
+
 
     const handleCloseEditModal = () => {
         setShowEditModal(false);
@@ -37,29 +51,25 @@ export default function EditPost(props){
         props.handleClose();
     };
 
+    const handleChange = (e) => {
+        const {name, value} = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        try {
             editBlog({
                 variables: {
                     _id: blog._id,
                     user_id: userAuth.user._id,
-                    title: title.value,
-                    content: content.value,
-                    post_type: postType.value
+                    title: formData.title,
+                    content: formData.content,
+                    post_type: formData.postType
                 }
             });
-
-            title.value = '';
-            content.value = '';
-            postType.value = '1';
-
-            setShowEditModal(false);
-            alert('Your blog post has been updated');
-            props.handleClose();
-        } catch (error) {
-            setErrorMessage(error.message);
-        }
     };
 
     return (
@@ -82,12 +92,12 @@ export default function EditPost(props){
                         <label>
                             Title:
                             <br />
-                            <input 
-                                ref={(node) => {
-                                    title = node;
-                                }}
-                                defaultValue={blog.title}
-                                autoFocus={true}
+                            <input
+                                type='text' 
+                                name='title'
+                                value={formData.title}
+                                onChange={handleChange} 
+                                required 
                             />
                         </label>
                     </div>
@@ -95,30 +105,15 @@ export default function EditPost(props){
                         <label>
                             Type your post here:
                             <br />
-                            <input 
-                                ref={(node) => {
-                                    content = node;
-                                }}
-                                defaultValue={blog.content}
+                            <input
+                                type="text" 
+                                name='content'
+                                value={formData.content}
+                                onChange={handleChange}
+                                required 
                             />
                         </label>
                     </div>
-                    <div className='form-group'>
-                        <label>
-                            Post Type:
-                            <select 
-                                id='postType'
-                                defaultValue={blog.post_type}
-                                ref={(node) => {
-                                    postType = node;
-                                }}
-                            >
-                                <option key='progress' value='PROGRESS'>Progress Update</option>
-                                <option key='review' value='REVIEW'>Review</option>
-                                <option key='comment' value='COMMENT'>Comment</option>
-                            </select>
-                        </label>
-                </div>
                 <button type='submit'>Update Post</button>
                 </form>
                 <button onClick={handleCloseEditModal}>Cancel</button> 

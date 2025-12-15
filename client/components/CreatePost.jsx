@@ -1,5 +1,6 @@
 import {useMutation} from '@apollo/client/react';
 import {useState, useContext} from 'react';
+import {useRouter} from 'next/router';
 import queries from '../queries/blogQueries.js';
 import {AuthContext} from "../lib/userAuthContext";
 
@@ -7,11 +8,12 @@ import {AuthContext} from "../lib/userAuthContext";
 export default function CreatePost (props) {
     const [errorMessage, setErrorMessage] = useState(null);
     const userAuth = useContext(AuthContext);
+    const router = useRouter();
 
     const [formData, setFormData] = useState({
         title: '',
         content: '',
-        postType: 'COMMENT'
+        postType: ''
     });
 
     const [addBlog] = useMutation(queries.CREATE_BLOG, {
@@ -19,6 +21,7 @@ export default function CreatePost (props) {
             document.getElementById('add-blog').reset();
             alert('Blog Post Added!');
             props.closeAddFormState();
+            router.reload();
         },
         onError: (error) => {
             setErrorMessage(error.message);

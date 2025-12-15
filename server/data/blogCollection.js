@@ -123,7 +123,7 @@ export const updateBlog = async (id, userId, updateInfo) => {
                 blog.content = helpers.checkString(updateInfo.content, 'Content');
             }
             if(updateInfo.post_type){
-                blog.post_type = helpers.validatePostType(updateInfo.post_type);
+                blog.post_type = helpers.checkString(updateInfo.post_type, 'Post Type');
             }
         } catch (e) {
             throw new Error (e);
