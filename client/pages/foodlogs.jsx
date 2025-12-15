@@ -18,7 +18,7 @@ import {
     REMOVE_FOOD_LOG,
 } from "../queries/foodLogQueries";
 
-import { GET_USER_MEALS } from "../queries/mealQueries";
+import { GET_MEALS_BY_USER } from "../queries/mealQueries";
 
 export default function FoodLogs() {
     const router = useRouter();
@@ -117,7 +117,7 @@ export default function FoodLogs() {
         setDateOffset(0);
     }, [viewMode]);
     
-    const { data: mealsData, loading: mealsLoading } = useQuery(GET_USER_MEALS);
+    const { data: mealsData, loading: mealsLoading } = useQuery(GET_MEALS_BY_USER);
     const [removeLog] = useMutation(REMOVE_FOOD_LOG);
   
     const { data: logsData, loading: logsLoading, refetch } = useQuery(GET_RANGED_FOOD_LOGS, {
@@ -276,7 +276,7 @@ export default function FoodLogs() {
             {/* Add meal modal */}
             {isUpdatelogOpen && (
                 <AddFoodLog
-                    meals={mealsData?.getUserMeals || []}
+                    meals={mealsData?.getMealsByUser || []}
                     onClose={() => setIsUpdateLogOpen(false)}
                     refetch={refetch}
                 />
@@ -286,7 +286,7 @@ export default function FoodLogs() {
             {updatingLog && (
                 <UpdateFoodLog
                     log={updatingLog}
-                    meals={mealsData?.getUserMeals || []}
+                    meals={mealsData?.getMealsByUser || []}
                     onClose={() => setupdatingLog(null)}
                     refetch={refetch}
                 />
