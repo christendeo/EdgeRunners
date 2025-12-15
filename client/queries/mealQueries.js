@@ -2,8 +2,8 @@
 import { gql } from '@apollo/client';
 
 export const GET_USER_MEALS = gql`
-  query GetUserMeals {
-    getUserMeals {
+  query getMealsByUser {
+    getMealsByUser {
       _id
       name
       total_calories
