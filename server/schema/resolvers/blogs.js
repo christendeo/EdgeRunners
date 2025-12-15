@@ -74,6 +74,10 @@ export const resolvers = {
         current_weight: async (parentValue) => {
             const user = await users.getUserById(parentValue.user_id);
             return user.weight;
+        },
+        user: async (parentValue) => {
+            const user = await users.getUserById(parentValue.user_id);
+            return user;
         }
     },
     Mutation: {
