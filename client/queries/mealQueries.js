@@ -1,0 +1,23 @@
+//TODO: add all other meal queries and mutations as needed
+import { gql } from '@apollo/client';
+
+export const GET_USER_MEALS = gql`
+  query GetUserMeals {
+    getUserMeals {
+      _id
+      name
+      total_calories
+      total_protein
+      total_carbs
+      total_fat
+      total_fiber
+      foods {
+        food_id
+        quantity
+        serving_unit
+      }
+      is_public
+      created_at
+    }
+  }
+`;
