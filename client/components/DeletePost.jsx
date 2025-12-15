@@ -1,10 +1,11 @@
-import {useState} from 'react';
+import {useState, useContext} from 'react';
 import {useMutation} from '@apollo/client/react';
-import {redirect} from 'next/navigation';
+import { useRouter } from 'next/router'
 import ReactModal from 'react-modal';
 import queries from '../queries/blogQueries.js';
+import {AuthContext} from "../lib/userAuthContext";
 
-ReactModal.setAppElement('#root');
+ReactModal.setAppElement('#__next');
 const customStyles = {
   content: {
     top: '50%',
@@ -23,18 +24,12 @@ const customStyles = {
 export default function DeletePost(props){
   const [showDeleteModal, setShowDeleteModal] = useState(props.isOpen);
   const [blog, setBlog] = useState(props.blog);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
 
-  const [removeBlog, {error}] = useMutation(queries.DELETE_BLOG, {
-    onCompleted: () => { //fires upon successful completion of the mutation
-      setShowDeleteModal(false);
-      alert('Your post has been deleted');
-      props.handleClose();
-      redirect('community/allposts');
-    },
-    onError: () => { //fires when an error is returned
-      setErrorMessage(error.message);
-    },
+  const userAuth = useContext(AuthContext);
+  const router = useRouter();
+
+  const [removeBlog, {loading, error}] = useMutation(queries.DELETE_BLOG, {
     update(cache) { //update cache upon successful mutation
       cache.modify({
         fields: {
@@ -47,6 +42,24 @@ export default function DeletePost(props){
       });
     }
   });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await removeBlog({
+        variables: {
+          _id: blog._id,
+          user_id: userAuth.user._id
+        }
+      });
+      setShowDeleteModal(false);
+      alert('Your post has been deleted');
+      props.handleClose();
+      router.push('/dashboard');
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  };
 
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
@@ -63,21 +76,16 @@ export default function DeletePost(props){
         style={customStyles}
       >
         <p>Are you sure you want to delete this post?</p>
-        {error && (
+        {errorMessage && (
           <p>An error has occured. {errorMessage}</p>
+        )}
+        {loading && (
+          <p>Loading...</p>
         )}
         <form
           className='form'
           id='delete-blog-post'
-          onSubmit={(e) => {
-            e.preventDefault();
-            removeBlog({
-              variables: {
-                "_id": blog._id,
-                "user_id": props.user_id
-              }
-            });
-          }}
+          onSubmit={handleSubmit}
         >
           <button type='submit'>Delete Post</button>
         </form>

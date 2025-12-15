@@ -1,8 +1,8 @@
 // Blog Collection CRUD
 import {ObjectId} from 'mongodb';
 import { blogs } from '../config/mongoCollections.js';
-import { users } from '../config/mongoCollections.js';
-import * as helpers from '../helpers/serverHelpers.js'
+import { getUserById } from './userCollection.js';
+import helpers from '../helpers/serverHelpers.js'
 
 export const getAllBlogs = async () => {
     const blogsCollection = await blogs();
@@ -27,7 +27,7 @@ export const getBlogById = async (id) => {
         throw new Error (e);
     }
     const blogsCollection = await blogs();
-    const blog = await blogsCollection.find({_id: new ObjectId(id)});
+    const blog = await blogsCollection.findOne({_id: new ObjectId(id)});
 
     if(!blog){
         throw new Error ('Blog Post Not Found');
@@ -65,13 +65,12 @@ export const createBlog = async (userId, title, content, postType) => {
         userId = helpers.checkId(userId, "User ID");
         title = helpers.checkString(title, 'Title');
         content = helpers.checkString(content, 'Content');
-        postType = helpers.validatePostType(postType);
+        postType = helpers.checkString(postType, "Post Type");
     } catch (e) {
         throw new Error (e);
     }
 
-    const usersCollection = await users();
-    let user = await usersCollection.getUserById(userId);
+    let user = await getUserById(userId);
     if(!user) throw new Error ('A user with this ID does not exist.');
 
     //create the date and format it as MM/DD/YYYY
@@ -124,7 +123,7 @@ export const updateBlog = async (id, userId, updateInfo) => {
                 blog.content = helpers.checkString(updateInfo.content, 'Content');
             }
             if(updateInfo.post_type){
-                blog.post_type = helpers.validatePostType(updateInfo.post_type);
+                blog.post_type = helpers.checkString(updateInfo.post_type, 'Post Type');
             }
         } catch (e) {
             throw new Error (e);

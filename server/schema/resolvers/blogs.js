@@ -119,7 +119,7 @@ export const resolvers = {
         editBlog: async (_, args) => {
             let blogPost;
             let updateInfo = {};
-        
+
             if(args.title){
                 updateInfo.title = args.title;
             }

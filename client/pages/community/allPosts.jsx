@@ -1,25 +1,43 @@
 import {useQuery} from '@apollo/client/react';
-import queries from '../queries/blogQueries.js';
-import DeletePost from '@/components/DeletePost.jsx';
+import {useState} from 'react';
+import Link from 'next/link';
+import queries from '@/queries/blogQueries.js';
+import CreatePost from '@/components/CreatePost';
+
 //displays all blog posts in a user's feed
-export default function AllPosts(props) {
-    const posts = props.getAllBlogs;
-console.log(posts);
-    return (
+export default function AllPosts() {
+    const [showAddForm, setShowAddForm] = useState(false);
+    const {loading, error, data} = useQuery(queries.GET_BLOGS);
+
+    const closeAddFormState = () => {
+        setShowAddForm(false);
+    };
+
+    if (data){
+        const posts = data.blogs;
+       return (
         <div>
-            <h1>All Posts</h1>
+            <h1>Community Posts</h1>
+            <br />
+            <button onClick={() => setShowAddForm(!showAddForm)}>
+                Add Post
+            </button>
+            <br />
+            {showAddForm && (
+                <CreatePost closeAddFormState={closeAddFormState}/>
+            )}
             {posts.map((post) => {
-                return (
-                    <p>{post.title}</p>
-                );
+                return(<Link href={`/community/${post._id}`}>{post.title}</Link>);
             })}
         </div>
-    );
+        ); 
+    }
+    else if (loading) {
+        return (<div>Loading...</div>);
+    }
+    else if (error) {
+         return (<div>{error.message}</div>);
+    }
+
 }
 
-export async function getServerSideProps(context) {
-    const {loading, error, data} = useQuery(queries.GET_BLOGS, {fetchPolicy: 'cache-and-network'});
-    if(data){
-        return {props: data.getAllBlogs};
-    }
-}
