@@ -43,6 +43,7 @@ export const foodTypeDefs = `#graphql
     extend type Query {
         foods: [Food]
         getFoodById(_id: String!): Food
+        getFoodsByUser(_id: String!): [Food]
         searchFoods(filters: FoodSearchInput, page: Int, limit: Int): FoodSearchResult
     }
 

@@ -30,6 +30,21 @@ export const resolvers = {
         await setCache(cacheKey, food);
         return food;
         },
+        getFoodsByUser: async(_, args) => {
+            const cacheKey = `userFoods:${args._id}`;
+
+            const cached = await getCache(cacheKey);
+            if (cached) {
+                console.log('Cache hit for: ', cacheKey);
+                return cached;
+            }
+            console.log('Cahe miss for: ', cacheKey);
+
+            const userFoods = await foodData.getFoodsByUser(args._id);
+
+            await setCache(cacheKey, userFoods);
+            return userFoods;
+        },
         foods: async () => {
              const cacheKey = 'allFoods';
 

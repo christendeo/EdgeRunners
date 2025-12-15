@@ -1,9 +1,9 @@
 import {useState, useEffect} from 'react';
 import { gql } from '@apollo/client';
-import { useLazyQuery, } from '@apollo/client/react';
+import { useLazyQuery } from '@apollo/client/react';
 import SearchInput from './SearchInput.jsx';
 import FilterInputs from './FilterInputs.jsx'
-import FoodCard from './FoodCard';
+import FoodCard from './FoodCard.jsx';
 
 
 
@@ -96,7 +96,7 @@ export default function FoodSearch() {
 
     return (
         <div>
-            <h2>Food Search Component Under Construction</h2>
+            <h2>Food Search</h2>
             <SearchInput value={name} onChange={setName} />
             <FilterInputs filters={filters} onFilterChange={setFilters} />
             
