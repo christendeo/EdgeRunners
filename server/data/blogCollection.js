@@ -1,7 +1,7 @@
 // Blog Collection CRUD
 import {ObjectId} from 'mongodb';
 import { blogs } from '../config/mongoCollections.js';
-import { users } from '../config/mongoCollections.js';
+import { getUserById } from './userCollection.js';
 import helpers from '../helpers/serverHelpers.js'
 
 export const getAllBlogs = async () => {
@@ -65,13 +65,12 @@ export const createBlog = async (userId, title, content, postType) => {
         userId = helpers.checkId(userId, "User ID");
         title = helpers.checkString(title, 'Title');
         content = helpers.checkString(content, 'Content');
-        postType = helpers.validatePostType(postType);
+        postType = helpers.checkString(postType, "Post Type");
     } catch (e) {
         throw new Error (e);
     }
 
-    const usersCollection = await users();
-    let user = await usersCollection.getUserById(userId);
+    let user = await getUserById(userId);
     if(!user) throw new Error ('A user with this ID does not exist.');
 
     //create the date and format it as MM/DD/YYYY

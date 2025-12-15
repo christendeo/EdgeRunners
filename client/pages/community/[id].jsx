@@ -8,13 +8,15 @@ import EditPost from '@/components/EditPost';
 //displays individual blog pages
 export default function Post() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [deletePost, setDeletePost] = useState(null);
+    const [editPost, setEditPost] = useState(null);
 
     const router = useRouter();
     const {id} = router.query;
 
     const {loading, error, data} = useQuery(queries.GET_BLOG, {
-        variables: {"_id": id}
+        variables: {_id: id}
     });
 
     const handleOpenDeleteModal = (post) => {
@@ -22,10 +24,15 @@ export default function Post() {
         setDeletePost(post);
     };
 
-  const handleCloseModals = () => {
-    //setShowEditModal(false);
-    setShowDeleteModal(false);
-  };
+    const handleOpenEditModal = (post) => {
+        setShowEditModal(true);
+        setEditPost(post);
+    };
+
+    const handleCloseModals = () => {
+        setShowEditModal(false);
+        setShowDeleteModal(false);
+    };
 
     if (data) {
         const post = data.getBlogById;
@@ -40,11 +47,25 @@ export default function Post() {
                 >
                     Delete
                 </button>
+                <button
+                    onClick={() => {
+                        handleOpenEditModal(post);
+                    }}
+                >
+                    Edit Post
+                </button>
                 {showDeleteModal && (
                     <DeletePost 
                         isOpen={showDeleteModal}
                         handleClose={handleCloseModals}
                         blog={deletePost}
+                    />
+                )}
+                {showEditModal && (
+                    <EditPost
+                        isOpen={showEditModal}
+                        handleClose={handleCloseModals}
+                        blog={editPost}
                     />
                 )}
             </div>

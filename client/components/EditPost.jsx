@@ -1,7 +1,8 @@
-import {useState} from 'react';
+import {useState, useContext} from 'react';
 import {useMutation} from '@apollo/client/react';
 import ReactModal from 'react-modal';
 import queries from '../queries/blogQueries.js';
+import {AuthContext} from "../lib/userAuthContext";
 
 ReactModal.setAppElement('#__next');
 const customStyles = {
@@ -22,6 +23,9 @@ const customStyles = {
 export default function EditPost(props){
     const [showEditModal, setShowEditModal] = useState(props.isOpen);
     const [blog, setBlog] = useState(props.blog);
+    const [errorMessage, setErrorMessage] = useState(null);
+
+    const userAuth = useContext(AuthContext);
 
     const [editBlog] = useMutation(queries.UPDATE_BLOG);
 
@@ -35,23 +39,27 @@ export default function EditPost(props){
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        editBlog({
-            variables: {
-                '_id': blog._id,
-                'user_id': blog.user_id,
-                'title': title.value,
-                'content': content.value,
-                'post_type': postType.value
-            }
-        });
+        try {
+            editBlog({
+                variables: {
+                    _id: blog._id,
+                    user_id: userAuth.user._id,
+                    title: title.value,
+                    content: content.value,
+                    post_type: postType.value
+                }
+            });
 
-        title.value = '';
-        content.value = '';
-        postType.value = '1';
+            title.value = '';
+            content.value = '';
+            postType.value = '1';
 
-        setShowEditModal(false);
-        alert('Your blog post has been updated');
-        props.handleClose();
+            setShowEditModal(false);
+            alert('Your blog post has been updated');
+            props.handleClose();
+        } catch (error) {
+            setErrorMessage(error.message);
+        }
     };
 
     return (
@@ -67,6 +75,9 @@ export default function EditPost(props){
                     id='edit-blog-post'
                     onSubmit={handleSubmit}
                 >
+                    {errorMessage && (
+                        <p>An error has occured. {errorMessage}</p>
+                    )}
                     <div className='form-group'>
                         <label>
                             Title:
