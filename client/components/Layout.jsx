@@ -31,6 +31,7 @@ export default function Layout( {children} ) {
     return (
         <>
         <Head>
+            <title>FuelMe</title>
             <link rel="icon" href="/FuelMeLogo.svg"/>
         </Head>
         <div className={NimbusFont.className}>

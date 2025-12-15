@@ -4,6 +4,7 @@ import Link from 'next/link';
 import localFont from 'next/font/local';
 import queries from '@/queries/blogQueries.js';
 import CreatePost from '@/components/CreatePost';
+import PostCards from '@/components/PostCard';
 
 const NimbusFont = localFont({ 
   src: '../../public/NimbuDemo-Regular.otf',
@@ -22,6 +23,7 @@ export default function AllPosts() {
     if (data){
         const posts = data.blogs;
        return (
+        <>
         <div className={NimbusFont.className}>
             <div className='flex flow-root text-white mx-12 my-8 border-b-4 border-white pb-2'>
                     <h1 className='float-left text-4xl'>FuelMe Community</h1>
@@ -29,14 +31,16 @@ export default function AllPosts() {
                         Add Post
                     </button>
             </div>
-
             {showAddForm && (
                 <CreatePost closeAddFormState={closeAddFormState}/>
             )}
+        </div>
+        <div>
             {posts.map((post) => {
-                return(<Link href={`/community/${post._id}`}>{post.title}</Link>);
+                return <PostCards post={post}/>
             })}
         </div>
+        </>
         ); 
     }
     else if (loading) {
