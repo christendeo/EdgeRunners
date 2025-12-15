@@ -2,12 +2,6 @@ import helpers from "../helpers/serverHelpers.js";
 import {foodLogs, foods, meals} from "../config/mongoCollections.js";
 import {ObjectId} from "mongodb";
 
-// Helper function to convert mm/dd/yyyy to Date object
-const parseDate = (dateStr) => {
-    const [month, day, year] = dateStr.split('/');
-    return new Date(year, month - 1, day); // month is 0-indexed in JS
-};
-
 export const getRangedFoodlogs = async (userId, startDate, endDate) => {
     try {
         userId = helpers.checkId(userId, "User ID");
@@ -17,19 +11,24 @@ export const getRangedFoodlogs = async (userId, startDate, endDate) => {
         
         let query = {user_id: new ObjectId(userId)};
 
-
         if (startDate && endDate) {
+            // String comparison works because MM/DD/YYYY format is sortable
             query.date = {
-                $gte: parseDate(startDate),
-                $lte: parseDate(endDate)
+                $gte: startDate,
+                $lte: endDate
             };
         } else { //default to last 7 days
             const end = new Date();
             const start = new Date();
             start.setDate(end.getDate() - 7);
+            
+            // Format dates as MM/DD/YYYY strings
+            const endStr = `${String(end.getMonth() + 1).padStart(2, '0')}/${String(end.getDate()).padStart(2, '0')}/${end.getFullYear()}`;
+            const startStr = `${String(start.getMonth() + 1).padStart(2, '0')}/${String(start.getDate()).padStart(2, '0')}/${start.getFullYear()}`;
+            
             query.date = {
-                $gte: start,
-                $lte: end
+                $gte: startStr,
+                $lte: endStr
             };
         }
         const foodLogList = await foodLogCollection.find(query).sort({date: -1}).toArray();
@@ -43,46 +42,54 @@ export const getRangedFoodlogs = async (userId, startDate, endDate) => {
 
 export const recalculateDailyTotals = async (logId) => {
     try {
-    const foodLogCollection = await foodLogs();
-    const foodLog = await foodLogCollection.findOne({_id: new ObjectId(logId)}); //get food log id
-    if (!foodLog) {
-        throw  new Error (`No food log found with id of ${logId}`);
-    }        
-    const mealCollection = await meals();
+        const foodLogCollection = await foodLogs();
+        const foodLog = await foodLogCollection.findOne({_id: new ObjectId(logId)});
+        if (!foodLog) {
+            throw new Error(`No food log found with id of ${logId}`);
+        }        
+        const mealCollection = await meals();
 
-    let daily_total_calories = 0;
-    let daily_total_protein = 0;
-    let daily_total_carbs = 0;
-    let daily_total_fat = 0; 
-    let daily_total_fiber = 0;
+        let daily_total_calories = 0;
+        let daily_total_protein = 0;
+        let daily_total_carbs = 0;
+        let daily_total_fat = 0; 
+        let daily_total_fiber = 0;
 
-    for (const entry of foodLog.meals_logged) { //loop through each meal logged object
-        if (entry.meal_id) {
-            const meal = await mealCollection.findOne({ _id: entry.meal_id });
-            if (meal) {
-                daily_total_calories += meal.total_calories || 0;
-                daily_total_protein += meal.total_protein || 0;
-                daily_total_carbs += meal.total_carbs || 0;
-                daily_total_fat += meal.total_fat || 0;
-                daily_total_fiber += meal.total_fiber || 0;
+        for (const entry of foodLog.meals_logged) {
+            if (entry.meal_id) {
+                // Convert meal_id string to ObjectId before querying
+                const meal = await mealCollection.findOne({ 
+                    _id: new ObjectId(entry.meal_id) 
+                });
+                
+                console.log('Found meal:', meal); // Debug log
+                
+                if (meal) {
+                    daily_total_calories += meal.total_calories || 0;
+                    daily_total_protein += meal.total_protein || 0;
+                    daily_total_carbs += meal.total_carbs || 0;
+                    daily_total_fat += meal.total_fat || 0;
+                    daily_total_fiber += meal.total_fiber || 0;
+                }
             }
         }
-    }
-    //update the food log entry
-    await foodLogCollection.updateOne(
-        { _id: new ObjectId(logId) },
-        { $set: {
-            daily_total_calories: daily_total_calories,
-            daily_total_protein: daily_total_protein,
-            daily_total_carbs: daily_total_carbs,
-            daily_total_fat: daily_total_fat,
-            daily_total_fiber: daily_total_fiber
-        }}
-    );
+        
+        console.log('Calculated totals:', { daily_total_calories, daily_total_protein }); // Debug
+        
+        //update the food log entry
+        await foodLogCollection.updateOne(
+            { _id: new ObjectId(logId) },
+            { $set: {
+                daily_total_calories,
+                daily_total_protein,
+                daily_total_carbs,
+                daily_total_fat,
+                daily_total_fiber
+            }}
+        );
     } catch (e) {
         throw new Error(`Error recalculating daily totals: ${e.message}`);
     }
-
 }
 
 export const addFoodLog = async (userId, date, meals_logged, notes) => {
@@ -93,16 +100,19 @@ export const addFoodLog = async (userId, date, meals_logged, notes) => {
 
         const foodLogCollection = await foodLogs();
         
+        // Check if food log already exists for this date - using string comparison
         const existing = await foodLogCollection.findOne({
             user_id: new ObjectId(userId),
-            date: parseDate(date)
+            date: date  // Compare strings directly
         });
+        
         if (existing) {
             throw new Error(`Food log for ${date} already exists.`);
         }
+        
         const newFoodLog = {
             user_id: new ObjectId(userId),
-            date: parseDate(date),
+            date: date,  // Store as string
             meals_logged: meals_logged,
             //rollback in case recalculation fails:
             daily_total_calories: null,  // ← null = "not yet calculated"
@@ -111,7 +121,8 @@ export const addFoodLog = async (userId, date, meals_logged, notes) => {
             daily_total_fat: null,
             daily_total_fiber: null,            
             notes: notes || "",
-            created_at: new Date()       };
+            created_at: new Date()
+        };
 
         const insertInfo = await foodLogCollection.insertOne(newFoodLog);
 
