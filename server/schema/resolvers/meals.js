@@ -172,8 +172,8 @@ export const resolvers = {
 				// Update meal and delete outdated caches
 				const updatedMeal = await mealCollection.updateMeal(mealId, updateData);
 				await deleteCache(`meals:${mealId}`);
-				await deleteCache('meals:public');
 				await deleteCache(`meals:user:${currentUserId}`);
+				await deleteCache('meals:public');
 				return updatedMeal;
 			} catch (e) {
 				if (e.extensions?.code) {
@@ -204,8 +204,8 @@ export const resolvers = {
 				// Delete meal and outdated caches
 				const deletedMeal = await mealCollection.deleteMeal(mealId);
 				await deleteCache(`meals:${mealId}`);
-				await deleteCache(`meals:public`);
 				await deleteCache(`meals:user:${currentUserId}`);
+				await deleteCache(`meals:public`);
 
 				return deletedMeal;
 			} catch (e) {
