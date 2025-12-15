@@ -22,6 +22,20 @@ export const getFoodById = async (foodId) => {
     return food;
 }
 
+export const getFoodsByUser = async (userId) => {
+    console.log('Searching for userId:', userId);
+    const foodCollection = await foods();
+
+    const userFoods = await foodCollection.find({ added_by: userId }).toArray();
+
+    console.log('Found foods:', userFoods);
+    
+    return userFoods.map(food => ({
+        ...food,
+        _id: food._id.toString()
+    }));
+}
+
 export const removeFood = async (foodId) => {
     const id = checkId(foodId, 'foodId');
     const foodCollection = await foods();
