@@ -59,6 +59,7 @@ export default function DashboardPage() {
             <div>Target Calories: {currentUser.target_calories}</div>
 
             <h2>Quick Links</h2>
+            <Link href="/profile">Edit Profile</Link>{" "}
             <div><Link href="/foods">Foods</Link></div>
             <div><Link href="/meals">Meals</Link></div>
             <Link href="/community/allPosts">Community</Link>
