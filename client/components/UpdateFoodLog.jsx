@@ -54,9 +54,9 @@ export default function EditFoodLogModal({ log, meals, onClose, refetch }) {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="p-6 rounded-lg w-96 max-h-[80vh] overflow-y-auto border">
-                <h2 className="text-2xl font-bold mb-4">Edit Log for {log.date}</h2>
+        <div className="fixed inset-0 flex items-center justify-center">
+            <div className="p-6 rounded-lg w-96 max-h-[80vh] overflow-y-auto border bg-[var(--color-background)] text-[var(--color-foreground)]">
+                <h2 className="text-2xl font-bold mb-4">Update Log for {log.date}</h2>
                 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div>
@@ -65,7 +65,7 @@ export default function EditFoodLogModal({ log, meals, onClose, refetch }) {
                             <button
                                 type="button"
                                 onClick={() => append({ mealId: '' })}
-                                className="text-sm px-2 py-1 rounded border hover:opacity-80"
+                                className="text-sm px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:opacity-80"
                             >
                                 + Add Another
                             </button>
@@ -79,7 +79,7 @@ export default function EditFoodLogModal({ log, meals, onClose, refetch }) {
                                             {...register(`selectedMeals.${index}.mealId`, {
                                                 required: 'Please select a meal or remove this field'
                                             })}
-                                            className="flex-1 px-3 py-2 border rounded-lg"
+                                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-[var(--color-background)] text-[var(--color-foreground)]"
                                         >
                                             <option value="">-- Choose a meal --</option>
                                             {meals?.map((meal) => (
@@ -92,7 +92,7 @@ export default function EditFoodLogModal({ log, meals, onClose, refetch }) {
                                             <button
                                                 type="button"
                                                 onClick={() => remove(index)}
-                                                className="px-3 py-2 border rounded-lg hover:opacity-80 text-red-500"
+                                                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:opacity-80 text-red-500"
                                             >
                                                 ✕
                                             </button>
@@ -119,7 +119,7 @@ export default function EditFoodLogModal({ log, meals, onClose, refetch }) {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 border rounded-lg hover:opacity-80"
+                            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:opacity-80"
                         >
                             Cancel
                         </button>

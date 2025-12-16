@@ -16,10 +16,7 @@ const seedMeals = async () => {
         // Drop existing meals
         await mealCollection.deleteMany({});
         console.log('Cleared existing meals');
-        
-        // Get some sample foods from your foods collection
-        // Since foods are in ElasticSearch, we need to insert some into MongoDB first
-        // OR use hardcoded food IDs if you already have them in MongoDB
+
         
         const sampleMeals = [
             {

@@ -18,7 +18,7 @@ import {
     REMOVE_FOOD_LOG,
 } from "../queries/foodLogQueries";
 
-import { GET_MEALS_BY_USER } from "../queries/mealQueries";
+import { GET_USER_MEALS } from "../queries/mealQueries";
 
 export default function FoodLogs() {
     const router = useRouter();
@@ -117,12 +117,21 @@ export default function FoodLogs() {
         setDateOffset(0);
     }, [viewMode]);
     
-    const { data: mealsData, loading: mealsLoading } = useQuery(GET_MEALS_BY_USER);
+    const currentUser = userAuth.user;
+
+
     const [removeLog] = useMutation(REMOVE_FOOD_LOG);
   
     const { data: logsData, loading: logsLoading, refetch } = useQuery(GET_RANGED_FOOD_LOGS, {
         variables: { startDate, endDate }
     });
+    
+    const { data: mealsData, loading: mealsLoading, error: mealsError } = useQuery(GET_USER_MEALS, {
+        variables: { userId: currentUser?._id }
+    });
+
+    console.log("Meals Data:", mealsData);
+    console.log("Current User:", currentUser);
     
     useEffect(() => {
         if (userAuth.authLoaded && !userAuth.user) {
@@ -142,8 +151,6 @@ export default function FoodLogs() {
         }
     };
 
-    const currentUser = userAuth.user;
-    
     return (
         <>
             <div className="mx-4 mt-8">
@@ -167,7 +174,7 @@ export default function FoodLogs() {
                                 </button>
                                 
                                 {showViewDropdown && (
-                                    <div className="absolute top-full mt-1 backdrop-blur-md bg-white/80 dark:bg-black/80 border rounded-lg shadow-lg z-10 min-w-full">
+                                    <div className="absolute top-full mt-1 backdrop-blur-md bg-[var(--color-background)] text-[var(--color-foreground)] border rounded-lg shadow-lg z-10 min-w-full ">
                                         <button
                                             onClick={() => {
                                                 setViewMode('day');
