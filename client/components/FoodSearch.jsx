@@ -95,27 +95,30 @@ export default function FoodSearch() {
    console.log('Response data:', data);
 
     return (
-        <div>
-            <h2>Food Search</h2>
+        <div className="max-w-2xl mx-auto p-4">
+            <h2 className="text-2xl font-sans">Food Search</h2>
             <SearchInput value={name} onChange={setName} />
             <FilterInputs filters={filters} onFilterChange={setFilters} />
             
-            <button onClick={handleSearch}>Search</button>
+            <button onClick={handleSearch}
+            className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600">
+                Search</button>
 
             {loading && <p>Loading...</p>}
             {error && <p>Error: {error.message}</p>}
             {data && (
                 <div>
                     <p>Found {data.searchFoods.total} foods</p>
-                    <ul>
+                    <ul className="flex flex-col gap-y-4">
                         {data.searchFoods.foods.map((food) => (
                             <FoodCard key={food._id} food={food} />
                         ))}
                     </ul>
-                    <div>
+                    <div className="mt-4 flex gap-x-4 items-center">
                         <button
                         onClick={() => setPage(page - 1)}
                         disabled={page === 1}
+                        className="bg-teal-500 text-white px-3 py-1 rounded disabled:bg-gray-300 disabled:opacity-50"
                         >
                             Previous
                         </button>
@@ -124,6 +127,7 @@ export default function FoodSearch() {
                         <button
                         onClick={() => setPage(page + 1)}
                         disabled={page >= data.searchFoods.totalPages}
+                        className="bg-teal-500 text-white px-3 py-1 rounded disabled:bg-gray-300 disabled:opacity-50"
                         >
                             Next
                         </button>
