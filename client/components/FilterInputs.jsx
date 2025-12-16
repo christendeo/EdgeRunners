@@ -7,7 +7,7 @@ export default function FilterInputs ({ filters, onFilterChange }) {
         });
     };
 
-    const inputStyle = "w-48 p-2 border-2 border-gray-300 rounded focus:border-teal-500 focus:outline-none";
+    const inputStyle = "w-48 p-2 border-2 border-gray-300 rounded focus:border-[#73AF6F] focus:outline-none";
     const labelStyle = "text-xl font-bold";
     const rowStyle = "flex gap-x-4 items-center my-2";
 

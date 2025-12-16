@@ -93,103 +93,103 @@ export default function CreateFood() {
 
     return (
         <div className="max-w-2xl mx-auto p-4">
-            <h2 className="text-2xl font-sans mb-4">Create a Custom Food</h2>
+            <h2 className="text-2xl font-sans mb-4 font-bold">Create a Custom Food</h2>
             {error && <p className="text-red-500">Error: {error.message}</p>}
             {data && <p className="text-green-500">Food created: {data.addFood.name}</p>}
             <form onSubmit={handleSubmit} className="flex flex-col gap-y-3">
                 <div className="flex items-center gap-x-2">
-                    <label className="w-32 text-sm font-medium">Name:{' '}</label>
+                    <label className="w-32 text-xl ">Name:{' '}</label>
                     <input
                         type="text"
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
                         required
-                        className="flex-1 p-2 border-2 border-gray-300 rounded focus:border-teal-500 focus:outline-none"
+                        className="flex-1 p-2 border-2 border-gray-300 rounded focus:border-[#73AF6F] focus:outline-none"
                     />    
                 </div>
 
                 <div className="flex items-center gap-x-2">
-                    <label className="w-32 text-sm font-medium">Serving Size:{' '}</label>
+                    <label className="w-32 text-xl">Serving Size:{' '}</label>
                     <input
                         type="number"
                         name="serving_size"
                         value={formData.serving_size}
                         onChange={handleChange}
                         required
-                        className="w-24 p-2 border-2 border-gray-300 rounded focus:border-teal-500 focus:outline-none"
+                        className="w-24 p-2 border-2 border-gray-300 rounded focus:border-[#73AF6F] focus:outline-none "
                     />    
                 </div>
 
                 <div className="flex items-center gap-x-2">
-                    <label className="w-32 text-sm font-medium">Serving Unit:{' '}</label>
+                    <label className="w-32 text-xl ">Serving Unit:{' '}</label>
                     <input
                         type="text"
                         name="serving_unit"
                         value={formData.serving_unit}
                         onChange={handleChange}
                         required
-                        className="w-24 p-2 border-2 border-gray-300 rounded focus:border-teal-500 focus:outline-none"
+                        className="w-24 p-2 border-2 border-gray-300 rounded focus:border-[#73AF6F] focus:outline-none"
                     />    
                 </div>
 
                 <div className="flex items-center gap-x-2">
-                    <label className="w-32 text-sm font-medium">Calories:{' '}</label>
+                    <label className="w-32 text-xl ">Calories:{' '}</label>
                     <input
                         type="number"
                         name="calories"
                         value={formData.calories}
                         onChange={handleChange}
                         required
-                        className="w-24 p-2 border-2 border-gray-300 rounded focus:border-teal-500 focus:outline-none"
+                        className="w-24 p-2 border-2 border-gray-300 rounded focus:border-[#73AF6F] focus:outline-none"
                     />    
                 </div>
 
                 <div className="flex items-center gap-x-2">
-                    <label className="w-32 text-sm font-medium">Protein (g):{' '}</label>
+                    <label className="w-32 text-xl ">Protein (g):{' '}</label>
                     <input
                         type="number"
                         name="protein"
                         value={formData.protein}
                         onChange={handleChange}
                         required
-                        className="w-24 p-2 border-2 border-gray-300 rounded focus:border-teal-500 focus:outline-none"
+                        className="w-24 p-2 border-2 border-gray-300 rounded focus:border-[#73AF6F] focus:outline-none"
                     />    
                 </div>
 
                 <div className="flex items-center gap-x-2">
-                    <label className="w-32 text-sm font-medium">Carbs (g):{' '}</label>
+                    <label className="w-32 text-xl ">Carbs (g):{' '}</label>
                     <input
                         type="number"
                         name="carbs"
                         value={formData.carbs}
                         onChange={handleChange}
                         required
-                        className="w-24 p-2 border-2 border-gray-300 rounded focus:border-teal-500 focus:outline-none"
+                        className="w-24 p-2 border-2 border-gray-300 rounded focus:border-[#73AF6F] focus:outline-none"
                     />    
                 </div>
 
                 <div className="flex items-center gap-x-2">
-                    <label className="w-32 text-sm font-medium">Fat (g):{' '}</label>
+                    <label className="w-32 text-xl ">Fat (g):{' '}</label>
                     <input
                         type="number"
                         name="fat"
                         value={formData.fat}
                         onChange={handleChange}
                         required
-                        className="w-24 p-2 border-2 border-gray-300 rounded focus:border-teal-500 focus:outline-none"
+                        className="w-24 p-2 border-2 border-gray-300 rounded focus:border-[#73AF6F] focus:outline-none"
                     />    
                 </div>
 
                 <div className="flex items-center gap-x-2">
-                    <label className="w-32 text-sm font-medium">Fiber(g):{' '}</label>
+                    <label className="w-32 text-xl">Fiber(g):{' '}</label>
                     <input
                         type="number"
                         name="fiber"
                         value={formData.fiber}
                         onChange={handleChange}
                         required
-                        className="w-24 p-2 border-2 border-gray-300 rounded focus:border-teal-500 focus:outline-none"
+                        className="w-24 p-2 border-2 border-gray-300 rounded focus:border-[#73AF6F] focus:outline-none"
                     />    
                 </div>
 
@@ -208,7 +208,7 @@ export default function CreateFood() {
                 </div>
 
                 <button type="submit" disabled={loading}
-                className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 disabled:bg-gray-300 disabled:opacity-50 w-fit">
+                className=" cursor-pointer bg-gradient-to-b from-[#73AF6F] to-[#007E6E] text-white px-4 py-2 rounded hover:bg-gradient-to-b from-[#73AF6F] to-[#007E6E] disabled:bg-gray-300 disabled:opacity-50 w-fit mx-auto block">
                     {loading ? 'Creating...' : 'Create Food'}
                 </button>
             </form>
