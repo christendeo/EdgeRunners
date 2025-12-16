@@ -32,7 +32,9 @@ const userResolvers = {
                 diet_goal: getUser.diet_goal,
                 target_calories: getUser.target_calories,
                 createdAt: getUser.createdAt,
-                updatedAt: getUser.updatedAt
+                updatedAt: getUser.updatedAt,
+                use_custom_target: getUser.use_custom_target,
+                custom_target_calories: getUser.custom_target_calories,
             };
         },
 
@@ -54,7 +56,9 @@ const userResolvers = {
                     diet_goal: currentUser.diet_goal,
                     target_calories: currentUser.target_calories,
                     createdAt: currentUser.createdAt,
-                    updatedAt: currentUser.updatedAt
+                    updatedAt: currentUser.updatedAt,
+                    use_custom_target: currentUser.use_custom_target,
+                    custom_target_calories: currentUser.custom_target_calories,
                 };
             });
         }
@@ -75,7 +79,9 @@ const userResolvers = {
                 args.height,
                 args.weight,
                 args.activity_level,
-                args.diet_goal
+                args.diet_goal,
+                args.use_custom_target,
+                args.custom_target_calories
             );
 
             return {
@@ -91,7 +97,9 @@ const userResolvers = {
                 diet_goal: createdUser.diet_goal,
                 target_calories: createdUser.target_calories,
                 createdAt: createdUser.createdAt,
-                updatedAt: createdUser.updatedAt
+                updatedAt: createdUser.updatedAt,
+                use_custom_target: createdUser.use_custom_target,
+                custom_target_calories: createdUser.custom_target_calories,
             };
         },
 
@@ -141,6 +149,15 @@ const userResolvers = {
                 userInput.diet_goal = args.diet_goal;
             }
 
+            // Check if custom is enabled
+            if (args.use_custom_target !== undefined) {
+                userInput.use_custom_target = args.use_custom_target;
+            }
+
+            if (args.custom_target_calories !== undefined) {
+                userInput.custom_target_calories = args.custom_target_calories;
+            }
+
             const updatedUser = await editUser(userId, userInput);
 
             return {
@@ -156,7 +173,9 @@ const userResolvers = {
                 diet_goal: updatedUser.diet_goal,
                 target_calories: updatedUser.target_calories,
                 createdAt: updatedUser.createdAt,
-                updatedAt: updatedUser.updatedAt
+                updatedAt: updatedUser.updatedAt,
+                use_custom_target: updatedUser.use_custom_target,
+                custom_target_calories: updatedUser.custom_target_calories,
             };
         },
 
@@ -180,7 +199,9 @@ const userResolvers = {
                 diet_goal: loggedInUser.diet_goal,
                 target_calories: loggedInUser.target_calories,
                 createdAt: loggedInUser.createdAt,
-                updatedAt: loggedInUser.updatedAt
+                updatedAt: loggedInUser.updatedAt,
+                use_custom_target: loggedInUser.use_custom_target,
+                custom_target_calories: loggedInUser.custom_target_calories,
             };
         },
 
@@ -194,7 +215,21 @@ const userResolvers = {
 
             return updatedUser;
         }
-    }
+    },
+
+    // For custom target calories
+    User: {
+        current_target_calories: (parent) => {
+            if (parent.use_custom_target === true) {
+                if (parent.custom_target_calories !== undefined && parent.custom_target_calories !== null) {
+                    return parent.custom_target_calories;
+                }
+            }
+
+            return parent.target_calories;
+        }
+    },
+
 };
 
 export default userResolvers;

@@ -4,28 +4,20 @@ import {gql} from "@apollo/client";
 import {useMutation} from "@apollo/client/react";
 import {useRouter} from "next/router";
 import Link from "next/link";
+import {LOGIN_USER} from "../lib/userGraphQL";
 
 // Utilize userAuthHelpers
 import {AuthContext} from "../lib/userAuthContext";
 
-// Login user using authentication. Show all fields
-const LOGIN_USER = gql`
-    mutation LoginUser($email: String!, $password: String!) {
-        loginUser(email: $email, password: $password) {
-            _id
-            first_name
-            last_name
-            email
-            sex
-            date_of_birth
-            height
-            weight
-            activity_level
-            diet_goal
-            target_calories
-        }
-    }
-`;
+// Import Tailwind
+import tailwindCSS from "../lib/tailwindUIClasses";
+
+// Import custom font
+import localFont from "next/font/local";
+const NimbusFont = localFont({
+    src: "../public/NimbuDemo-Regular.otf",
+    variable: "--font-nimbus"
+});
 
 // Login details
 const LoginPage = () => {
@@ -70,43 +62,68 @@ const LoginPage = () => {
 
     // For displaying the page
     return (
-        <div className="page-container">
-            <h1>Log In</h1>
+        <div className={`${tailwindCSS.pageWrap} flex justify-center`}>
+            <div className="w-full max-w-md">
 
-            {/*For displaying error messages*/}
-            {errorMessage && <p className="error-text">{errorMessage}</p>}
+                <h1 className={`${NimbusFont.className} ${tailwindCSS.h1} font-bold mb-3`}>Log In</h1>
+                <p className="text-sm opacity-80 mb-6">
+                    Welcome back! Log in to view your dashboard.
+                </p>
 
-            <form onSubmit={handleSubmit} className="form-card">
-                <div className="form-row">
-                    <label>Email Address</label>
-                    <input
-                        type="email"
-                        placeholder="Enter Email Address"
-                        value={userEmailAddress}
-                        onChange={(e) => {
-                            setEmail(e.target.value);
-                        }}
-                        required
-                    />
+                {/*For error or success messages*/}
+                {errorMessage && (
+                    <div className={`${tailwindCSS.alertError} mb-4`}>
+                        {errorMessage}
+                    </div>
+                )}
+
+                <div className={tailwindCSS.cardSoft}>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+
+                        <div>
+                            <label className={`font-semibold ${NimbusFont.className}`}>Email Address</label>
+                            <input
+                                className={tailwindCSS.input}
+                                type="email"
+                                placeholder="Enter Email Address"
+                                value={userEmailAddress}
+                                onChange={(e) => {
+                                    setEmail(e.target.value);
+                                }}
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label className={`font-semibold ${NimbusFont.className}`}>Password</label>
+                            <input
+                                className={tailwindCSS.input}
+                                type="password"
+                                placeholder="Enter Password"
+                                value={userPassword}
+                                onChange={(e) => {
+                                    setPassword(e.target.value);
+                                }}
+                                required
+                            />
+                        </div>
+
+                        <button className={`${tailwindCSS.btnPrimary} w-full`} type="submit" disabled={loading}>
+                            {loading ? "Logging in..." : "Log In"}
+                        </button>
+
+                        {/*If user has no account, prompt to sign up*/}
+                        <div className="text-sm">
+                            No Account?{" "}
+                            <Link className={tailwindCSS.link} href="/signup">
+                                Sign Up Today
+                            </Link>
+                        </div>
+
+                    </form>
                 </div>
 
-                <div className="form-row">
-                    <label>Password</label>
-                    <input
-                        type="password"
-                        placeholder="Enter Password"
-                        value={userPassword}
-                        onChange={(e) => {
-                            setPassword(e.target.value);
-                        }}
-                        required
-                    />
-                </div>
-
-                <button type="submit" disabled={loading}>
-                    {loading ? "Logging in..." : "Log In"}
-                </button>
-            </form>
+            </div>
         </div>
     );
 };

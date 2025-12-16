@@ -2,9 +2,20 @@
 import {useContext, useEffect} from "react";
 import {useRouter} from "next/router";
 import Link from "next/link";
+import TodaysProgress from "../components/UserTodaysProgress";
 
 // Utilize userAuthContext
 import {AuthContext} from "../lib/userAuthContext";
+
+// Import Tailwind
+import tailwindCSS from "../lib/tailwindUIClasses";
+
+// Import custom font
+import localFont from "next/font/local";
+const NimbusFont = localFont({
+    src: "../public/NimbuDemo-Regular.otf",
+    variable: "--font-nimbus"
+});
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -42,37 +53,93 @@ export default function DashboardPage() {
     }
 
     const currentUser = userAuth.user;
+    let displayTarget = currentUser.target_calories;
+
+    if (currentUser.current_target_calories !== undefined && currentUser.current_target_calories !== null) {
+        displayTarget = currentUser.current_target_calories;
+    }
 
     // Display page
     return (
-        <div>
-            <h1>Hello, {currentUser.first_name}</h1>
+        <div className={tailwindCSS.pageWrap}>
 
-            <h2>Profile Information</h2>
-            <div>Email: {currentUser.email}</div>
-            <div>Sex: {currentUser.sex}</div>
-            <div>DOB: {currentUser.date_of_birth}</div>
+            <div className="flex items-center justify-between mb-4">
+                <div>
+                    <h1 className={`${tailwindCSS.h1} ${NimbusFont.className} font-bold`}>
+                        Hello, {currentUser.first_name}
+                    </h1>
+                    <p className="text-sm opacity-80">
+                        Here’s your daily target and quick actions.
+                    </p>
+                </div>
 
-            <h2>Goals</h2>
-            <div>Diet Goal: {currentUser.diet_goal}</div>
-            <div>Activity Level: {currentUser.activity_level}</div>
-            <div>Target Calories: {currentUser.target_calories}</div>
+                <button
+                    className={tailwindCSS.btnSecondary}
+                    type="button"
+                    onClick={() => {
+                        userAuth.logout();
+                        router.push("/login");
+                    }}
+                >
+                    Logout
+                </button>
+            </div>
 
-            <h2>Quick Links</h2>
-            <Link href="/profile">Edit Profile</Link>{" "}
-            <div><Link href="/foods">Foods</Link></div>
-            <div><Link href="/meals">Meals</Link></div>
-            <Link href="/community/allPosts">Community</Link>
+            <hr className="mb-4" />
 
-            <button
-                type="button"
-                onClick={() => {
-                    userAuth.logout();
-                    router.push("/login");
-                }}
-            >
-                Logout
-            </button>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+                <div className={tailwindCSS.card}>
+                    <div className="text-sm opacity-80">Target Calories</div>
+                    <div className="text-2xl font-bold">{displayTarget}</div>
+                </div>
+
+                <div className={tailwindCSS.card}>
+                    <div className="text-sm opacity-80">Diet Goal</div>
+                    <div className="text-xl font-semibold">{currentUser.diet_goal}</div>
+                </div>
+
+                <div className={tailwindCSS.card}>
+                    <div className="text-sm opacity-80">Activity Level</div>
+                    <div className="text-xl font-semibold">{currentUser.activity_level}</div>
+                </div>
+            </div>
+
+            <div className={tailwindCSS.card}>
+                <h2 className={`${tailwindCSS.h2} ${NimbusFont.className} mb-3`}>Profile</h2>
+                <div className="text-sm space-y-1">
+                    <div>Email: {currentUser.email}</div>
+                    <div>Sex: {currentUser.sex}</div>
+                    <div>DOB: {currentUser.date_of_birth}</div>
+                </div>
+            </div>
+
+            <div className={`${tailwindCSS.card} mt-6`}>
+                <TodaysProgress />
+            </div>
+
+            <div className={`${tailwindCSS.card} mt-6`}>
+                <h2 className={`${tailwindCSS.h2} ${NimbusFont.className} mb-3`}>Quick Links</h2>
+
+                <div className="flex flex-wrap gap-2">
+                    <Link className={tailwindCSS.btnSmallPrimary} href="/profile">
+                        Edit Profile
+                    </Link>
+
+                    <Link className={tailwindCSS.btnSecondary} href="/foods">
+                        Foods
+                    </Link>
+
+                    <Link className={tailwindCSS.btnSecondary} href="/foodlogs">
+                        Food Logs
+                    </Link>
+
+                    <Link className={tailwindCSS.btnSecondary} href="/community/allPosts">
+                        Community
+                    </Link>
+                </div>
+            </div>
+
         </div>
     );
 }
