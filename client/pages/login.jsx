@@ -1,5 +1,5 @@
 // User login page
-import React, {useContext, useState} from "react";
+import React, {useContext, useState, useEffect} from "react";
 import {gql} from "@apollo/client";
 import {useMutation} from "@apollo/client/react";
 import {useRouter} from "next/router";
@@ -31,6 +31,16 @@ const LoginPage = () => {
 
     const [loginUser, {loading}] = useMutation(LOGIN_USER);
 
+    useEffect(() => {
+    
+            // Check first if user is logged in
+            if (userAuth.authLoaded) {
+                if (userAuth.user) {
+                    router.push("/dashboard");
+                }
+            }
+    
+        }, [userAuth.authLoaded, userAuth.user, router]);
     // For handling user login
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -62,6 +72,7 @@ const LoginPage = () => {
 
     // For displaying the page
     return (
+        
         <div className={`${tailwindCSS.pageWrap} flex justify-center`}>
             <div className="w-full max-w-md">
 

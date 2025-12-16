@@ -41,9 +41,9 @@ export default function MyFoods() {
 
     return (
         <div className="max-w-2xl mx-auto p-4">
-
+            {currentUser &&
             <button onClick={handleShowMyFoods} className="cursor-pointer bg-gradient-to-b from-[#73AF6F] to-[#007E6E] text-white px-4 py-2 rounded hover:bg-gradient-to-b from-[#73AF6F] to-[#007E6E] disabled:bg-gray-300 disabled:opacity-50 w-fit mx-auto block">My Foods</button>
-
+            }
             {loading && <p>Loading...</p>}
                         {error && <p>Error: {error.message}</p>}
                         {data && (
