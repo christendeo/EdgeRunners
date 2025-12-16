@@ -49,6 +49,7 @@ export const GET_MEALS_BY_USER = gql`
 		getMealsByUser(userId: $userId) {
 			_id
 			name
+			user_id
 			total_calories
 			total_protein
 			total_carbs

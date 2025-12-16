@@ -40,11 +40,8 @@ export default function Meals() {
 	const [deleteMeal] = useMutation(DELETE_MEAL);
 
 	const refetchMeals = () => {
-		if (view === 'user') {
-			refetchUserMeals();
-		} else {
-			refetchPublicMeals();
-		}
+		refetchUserMeals();
+		refetchPublicMeals();
 	};
 
 	const handleDelete = async (meal) => {
@@ -127,7 +124,7 @@ export default function Meals() {
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 					{meals.map(meal => {
 						console.log(`Meal ${meal.name}, user_id ${meal.user_id}, currentUser._id ${currentUser._id}`);
-						return <MealCard key={meal._id} meal={meal} onEdit={() => setEditingMeal(meal)} onDelete={handleDelete} showActions={meal.user_id === currentUser._id} />;	
+						return <MealCard key={meal._id} meal={meal} onEdit={() => setEditingMeal(meal)} onDelete={handleDelete} showActions={meal.user_id === currentUser._id.toString()} />;	
 					})}
 				</div>
 			)}

@@ -143,6 +143,8 @@ function FoodItemDetail({ foodItem }) {
         );
     }
 
+	console.log(data);
+
     if (!data?.getFoodById) {
         return (
             <div className="border rounded-lg p-4">

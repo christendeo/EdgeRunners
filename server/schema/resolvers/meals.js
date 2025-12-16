@@ -99,7 +99,10 @@ export const resolvers = {
 
 			const validatedFoods = args.foods.map(food => {
 				// Validate each meal food
-				validateId(food.food_id);
+				if (!food.food_id || (typeof food.food_id !== 'string' && typeof food.food_id !== 'number')) {
+					throwGraphQLError("Food ID is required as a string or number", 'BAD_USER_INPUT');
+				}
+
 				validateNumber(food.quantity, 'Food Quantity', 0.01);
 
 				return {
@@ -148,7 +151,10 @@ export const resolvers = {
 					}
 
 					updateData.foods = args.foods.map(food => {
-						validateId(food.food_id);
+						if (!food.food_id || (typeof food.food_id !== 'string' && typeof food.food_id !== 'number')) {
+							throwGraphQLError("Food ID is required as a string or number", 'BAD_USER_INPUT');
+						}
+						
 						validateNumber(food.quantity, 'Food Quantity', 0.01);
 
 						return {
