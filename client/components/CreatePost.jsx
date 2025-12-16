@@ -49,16 +49,13 @@ export default function CreatePost (props) {
     };
 
     return (
-        <div className='form'>
-            <form className='form' id='add-blog' onSubmit={onSubmit}>
-                {errorMessage && (
-                    <p>An error has occured. {errorMessage}</p>
-                )}
-                <div className='form-group'>
+        <div className='flex justify-center bg-darkgreen mx-12 my-8 rounded-full'>
+            <form className='text-center text-white text-lg py-2 space-x-2' id='add-blog' onSubmit={onSubmit}>
+                <div>
                     <label>
-                        Title:
+                        Title
                         <br />
-                        <input
+                        <input className="bg-white text-black"
                             type='text' 
                             name='title'
                             value={formData.title}
@@ -66,12 +63,14 @@ export default function CreatePost (props) {
                             required 
                             />
                     </label>
+                    <br />
+                    <br />
                 </div>
-                <div className='form-group'>
+                <div>
                     <label>
-                        Type your post here:
+                        Type your post here
                         <br />
-                        <input
+                        <input className="bg-white text-black"
                         type="text" 
                         name='content'
                         value={formData.content}
@@ -79,10 +78,12 @@ export default function CreatePost (props) {
                         required 
                         />
                     </label>
+                    <br />
+                    <br />
                 </div>
-                <div className='form-group'>
+                <p>Post Type</p>
+                <div>
                     <label>
-                        Progress Update
                         <input 
                             type="radio"
                             name="postType"
@@ -91,9 +92,10 @@ export default function CreatePost (props) {
                             onChange={handleChange}
                             required
                         />
+                        Progress Update
                     </label>
+                    <br />
                     <label>
-                        Review
                         <input 
                             type="radio"
                             name="postType"
@@ -101,9 +103,10 @@ export default function CreatePost (props) {
                             value="REVIEW"
                             onChange={handleChange}
                         />
+                        Review
                     </label>
+                    <br />
                     <label>
-                        Comment
                         <input 
                             type="radio"
                             name="postType"
@@ -111,12 +114,16 @@ export default function CreatePost (props) {
                             value="COMMENT"
                             onChange={handleChange}
                         />
+                        Comment
                     </label>
                 </div>
                 <br />
                 <br />
-                <button type='submit'>Post</button>
-                <button
+                {errorMessage && (
+                    <p>An error has occured. {errorMessage}</p>
+                )}
+                <button className="px-4 rounded-full border-1 border-white hover:underline" type='submit'>Post</button>
+                <button className="px-4 rounded-full border-1 border-white hover:underline"
                     type='button'
                     onClick={() => {
                         document.getElementById('add-blog').reset();

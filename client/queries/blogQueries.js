@@ -6,6 +6,10 @@ const GET_BLOGS = gql`
         blogs {
             _id
             user_id
+            user {
+                first_name
+                last_name
+            }
             title
             content
             post_type
@@ -21,6 +25,10 @@ const GET_BLOG = gql`
         getBlogById (_id: $_id) {
             _id
             user_id
+            user {
+                first_name
+                last_name
+            }
             title
             content
             post_type
