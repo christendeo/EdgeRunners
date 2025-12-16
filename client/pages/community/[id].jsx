@@ -1,10 +1,11 @@
 import {useRouter} from 'next/router';
 import {useQuery} from '@apollo/client/react';
-import { useState } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import localFont from 'next/font/local';
 import queries from '@/queries/blogQueries.js';
 import DeletePost from '@/components/DeletePost';
 import EditPost from '@/components/EditPost';
+import {AuthContext} from "../../lib/userAuthContext";
 
 const NimbusFont = localFont({ 
   src: '../../public/NimbuDemo-Regular.otf',
@@ -20,6 +21,15 @@ export default function Post() {
 
     const router = useRouter();
     const {id} = router.query;
+
+    //verify that the user is logged in
+    const userAuth = useContext(AuthContext);
+
+    useEffect(() => {
+        if (userAuth.authLoaded && !userAuth.user) {
+            router.push("/login");
+        }
+    }, [userAuth.authLoaded, userAuth.user, router]); 
 
     const {loading, error, data} = useQuery(queries.GET_BLOG, {
         variables: {_id: id}

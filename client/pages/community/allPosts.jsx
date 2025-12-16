@@ -1,10 +1,11 @@
 import {useQuery} from '@apollo/client/react';
-import {useState} from 'react';
-import Link from 'next/link';
+import {useState, useEffect, useContext} from 'react';
+import {useRouter} from 'next/router';
 import localFont from 'next/font/local';
 import queries from '@/queries/blogQueries.js';
 import CreatePost from '@/components/CreatePost';
 import PostCards from '@/components/PostCard';
+import {AuthContext} from "../../lib/userAuthContext";
 
 const NimbusFont = localFont({ 
   src: '../../public/NimbuDemo-Regular.otf',
@@ -15,6 +16,17 @@ const NimbusFont = localFont({
 export default function AllPosts() {
     const [showAddForm, setShowAddForm] = useState(false);
     const {loading, error, data} = useQuery(queries.GET_BLOGS);
+
+    const router = useRouter();
+
+    //verify that the user is logged in
+    const userAuth = useContext(AuthContext);
+
+    useEffect(() => {
+        if (userAuth.authLoaded && !userAuth.user) {
+            router.push("/login");
+        }
+    }, [userAuth.authLoaded, userAuth.user, router]);
 
     const closeAddFormState = () => {
         setShowAddForm(false);
