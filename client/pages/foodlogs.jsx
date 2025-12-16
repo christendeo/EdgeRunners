@@ -17,6 +17,10 @@ import {
     UPDATE_FOOD_LOG,
     REMOVE_FOOD_LOG,
 } from "../queries/foodLogQueries";
+//BONUS: get list of foods in meals
+import {
+    GET_FOOD_BY_ID
+} from "../queries/foodQueries.js";
 
 import { GET_USER_MEALS } from "../queries/mealQueries";
 
@@ -253,6 +257,7 @@ export default function FoodLogs() {
                                         <p>Protein: {log.daily_total_protein || 0}g</p>
                                         <p>Carbs: {log.daily_total_carbs || 0}g</p>
                                         <p>Fat: {log.daily_total_fat || 0}g</p>
+                                        <p>Fiber: {log.daily_total_fiber || 0}g</p>
                                     </div>
                                     <p className="mt-2 text-sm">Meals: {log.meals_logged?.length || 0}</p>
                                     {log.notes && <p className="mt-2 text-sm italic">{log.notes}</p>}

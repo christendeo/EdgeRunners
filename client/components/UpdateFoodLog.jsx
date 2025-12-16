@@ -5,7 +5,8 @@ import { UPDATE_FOOD_LOG } from '../queries/foodLogQueries';
 export default function EditFoodLogModal({ log, meals, onClose, refetch }) {
     const { register, handleSubmit, control, formState: { errors }, setError } = useForm({
         defaultValues: {
-            selectedMeals: log.meals_logged.map(meal => ({ mealId: meal.meal_id }))
+            selectedMeals: log.meals_logged.map(meal => ({ mealId: meal.meal_id })),
+            notes: log.notes || ''
         }
     });
     
@@ -48,7 +49,8 @@ export default function EditFoodLogModal({ log, meals, onClose, refetch }) {
         updateFoodLog({
             variables: {
                 logId: log._id,
-                updatedMealsLogged: mealsLogged
+                updatedMealsLogged: mealsLogged,
+                notes: data.notes || null
             }
         });
     };
@@ -75,7 +77,11 @@ export default function EditFoodLogModal({ log, meals, onClose, refetch }) {
                             {fields.map((field, index) => (
                                 <div key={field.id}>
                                     <div className="flex gap-2">
+                                        <label htmlFor={`update-meal-${index}`} className="sr-only">
+                                            Meal {index + 1}
+                                        </label>
                                         <select
+                                            id={`update-meal-${index}`}
                                             {...register(`selectedMeals.${index}.mealId`, {
                                                 required: 'Please select a meal or remove this field'
                                             })}
@@ -93,6 +99,7 @@ export default function EditFoodLogModal({ log, meals, onClose, refetch }) {
                                                 type="button"
                                                 onClick={() => remove(index)}
                                                 className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:opacity-80 text-red-500"
+                                                aria-label={`Remove meal ${index + 1}`}
                                             >
                                                 ✕
                                             </button>
@@ -109,6 +116,17 @@ export default function EditFoodLogModal({ log, meals, onClose, refetch }) {
                         {errors.selectedMeals && typeof errors.selectedMeals.message === 'string' && (
                             <p className="text-red-500 text-sm mt-1">{errors.selectedMeals.message}</p>
                         )}
+                    </div>
+
+                    <div>
+                        <label htmlFor="update-notes" className="block text-sm font-medium mb-1">Notes (optional)</label>
+                        <textarea
+                            id="update-notes"
+                            {...register('notes')}
+                            rows={3}
+                            className="w-full px-3 py-2 border rounded-lg text-[var(--color-foreground)]"
+                            placeholder="Add any notes..."
+                        />
                     </div>
 
                     {errors.root && (
