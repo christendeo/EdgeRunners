@@ -1,6 +1,4 @@
-// To add more queries and mutations later
-// server/schema/typeDefs/users.js
-
+// User queries and mutations
 const userTypeDefs = `#graphql
 type User {
     _id: String,
@@ -15,7 +13,10 @@ type User {
     diet_goal: String,
     target_calories: Int,
     createdAt: String,
-    updatedAt: String
+    updatedAt: String,
+    use_custom_target: Boolean,
+    custom_target_calories: Float,
+    current_target_calories: Float
 }
 
 extend type Query {
@@ -34,7 +35,9 @@ extend type Mutation {
         height: Float!,
         weight: Float!,
         activity_level: String!,
-        diet_goal: String!
+        diet_goal: String!,
+        use_custom_target: Boolean,
+        custom_target_calories: Float
     ): User
 
     editUser(
@@ -49,6 +52,8 @@ extend type Mutation {
         weight: Float,
         activity_level: String,
         diet_goal: String
+        use_custom_target: Boolean,
+        custom_target_calories: Float
     ): User
 
     loginUser(

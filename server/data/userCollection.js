@@ -18,7 +18,9 @@ export const addUser = async (
     userHeight,
     userWeight,
     userActivityLevel,
-    userDietGoal
+    userDietGoal,
+    userUseCustomTarget,
+    userCustomTargetCalories
 ) => {
 
     // Validation checks
@@ -65,6 +67,38 @@ export const addUser = async (
     let saltRounds = 10;
     let passwordHash = await bcrypt.hash(userPassword, saltRounds);
 
+    // User custom target calories
+    let useCustomTarget = false;
+
+    if (userUseCustomTarget !== undefined && userUseCustomTarget !== null) {
+        if (typeof userUseCustomTarget !== "boolean") {
+            throw new Error("Error: userUseCustomTarget must be a boolean :(");
+        }
+
+        useCustomTarget = userUseCustomTarget;
+    }
+
+    let customTargetCalories = null;
+    if (userCustomTargetCalories !== undefined && userCustomTargetCalories !== null) {
+        if (typeof userCustomTargetCalories !== "number" || isNaN(userCustomTargetCalories)) {
+            throw new Error("Error: userCustomTargetCalories must be a number :(");
+        }
+
+        if (userCustomTargetCalories < 800 || userCustomTargetCalories > 6000) {
+            throw new Error("Error: userCustomTargetCalories must be between 800 and 6000 :(");
+        }
+
+        customTargetCalories = Math.round(userCustomTargetCalories);
+    }
+
+    if (useCustomTarget === true && customTargetCalories === null) {
+        throw new Error("Oh no! Custom target calories must be provided if use_custom_target is true :(");
+    }
+
+    if (useCustomTarget === false) {
+        customTargetCalories = null;
+    }
+
     // Store fields
     const newUser = {
         first_name: userFirstName,
@@ -78,6 +112,10 @@ export const addUser = async (
         activity_level: userActivityLevel,
         diet_goal: userDietGoal,
         target_calories: autoTargetCalories,
+
+        use_custom_target: useCustomTarget,
+        custom_target_calories: customTargetCalories,
+
         createdAt: new Date(),
         updatedAt: new Date()
     };
@@ -182,7 +220,7 @@ export const editUser = async (userId, updatedUser) => {
     }
 
     if (updatedUser.weight !== undefined) {
-        updatedUserData.weight = helpers.checkWeight(updatedUser.weight);
+        updatedUserData.weight = helpers.checkWeight(updatedUser.weight, "Weight");
     }
 
     if (updatedUser.activity_level !== undefined) {
@@ -195,6 +233,50 @@ export const editUser = async (userId, updatedUser) => {
 
     if (updatedUser.target_calories !== undefined) {
         updatedUserData.target_calories = updatedUser.target_calories;
+    }
+
+    // Custom target toggle and value
+    if (updatedUser.use_custom_target !== undefined) {
+        if (typeof updatedUser.use_custom_target !== "boolean") {
+            throw new Error("Error: use_custom_target must be a boolean");
+        }
+
+        updatedUserData.use_custom_target = updatedUser.use_custom_target;
+    }
+
+    if (updatedUser.custom_target_calories !== undefined) {
+        if (updatedUser.custom_target_calories === null) {
+            updatedUserData.custom_target_calories = null;
+        } else {
+            if (typeof updatedUser.custom_target_calories !== "number" || isNaN(updatedUser.custom_target_calories)) {
+                throw new Error("Error: customTargetCalories must be a number :(");
+            }
+
+            if (updatedUser.custom_target_calories < 800 || updatedUser.custom_target_calories > 6000) {
+                throw new Error("Error: customTargetCalories must be between 800 and 6000 :(");
+            }
+
+            updatedUserData.custom_target_calories = Math.round(updatedUser.custom_target_calories);
+        }
+    }
+
+    // If user turns off custom target, clear custom value
+    if (updatedUserData.use_custom_target === false) {
+        updatedUserData.custom_target_calories = null;
+    }
+
+    // If user turns on custom target, they must supply calories
+    if (updatedUserData.use_custom_target === true) {
+        let finalCustom = null;
+        if (updatedUserData.custom_target_calories !== undefined) {
+            finalCustom = updatedUserData.custom_target_calories;
+        } else {
+            finalCustom = currentUser.custom_target_calories;
+        }
+
+        if (finalCustom === null || finalCustom === undefined) {
+            throw new Error("Oh no! Custom target calories must be provided if customTargetCalories is true :(");
+        }
     }
 
     updatedUserData.updatedAt = new Date();

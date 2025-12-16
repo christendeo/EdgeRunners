@@ -3,6 +3,16 @@ import React, {useState} from "react";
 import {useMutation} from "@apollo/client/react";
 import {CHANGE_PASSWORD} from "../lib/userGraphQL";
 
+// Import Tailwind
+import tailwindCSS from "../lib/tailwindUIClasses";
+
+// Import custom font
+import localFont from "next/font/local";
+const NimbusFont = localFont({
+    src: "../public/NimbuDemo-Regular.otf",
+    variable: "--font-nimbus"
+});
+
 export default function ChangePasswordForm({userAuth}) {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
@@ -71,60 +81,78 @@ export default function ChangePasswordForm({userAuth}) {
     };
 
     // Render display user profile change password page
+    let hiddenEmail = "";
+    if (userAuth && userAuth.user && userAuth.user.email) {
+        hiddenEmail = userAuth.user.email;
+    }
+
     return (
-        <div>
-            <h2>Change Password</h2>
+        <div className={tailwindCSS.cardSoft}>
+            <h2 className={`${tailwindCSS.h2} ${NimbusFont.className}`}>Change Password</h2>
 
-            {/*For error or success messages*/}
-            {errorMessage && <p>{errorMessage}</p>}
-            {successMessage && <p>{successMessage}</p>}
+            {/*For displaying error messages or success*/}
+            <div className="mt-3 space-y-2">
+                {errorMessage &&
+                    <div className={tailwindCSS.alertError}>
+                        {errorMessage}
+                    </div>}
 
-            <form onSubmit={handleSubmit} autoComplete="on">
+                {successMessage &&
+                    <div className={tailwindCSS.alertSuccess}>
+                        {successMessage}
+                    </div>}
+            </div>
 
-                {/* Helps browser know which account this password is for */}
+            <form onSubmit={handleSubmit} autoComplete="on" className="mt-4 space-y-4">
                 <input
                     type="email"
                     name="email"
-                    value={userAuth.user ? userAuth.user.email : ""}
+                    value={hiddenEmail}
                     readOnly
                     autoComplete="username"
-                    style={{ display: "none" }}
+                    style={{display: "none"}}
                 />
 
-                <div>
-                    <label>Old Password</label>
+                <div className="space-y-1">
+                    <label className="text-sm font-medium">Old Password</label>
                     <input
+                        className={tailwindCSS.input}
                         type="password"
                         name="oldPassword"
                         value={formData.oldPassword}
                         onChange={handleChange}
                         autoComplete="current-password"
+                        required
                     />
                 </div>
 
-                <div>
-                    <label>New Password</label>
+                <div className="space-y-1">
+                    <label className="text-sm font-medium">New Password</label>
                     <input
+                        className={tailwindCSS.input}
                         type="password"
                         name="newPassword"
                         value={formData.newPassword}
                         onChange={handleChange}
                         autoComplete="new-password"
+                        required
                     />
                 </div>
 
-                <div>
-                    <label>Confirm New Password</label>
+                <div className="space-y-1">
+                    <label className="text-sm font-medium">Confirm New Password</label>
                     <input
+                        className={tailwindCSS.input}
                         type="password"
                         name="confirmNewPassword"
                         value={formData.confirmNewPassword}
                         onChange={handleChange}
                         autoComplete="new-password"
+                        required
                     />
                 </div>
 
-                <button type="submit" disabled={loading}>
+                <button className={tailwindCSS.btnPrimary} type="submit" disabled={loading}>
                     {loading ? "Updating..." : "Update Password"}
                 </button>
             </form>
