@@ -73,26 +73,22 @@ export default function EditPost(props){
     };
 
     return (
-        <div className='form'>
+        <div>
             <ReactModal
                 name='editModal'
                 isOpen={showEditModal}
                 contentLabel='Edit Post'
                 style={customStyles}
             >
-                <form
-                    className='form'
+                <form className='text-lg text-center'
                     id='edit-blog-post'
                     onSubmit={handleSubmit}
                 >
-                    {errorMessage && (
-                        <p>An error has occured. {errorMessage}</p>
-                    )}
-                    <div className='form-group'>
+                    <div>
                         <label>
                             Title:
                             <br />
-                            <input
+                            <input className="bg-white text-black"
                                 type='text' 
                                 name='title'
                                 value={formData.title}
@@ -101,11 +97,12 @@ export default function EditPost(props){
                             />
                         </label>
                     </div>
-                    <div className='form-group'>
+                    <br />
+                    <div>
                         <label>
                             Type your post here:
                             <br />
-                            <input
+                            <input className="bg-white text-black"
                                 type="text" 
                                 name='content'
                                 value={formData.content}
@@ -114,9 +111,15 @@ export default function EditPost(props){
                             />
                         </label>
                     </div>
-                <button type='submit'>Update Post</button>
+                    <br />
+                <button className='hover:underline' type='submit'>Update Post</button>
                 </form>
-                <button onClick={handleCloseEditModal}>Cancel</button> 
+                <div className="text-lg text-center">
+                    {errorMessage && (
+                        <p>An error has occured. {errorMessage}</p>
+                    )}
+                    <button className="hover:underline" onClick={handleCloseEditModal}>Cancel</button> 
+                </div>
             </ReactModal>
         </div>
     );
