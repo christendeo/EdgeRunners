@@ -60,10 +60,11 @@ export default function Layout( {children} ) {
                     )}
 
                     {authLoaded && currentUser && (
-                        <div className="flex gap-4 text-3xl">
+                        <div className="flex gap-4 text-3xl ">
                             <Link href="/dashboard">Dashboard</Link>
-                            <button
+                            <button 
                                 type="button"
+                                className="text-white hover:underline mt-3"
                                 onClick={() => {
                                     userAuth.logout();
                                     router.push("/login");

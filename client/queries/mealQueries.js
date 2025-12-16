@@ -1,9 +1,9 @@
 //TODO: add all other meal queries and mutations as needed
 import { gql } from '@apollo/client';
 
-export const GET_MEALS_BY_USER = gql`
-  query getMealsByUser {
-    getMealsByUser {
+export const GET_USER_MEALS = gql`
+  query GetMealsByUser($userId: ID!) { #required userId parameter
+    getMealsByUser(userId: $userId) { 
       _id
       name
       total_calories

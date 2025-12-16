@@ -66,7 +66,7 @@ export const seedFoods = async () => {
 
         if (result.errors) {
             console.log('Some documents had errors');
-        }
+        };        
     } catch (error) {
         console.error('Seed failed:', error);
     } finally {
