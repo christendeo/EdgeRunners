@@ -171,6 +171,7 @@ export default function AddMealModal({ userId, onClose, refetch }) {
 								</div>
 							))}
 						</div>
+						
 						{errors.foods && <p className="text-red-500 text-sm mt-1">{errors.foods.message}</p>}
 					</div>
 
