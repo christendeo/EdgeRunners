@@ -31,10 +31,10 @@ export default function AllPosts() {
                         Add Post
                     </button>
             </div>
-            {showAddForm && (
-                <CreatePost closeAddFormState={closeAddFormState}/>
-            )}
         </div>
+        {showAddForm && (
+            <CreatePost closeAddFormState={closeAddFormState}/>
+        )}
         <div>
             {posts.map((post) => {
                 return <PostCards post={post}/>

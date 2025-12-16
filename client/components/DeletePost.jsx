@@ -15,8 +15,8 @@ const customStyles = {
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
     width: '50%',
-    border: '1px solid #28547a',
-    borderRadius: '4px'
+    borderRadius: '4px',
+    background: "#007E6E"
   }
 };
 
@@ -75,21 +75,23 @@ export default function DeletePost(props){
         contentLabel='Delete Post'
         style={customStyles}
       >
-        <p>Are you sure you want to delete this post?</p>
-        {errorMessage && (
-          <p>An error has occured. {errorMessage}</p>
-        )}
-        {loading && (
-          <p>Loading...</p>
-        )}
-        <form
-          className='form'
-          id='delete-blog-post'
-          onSubmit={handleSubmit}
-        >
-          <button type='submit'>Delete Post</button>
-        </form>
-        <button onClick={handleCloseDeleteModal}>Cancel</button>
+        <div className='text-lg text-center'>
+          <p>Are you sure you want to delete this post?</p>
+          {errorMessage && (
+            <p>An error has occured. {errorMessage}</p>
+          )}
+          {loading && (
+            <p>Loading...</p>
+          )}
+          <form
+            className='form'
+            id='delete-blog-post'
+            onSubmit={handleSubmit}
+          >
+            <button className="hover:underline" type='submit'>Delete Post</button>
+          </form>
+          <button className="hover:underline" onClick={handleCloseDeleteModal}>Cancel</button>
+        </div>
       </ReactModal>
     </div>
   );
