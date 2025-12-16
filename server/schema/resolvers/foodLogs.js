@@ -128,7 +128,7 @@ export const resolvers = {
             }
         },
 
-        updateFoodLog: async (parent, { logId, updatedMealsLogged }, context) => {
+        updateFoodLog: async (parent, { logId, updatedMealsLogged, notes }, context) => {
             // if (!context.user) {
             //     throw new GraphQLError('Not authenticated', {
             //         extensions: { code: 'UNAUTHENTICATED' }
@@ -139,7 +139,8 @@ export const resolvers = {
                 const result = await foodLogs.updateFoodlog(
                     context.user ? context.user.id : TEST_USER_ID,
                     logId,
-                    updatedMealsLogged
+                    updatedMealsLogged,
+                    notes
                 );
 
                 await deleteCache(`foodLog:${logId}`);

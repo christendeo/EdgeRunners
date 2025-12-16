@@ -138,7 +138,7 @@ export const addFoodLog = async (userId, date, meals_logged, notes) => {
     }
 }
 
-export const updateFoodlog = async (userId, logId, updatedMealsLogged) => {
+export const updateFoodlog = async (userId, logId, updatedMealsLogged, notes) => {
     try {
         userId = helpers.checkId(userId, "User ID");
         logId = helpers.checkId(logId, "Log ID");
@@ -149,6 +149,7 @@ export const updateFoodlog = async (userId, logId, updatedMealsLogged) => {
         }
         const updatedFoodLog = {
             meals_logged: updatedMealsLogged,
+            notes: notes !== undefined ? notes : foodLog.notes
         };
         if (updatedMealsLogged.length === 0) {
             return removeFoodlog(userId, logId);

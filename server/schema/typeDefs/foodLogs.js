@@ -41,7 +41,7 @@ export const foodLogTypeDefs = `#graphql
         addFoodLog(input: AddFoodLogInput!): Boolean!
         
         #update existing food log
-        updateFoodLog(logId: ID!, updatedMealsLogged: [MealLoggedInput!]!): Boolean!
+        updateFoodLog(logId: ID!, updatedMealsLogged: [MealLoggedInput!]!, notes: String): String!
         
         #remove food log
         removeFoodLog(logId: ID!): Boolean!
