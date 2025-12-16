@@ -77,9 +77,9 @@ export default function UserTodaysProgress() {
 
     // Display render page
     return (
-        <div className={tailwindCSS.cardSoft}>
+        <div className={""}>
             <div className="flex items-center justify-between mb-2">
-                <h2 className={tailwindCSS.h2}>Today’s Progress</h2>
+                <h2 className={`${tailwindCSS.h2} ${NimbusFont.className}`}>Today’s Progress</h2>
                 <div className="text-sm opacity-70">{todayStr}</div>
             </div>
 

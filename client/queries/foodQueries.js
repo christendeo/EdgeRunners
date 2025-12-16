@@ -40,27 +40,28 @@ export const GET_FOOD_BY_ID = gql`
         }
     }
 `;
-const SEARCH_FOODS = gql`
+
+export const SEARCH_FOODS = gql`
     query SearchFoods($filters: FoodSearchInput, $page: Int, $limit: Int) {
         searchFoods(filters: $filters, page: $page, limit: $limit) {
             foods {
                 _id
-            name
-            serving_size
-            serving_unit
-            calories
-            protein
-            carbs
-            fat 
-            fiber 
-            added_by 
-            is_public 
-            created_at
-            }
-            total
-            page 
-            limit 
-            totalPages
+				name
+				serving_size
+				serving_unit
+				calories
+				protein
+				carbs
+				fat 
+				fiber 
+				added_by 
+				is_public 
+				created_at
+			}
+			total
+			page 
+			limit 
+			totalPages
         }
     }
 `;
