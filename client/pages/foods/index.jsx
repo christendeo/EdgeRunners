@@ -5,11 +5,11 @@ import MyFoods from '../../components/MyFoods.jsx';
 export default function FoodsPage() {
     return (
         <div>
-            <h1>Food Search</h1>
+            <p className="text-4xl font-style: italic">Search and filter foods here, or add your own!</p>
             <FoodSearch />
             <CreateFood />
             <MyFoods />
-            <p>Search and filter foods here, or add your own!</p>
+            
         </div>
     );
 }
