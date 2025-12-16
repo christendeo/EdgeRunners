@@ -65,7 +65,7 @@ export default function DashboardPage() {
 
             <div className="flex items-center justify-between mb-4">
                 <div>
-                    <h1 className={`${tailwindCSS.h1} ${NimbusFont.className} font-bold`}>
+                    <h1 className={`${tailwindCSS.h1} ${NimbusFont.className}`}>
                         Hello, {currentUser.first_name}
                     </h1>
                     <p className="text-sm opacity-80">
@@ -90,18 +90,18 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 
                 <div className={tailwindCSS.card}>
-                    <div className="text-sm opacity-80">Target Calories</div>
+                    <div className={`${tailwindCSS.h2} ${NimbusFont.className} mb-3`}>Target Calories</div>
                     <div className="text-2xl font-bold">{displayTarget}</div>
                 </div>
 
                 <div className={tailwindCSS.card}>
-                    <div className="text-sm opacity-80">Diet Goal</div>
-                    <div className="text-xl font-semibold">{currentUser.diet_goal}</div>
+                    <div className={`${tailwindCSS.h2} ${NimbusFont.className} mb-3`}>Diet Goal</div>
+                    <div className="text-xl font-semibold capitalize">{currentUser.diet_goal}</div>
                 </div>
 
                 <div className={tailwindCSS.card}>
-                    <div className="text-sm opacity-80">Activity Level</div>
-                    <div className="text-xl font-semibold">{currentUser.activity_level}</div>
+                    <div className={`${tailwindCSS.h2} ${NimbusFont.className} mb-3`}>Activity Level</div>
+                    <div className="text-xl font-semibold capitalize">{currentUser.activity_level}</div>
                 </div>
             </div>
 
@@ -122,21 +122,13 @@ export default function DashboardPage() {
                 <h2 className={`${tailwindCSS.h2} ${NimbusFont.className} mb-3`}>Quick Links</h2>
 
                 <div className="flex flex-wrap gap-2">
-                    <Link className={tailwindCSS.btnSmallPrimary} href="/profile">
-                        Edit Profile
-                    </Link>
+                    <Link className={tailwindCSS.btnSmallPrimary} href="/profile">Edit Profile</Link>
 
-                    <Link className={tailwindCSS.btnSecondary} href="/foods">
-                        Foods
-                    </Link>
+                    <Link className={tailwindCSS.btnSecondary} href="/foods">Foods</Link>
 
-                    <Link className={tailwindCSS.btnSecondary} href="/foodlogs">
-                        Food Logs
-                    </Link>
+                    <Link className={tailwindCSS.btnSecondary} href="/foodlogs">Food Logs</Link>
 
-                    <Link className={tailwindCSS.btnSecondary} href="/community/allPosts">
-                        Community
-                    </Link>
+                    <Link className={tailwindCSS.btnSecondary} href="/community/allPosts">Community</Link>
                 </div>
             </div>
 

@@ -61,7 +61,6 @@ export default function Layout( {children} ) {
 
                     {authLoaded && currentUser && (
                         <div className="flex gap-4 text-3xl ">
-                            <Link href="/dashboard">Dashboard</Link>
                             <button 
                                 type="button"
                                 className="text-white hover:underline mt-3"
