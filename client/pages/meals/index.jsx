@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
-import { useQuery } from '@apollo/client/react';
+import { useQuery, useMutation } from '@apollo/client/react';
 import { AuthContext } from '@/lib/userAuthContext';
-import { GET_MEALS_BY_USER, GET_ALL_PUBLIC_MEALS } from '@/queries/mealQueries';
+import { GET_MEALS_BY_USER, GET_ALL_PUBLIC_MEALS, DELETE_MEAL } from '@/queries/mealQueries';
 import MealCard from '@/components/meals/MealCard';
 import AddMealModal from '@/components/meals/AddMealModal';
 import EditMealModal from '@/components/meals/EditMealModal';
@@ -37,15 +37,26 @@ export default function Meals() {
 		skip: view !== 'public'
 	});
 
-	const handleDelete = () => {
-
-	};
+	const [deleteMeal] = useMutation(DELETE_MEAL);
 
 	const refetchMeals = () => {
 		if (view === 'user') {
 			refetchUserMeals();
 		} else {
 			refetchPublicMeals();
+		}
+	};
+
+	const handleDelete = async (meal) => {
+		if (!confirm(`Are you sure you want to delete ${meal.name}?`)) {
+			return;
+		}
+
+		try {
+			await deleteMeal({ variables: { mealId: meal._id } });
+			refetchMeals();
+		} catch (e) {
+			alert("Failed to delete meal: " + e.message);
 		}
 	};
 
@@ -113,10 +124,11 @@ export default function Meals() {
 						)}
 					</div>
 				) : (
-				<div className="grid grid-cols-1 gap-4">
-					{meals.map(meal => (
-						<MealCard key={meal._id} meal={meal} onEdit={() => setEditingMeal(meal)} onDelete={handleDelete} showActions={view === 'user' || meal.user_id === currentUser._id} />
-					))}
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+					{meals.map(meal => {
+						console.log(`Meal ${meal.name}, user_id ${meal.user_id}, currentUser._id ${currentUser._id}`);
+						return <MealCard key={meal._id} meal={meal} onEdit={() => setEditingMeal(meal)} onDelete={handleDelete} showActions={meal.user_id === currentUser._id} />;	
+					})}
 				</div>
 			)}
 			</div>
