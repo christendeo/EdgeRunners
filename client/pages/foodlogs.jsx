@@ -22,7 +22,7 @@ import {
     GET_FOOD_BY_ID
 } from "../queries/foodQueries.js";
 
-import { GET_USER_MEALS } from "../queries/mealQueries";
+import { GET_MEALS_BY_USER } from "../queries/mealQueries";
 
 export default function FoodLogs() {
     const router = useRouter();
@@ -130,7 +130,7 @@ export default function FoodLogs() {
         variables: { startDate, endDate }
     });
     
-    const { data: mealsData, loading: mealsLoading, error: mealsError } = useQuery(GET_USER_MEALS, {
+    const { data: mealsData, loading: mealsLoading, error: mealsError } = useQuery(GET_MEALS_BY_USER, {
         variables: { userId: currentUser?._id }
     });
 
