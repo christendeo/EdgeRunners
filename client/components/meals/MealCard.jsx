@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function MealCard({ meal, onEdit, onDelete, showActions=true }) {
     return (
         <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
@@ -7,7 +9,10 @@ export default function MealCard({ meal, onEdit, onDelete, showActions=true }) {
 						{meal.is_public && (
 							<span className="text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">Public</span>
 						)}
-						<h3 className="text-xl font-bold">{meal.name}</h3>
+
+						<Link href={`/meals/${meal._id}`}>
+							<h3 className="text-xl font-bold hover:underline cursor-pointer">{meal.name}</h3>
+						</Link>
 					</div>
 
 					<div className="text-sm text-gray-500">
