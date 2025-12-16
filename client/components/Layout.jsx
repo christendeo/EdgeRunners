@@ -4,6 +4,7 @@ import Image from "next/image";
 import {useContext} from "react";
 import {useRouter} from "next/router";
 import {AuthContext} from "../lib/userAuthContext";
+import Head from "next/head";
 import localFont from 'next/font/local';
 
 const NimbusFont = localFont({ 
@@ -29,6 +30,10 @@ export default function Layout( {children} ) {
 
     return (
         <>
+        <Head>
+            <title>FuelMe</title>
+            <link rel="icon" href="/FuelMeLogo.svg"/>
+        </Head>
         <div className={NimbusFont.className}>
             <header className="flex justify-between p-4 bg-neutral-800">
                 <div className="flex gap-4 text-4xl items-center text-center  ">
@@ -55,10 +60,11 @@ export default function Layout( {children} ) {
                     )}
 
                     {authLoaded && currentUser && (
-                        <div className="flex gap-4 text-3xl">
+                        <div className="flex gap-4 text-3xl ">
                             <Link href="/dashboard">Dashboard</Link>
-                            <button
+                            <button 
                                 type="button"
+                                className="text-white hover:underline mt-3"
                                 onClick={() => {
                                     userAuth.logout();
                                     router.push("/login");

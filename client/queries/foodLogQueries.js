@@ -44,8 +44,8 @@ export const ADD_FOOD_LOG = gql`
 `;
 
 export const UPDATE_FOOD_LOG = gql`
-    mutation UpdateFoodLog($logId: ID!, $updatedMealsLogged: [MealLoggedInput!]!) {
-        updateFoodLog(logId: $logId, updatedMealsLogged: $updatedMealsLogged)
+    mutation UpdateFoodLog($logId: ID!, $updatedMealsLogged: [MealLoggedInput!]!, $notes: String) {
+        updateFoodLog(logId: $logId, updatedMealsLogged: $updatedMealsLogged, notes: $notes)
     }
 `;
 

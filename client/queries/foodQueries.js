@@ -21,8 +21,8 @@ const GET_FOODS = gql`
 
 
 `;
-const GET_FOOD_BY_ID = gql`
-    query GetFoodById($id: !String) {
+export const GET_FOOD_BY_ID = gql`
+    query GetFoodById($id: String!) {
         GetFoodById(_id: $id) {
             _id
             name

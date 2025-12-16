@@ -36,17 +36,17 @@ export default function MyFoods() {
     };
 
     return (
-        <div>
+        <div className="max-w-2xl mx-auto p-4">
 
-            <button onClick={handleShowMyFoods}>My Foods</button>
+            <button onClick={handleShowMyFoods} className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 disabled:bg-gray-300 disabled:opacity-50 w-fit">My Foods</button>
 
             {loading && <p>Loading...</p>}
                         {error && <p>Error: {error.message}</p>}
                         {data && (
                             <div>
                                 {console.log('Data received:', data)}
-                                <p>My Saved Foods</p>
-                                <ul>
+                                <p className="text-2xl font-sans mb-4">My Saved Foods</p>
+                                <ul className="flex flex-col gap-y-4">
                                     {data.getFoodsByUser.map((food) => (
                                         <FoodCard key={food._id} food={food} />
                                     ))}

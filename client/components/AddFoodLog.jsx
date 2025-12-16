@@ -62,25 +62,26 @@ export default function AddMealToLogModal({ meals, onClose, refetch }) {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="p-6 rounded-lg w-96 max-h-[80vh] overflow-y-auto border">
+        <div className="fixed inset-0 flex items-center justify-center ">
+            <div className="p-6 rounded-lg w-96 max-h-[80vh] overflow-y-auto border bg-[var(--color-background)] text-[var(--color-foreground)]">
                 <h2 className="text-2xl font-bold mb-4">Add Meals to Log</h2>
                 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium mb-1">Date</label>
+                        <label htmlFor="log-date" className="block text-sm font-medium mb-1">Date</label>
                         <input
+                            id="log-date"
                             type="date"
                             {...register('date', { required: 'Date is required' })}
                             defaultValue={new Date().toISOString().split('T')[0]}
-                            className="w-full px-3 py-2 border rounded-lg"
+                            className="w-full px-3 py-2 border rounded-lg bg-[var(--color-background)] text-[var(--color-foreground)] [color-scheme:light] dark:[color-scheme:dark]"
                         />
                         {errors.date && <p className="text-red-500 text-sm">{errors.date.message}</p>}
                     </div>
 
-                    <div>
-                        <div className="flex items-center justify-between mb-1">
-                            <label className="block text-sm font-medium">Select Meals</label>
+                    <fieldset>
+                        <legend className="flex items-center justify-between mb-1 w-full">
+                            <span className="block text-sm font-medium">Select Meals</span>
                             <button
                                 type="button"
                                 onClick={() => append({ mealId: '' })}
@@ -88,14 +89,18 @@ export default function AddMealToLogModal({ meals, onClose, refetch }) {
                             >
                                 + Add Another
                             </button>
-                        </div>
+                        </legend>
                         
                         <div className="space-y-2">
                             {fields.map((field, index) => (
                                 <div key={field.id} className="flex gap-2">
+                                    <label htmlFor={`meal-select-${index}`} className="sr-only">
+                                        Meal {index + 1}
+                                    </label>
                                     <select
+                                        id={`meal-select-${index}`}
                                         {...register(`selectedMeals.${index}.mealId`)}
-                                        className="flex-1 px-3 py-2 border rounded-lg"
+                                        className="flex-1 px-3 py-2 border rounded-lg bg-[var(--color-background)] text-[var(--color-foreground)]"
                                     >
                                         <option value="">-- Choose a meal --</option>
                                         {meals?.map((meal) => (
@@ -109,6 +114,7 @@ export default function AddMealToLogModal({ meals, onClose, refetch }) {
                                             type="button"
                                             onClick={() => remove(index)}
                                             className="px-3 py-2 border rounded-lg hover:opacity-80 text-red-500"
+                                            aria-label={`Remove meal ${index + 1}`}
                                         >
                                             ✕
                                         </button>
@@ -119,14 +125,15 @@ export default function AddMealToLogModal({ meals, onClose, refetch }) {
                         {errors.selectedMeals && (
                             <p className="text-red-500 text-sm mt-1">{errors.selectedMeals.message}</p>
                         )}
-                    </div>
+                    </fieldset>
 
                     <div>
-                        <label className="block text-sm font-medium mb-1">Notes (optional)</label>
+                        <label htmlFor="log-notes" className="block text-sm font-medium mb-1">Notes (optional)</label>
                         <textarea
+                            id="log-notes"
                             {...register('notes')}
                             rows={3}
-                            className="w-full px-3 py-2 border rounded-lg"
+                            className="w-full px-3 py-2 border rounded-lg bg-[var(--color-background)] text-[var(--color-foreground)]"
                             placeholder="Add any notes..."
                         />
                     </div>
