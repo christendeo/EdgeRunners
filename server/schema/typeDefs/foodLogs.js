@@ -27,24 +27,24 @@ export const foodLogTypeDefs = `#graphql
     
     type Query {
         #get food logs in date range
-        getRangedFoodLogs(startDate: String!, endDate: String!): [FoodLog!]!
+        getRangedFoodLogs(_id: String, startDate: String!, endDate: String!): [FoodLog!]!
         
         #get specific food log by ID
-        getFoodLogById(logId: ID!): FoodLog
+        getFoodLogById(_id: String, logId: ID!): FoodLog
         
         #get today's food log
-        getTodayFoodLog: FoodLog
+        getTodayFoodLog(_id: String): FoodLog
     }
     
     type Mutation {
         #create new food log
-        addFoodLog(input: AddFoodLogInput!): Boolean!
+        addFoodLog(_id: String, input: AddFoodLogInput!): Boolean!
         
         #update existing food log
-        updateFoodLog(logId: ID!, updatedMealsLogged: [MealLoggedInput!]!, notes: String): String!
+        updateFoodLog(_id: String, logId: ID!, updatedMealsLogged: [MealLoggedInput!]!, notes: String): String!
         
         #remove food log
-        removeFoodLog(logId: ID!): Boolean!
+        removeFoodLog(_id: String, logId: ID!): Boolean!
     }
     
     input AddFoodLogInput {

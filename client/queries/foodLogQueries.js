@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 export const GET_RANGED_FOOD_LOGS = gql`
-    query GetRangedFoodLogs($startDate: String!, $endDate: String!) {
-        getRangedFoodLogs(startDate: $startDate, endDate: $endDate) {
+    query GetRangedFoodLogs($_id: String!, $startDate: String!, $endDate: String!) {
+        getRangedFoodLogs(_id: $_id, startDate: $startDate, endDate: $endDate) {
             _id
             date
             daily_total_calories
@@ -20,8 +20,8 @@ export const GET_RANGED_FOOD_LOGS = gql`
 `;
 
 export const GET_TODAY_FOOD_LOG = gql`
-    query GetTodayFoodLog {
-        getTodayFoodLog {
+    query GetTodayFoodLog($_id: String!) {
+        getTodayFoodLog(_id: $_id) {
             _id
             date
             daily_total_calories
@@ -38,19 +38,19 @@ export const GET_TODAY_FOOD_LOG = gql`
 `;
 
 export const ADD_FOOD_LOG = gql`
-    mutation AddFoodLog($input: AddFoodLogInput!) {
-        addFoodLog(input: $input)
+    mutation AddFoodLog($_id: String, $input: AddFoodLogInput!) {
+        addFoodLog(_id: $_id, input: $input)
     }
 `;
 
 export const UPDATE_FOOD_LOG = gql`
-    mutation UpdateFoodLog($logId: ID!, $updatedMealsLogged: [MealLoggedInput!]!, $notes: String) {
-        updateFoodLog(logId: $logId, updatedMealsLogged: $updatedMealsLogged, notes: $notes)
+    mutation UpdateFoodLog($_id: String, $logId: ID!, $updatedMealsLogged: [MealLoggedInput!]!, $notes: String) {
+        updateFoodLog(_id: $_id, logId: $logId, updatedMealsLogged: $updatedMealsLogged, notes: $notes)
     }
 `;
 
 export const REMOVE_FOOD_LOG = gql`
-    mutation RemoveFoodLog($logId: ID!) {
-        removeFoodLog(logId: $logId)
+    mutation RemoveFoodLog($_id: String, $logId: ID!) {
+        removeFoodLog(_id: $_id, logId: $logId)
     }
 `;

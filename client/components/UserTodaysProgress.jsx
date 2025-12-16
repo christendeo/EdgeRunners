@@ -27,9 +27,11 @@ export default function UserTodaysProgress() {
     const todayStr = clientHelpers.getTodaysQueryDate();
     const {data, loading, error} = useQuery(GET_RANGED_FOOD_LOGS, {
         variables: {
+            _id: currentUser?._id,
             startDate: todayStr,
             endDate: todayStr
         },
+        skip: !currentUser?._id,
         fetchPolicy: "network-only"
     });
 

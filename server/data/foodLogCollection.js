@@ -155,7 +155,14 @@ export const updateFoodlog = async (userId, logId, updatedMealsLogged, notes) =>
             return removeFoodlog(userId, logId);
         }
 
-        await foodLogCollection.updateOne({"_id": new ObjectId(logId)}, {"$set": updatedFoodLog});
+        const updateResult = await foodLogCollection.updateOne(
+            { _id: new ObjectId(logId), user_id: new ObjectId(userId) }, 
+            { $set: updatedFoodLog }
+        );
+
+        if (updateResult.matchedCount === 0) {
+            throw new Error(`Failed to update food log with id ${logId}`);
+        }
 
         await recalculateDailyTotals(logId);
         return true;

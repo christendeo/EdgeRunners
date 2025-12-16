@@ -127,7 +127,8 @@ export default function FoodLogs() {
     const [removeLog] = useMutation(REMOVE_FOOD_LOG);
   
     const { data: logsData, loading: logsLoading, refetch } = useQuery(GET_RANGED_FOOD_LOGS, {
-        variables: { startDate, endDate }
+        variables: { _id: currentUser?._id, startDate, endDate },
+        skip: !currentUser?._id
     });
     
     const { data: mealsData, loading: mealsLoading, error: mealsError } = useQuery(GET_USER_MEALS, {
@@ -146,7 +147,7 @@ export default function FoodLogs() {
     const handleDeleteLog = async (logId) => {
         try {
             await removeLog({
-                variables: { logId }
+                variables: { _id: currentUser?._id, logId }
             });
             // Refetch logs after deletion
             refetch();
@@ -291,6 +292,7 @@ export default function FoodLogs() {
                     meals={mealsData?.getMealsByUser || []}
                     onClose={() => setIsUpdateLogOpen(false)}
                     refetch={refetch}
+                    currentUser={currentUser}
                 />
             )}
 
@@ -301,6 +303,7 @@ export default function FoodLogs() {
                     meals={mealsData?.getMealsByUser || []}
                     onClose={() => setupdatingLog(null)}
                     refetch={refetch}
+                    currentUser={currentUser}
                 />
             )}
         </>

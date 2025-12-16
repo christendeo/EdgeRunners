@@ -48,7 +48,7 @@ export const resolvers = {
 				throwGraphQLError(e.message, 'INTERNAL_SERVER_ERROR');
 			}
 
-			if (!meal.is_public && meal.user_id.toString() !== context.user?.id && meal.user_id.toString() !== TEST_USER_ID) {
+			if (!meal.is_public && meal.user_id.toString() !== context.user?.id && meal.user_id.toString() !== args.userId) {
 				// Don't reveal which IDs are valid
 				throwGraphQLError(`Meal ${mealId} not found`, 'NOT_FOUND');
 			}
@@ -61,7 +61,7 @@ export const resolvers = {
 			// }
 
 			const userId = validateId(args.userId);
-			const currentUserId = context.user ? context.user.id : TEST_USER_ID;
+			const currentUserId = context.user ? context.user.id : args.userId;
 			if (currentUserId !== userId) {
 				throwGraphQLError("Not authorized to view other users' meals", 'FORBIDDEN');
 			}
@@ -89,7 +89,7 @@ export const resolvers = {
 			// }
 
 			const userId = validateId(args.userId);
-			const currentUserId = context.user ? context.user.id : TEST_USER_ID;
+			const currentUserId = context.user ? context.user.id : args.userId;
 
 			if (currentUserId !== userId) {
 				throwGraphQLError("Not authorized to create meals for other users", 'FORBIDDEN');
@@ -129,7 +129,7 @@ export const resolvers = {
 			// }
 
 			const mealId = validateId(args.mealId);
-			const currentUserId = context.user ? context.user.id : TEST_USER_ID;
+			const currentUserId = context.user ? context.user.id : args.userId;
 
 			try {
 				const meal = await mealCollection.getMealById(mealId);
@@ -193,7 +193,7 @@ export const resolvers = {
 			// }
 
 			const mealId = validateId(args.mealId);
-			const currentUserId = context.user ? context.user.id : TEST_USER_ID;
+			const currentUserId = context.user ? context.user.id : args.userId;
 
 			try {
 				const meal = await mealCollection.getMealById(mealId);

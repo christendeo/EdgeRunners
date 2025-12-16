@@ -2,7 +2,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { useMutation } from '@apollo/client/react';
 import { UPDATE_FOOD_LOG } from '../queries/foodLogQueries';
 
-export default function EditFoodLogModal({ log, meals, onClose, refetch }) {
+export default function EditFoodLogModal({ log, meals, onClose, refetch, currentUser }) {
     const { register, handleSubmit, control, formState: { errors }, setError } = useForm({
         defaultValues: {
             selectedMeals: log.meals_logged.map(meal => ({ mealId: meal.meal_id })),
@@ -48,6 +48,7 @@ export default function EditFoodLogModal({ log, meals, onClose, refetch }) {
 
         updateFoodLog({
             variables: {
+                _id: currentUser?._id,
                 logId: log._id,
                 updatedMealsLogged: mealsLogged,
                 notes: data.notes || null
