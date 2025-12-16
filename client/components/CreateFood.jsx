@@ -88,7 +88,7 @@ export default function CreateFood() {
     };
 
     if (!currentUser) {
-        return <p>Please log in to create foods.</p>
+        return <p className="text-center">Please log in to create foods.</p>
     }
 
     return (

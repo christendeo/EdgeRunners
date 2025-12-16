@@ -1,5 +1,5 @@
 // User account creation
-import React, {useContext, useState} from "react";
+import React, {useContext, useState, useEffect} from "react";
 import {gql} from "@apollo/client";
 import {useMutation} from "@apollo/client/react";
 import {useRouter} from "next/router";
@@ -18,8 +18,18 @@ const NimbusFont = localFont({
 });
 
 const SignupPage = () => {
-
+    const router = useRouter();
     const userAuth = useContext(AuthContext);
+        useEffect(() => {
+    
+            // Check first if user is logged in
+            if (userAuth.authLoaded) {
+                if (userAuth.user) {
+                    router.push("/dashboard");
+                }
+            }
+    
+        }, [userAuth.authLoaded, userAuth.user, router]);
     const [formData, setFormData] = useState({
         first_name: "",
         last_name: "",
@@ -40,7 +50,7 @@ const SignupPage = () => {
     const [successMessage, setSuccessMessage] = useState("");
 
     const [addUser, {loading}] = useMutation(ADD_USER);
-    const router = useRouter();
+
 
     // For handling user changes
     const handleChange = (e) => {
@@ -137,7 +147,7 @@ const SignupPage = () => {
         <div className={`${tailwindCSS.pageWrap} flex justify-center`}>
             <div className="w-full max-w-2xl">
 
-                <h1 className={`${NimbusFont.className} ${tailwindCSS.h1} font-bold mb-3`}>Create an Account</h1>
+                <h1 className={`${NimbusFont.className} ${tailwindCSS.h1} mb-3`}>Create an Account</h1>
                 <p className="text-sm opacity-80 mb-6">
                     Enter your info to calculate your daily targets.
                 </p>
@@ -158,7 +168,7 @@ const SignupPage = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className={`font-semibold ${NimbusFont.className}`}>First Name</label>
+                                <label className={`${NimbusFont.className}`}>First Name</label>
                                 <input
                                     className={tailwindCSS.input}
                                     type="text"
@@ -171,7 +181,7 @@ const SignupPage = () => {
                             </div>
 
                             <div>
-                                <label className={`font-semibold ${NimbusFont.className}`}>Last Name</label>
+                                <label className={`${NimbusFont.className}`}>Last Name</label>
                                 <input
                                     className={tailwindCSS.input}
                                     type="text"
@@ -185,7 +195,7 @@ const SignupPage = () => {
                         </div>
 
                         <div>
-                            <label className={`font-semibold ${NimbusFont.className}`}>Email Address</label>
+                            <label className={`${NimbusFont.className}`}>Email Address</label>
                             <input
                                 className={tailwindCSS.input}
                                 type="email"
@@ -198,7 +208,7 @@ const SignupPage = () => {
                         </div>
 
                         <div>
-                            <label className={`font-semibold ${NimbusFont.className}`}>Password</label>
+                            <label className={`${NimbusFont.className}`}>Password</label>
                             <input
                                 className={tailwindCSS.input}
                                 type="password"
@@ -212,7 +222,7 @@ const SignupPage = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className={`font-semibold ${NimbusFont.className}`}>Sex</label>
+                                <label className={`${NimbusFont.className}`}>Sex</label>
                                 <select
                                     className={tailwindCSS.input}
                                     name="sex"
@@ -225,7 +235,7 @@ const SignupPage = () => {
                             </div>
 
                             <div>
-                                <label className={`font-semibold ${NimbusFont.className}`}>Date of Birth (MM/DD/YYYY)</label>
+                                <label className={`${NimbusFont.className}`}>Date of Birth (MM/DD/YYYY)</label>
                                 <input
                                     className={tailwindCSS.input}
                                     type="text"
@@ -240,7 +250,7 @@ const SignupPage = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label className={`font-semibold ${NimbusFont.className}`}>Height (ft)</label>
+                                <label className={`${NimbusFont.className}`}>Height (ft)</label>
                                 <input
                                     className={tailwindCSS.input}
                                     type="number"
@@ -253,7 +263,7 @@ const SignupPage = () => {
                             </div>
 
                             <div>
-                                <label className={`font-semibold ${NimbusFont.className}`}>Height (in)</label>
+                                <label className={`${NimbusFont.className}`}>Height (in)</label>
                                 <input
                                     className={tailwindCSS.input}
                                     type="number"
@@ -266,7 +276,7 @@ const SignupPage = () => {
                             </div>
 
                             <div>
-                                <label className={`font-semibold ${NimbusFont.className}`}>Weight (lbs)</label>
+                                <label className={`${NimbusFont.className}`}>Weight (lbs)</label>
                                 <input
                                     className={tailwindCSS.input}
                                     type="number"
@@ -282,7 +292,7 @@ const SignupPage = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className={`font-semibold ${NimbusFont.className}`}>Activity Level</label>
+                                <label className={`${NimbusFont.className}`}>Activity Level</label>
                                 <select
                                     className={tailwindCSS.input}
                                     name="activity_level"
@@ -298,7 +308,7 @@ const SignupPage = () => {
                             </div>
 
                             <div>
-                                <label className={`font-semibold ${NimbusFont.className}`}>Goal</label>
+                                <label className={`${NimbusFont.className}`}>Goal</label>
                                 <select
                                     className={tailwindCSS.input}
                                     name="diet_goal"
@@ -334,11 +344,11 @@ const SignupPage = () => {
                                     });
                                 }}
                             />
-                            <span className={`font-semibold ${NimbusFont.className}`}>Use Custom Target Calories</span>
+                            <span className={`${NimbusFont.className}`}>Use Custom Target Calories</span>
                         </div>
 
                         <div>
-                            <label className={`font-semibold ${NimbusFont.className}`}>Custom Target Calories</label>
+                            <label className={`${NimbusFont.className}`}>Custom Target Calories</label>
                             <input
                                 className={tailwindCSS.input}
                                 type="number"
@@ -350,7 +360,7 @@ const SignupPage = () => {
                             />
                         </div>
 
-                        <button className={`${tailwindCSS.btnPrimary} w-full`} type="submit" disabled={loading}>
+                        <button className={`${NimbusFont.className}`} type="submit" disabled={loading}>
                             {loading ? "Creating account..." : "Sign Up"}
                         </button>
 
