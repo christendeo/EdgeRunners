@@ -7,7 +7,7 @@ import {
     loginUser as loginUserData,
     changePassword as resetPasswordData
 } from "../../data/userCollection.js";
-import redis from "../../config/redisConnection.js"
+import { generateToken } from '../../helpers/jwtHelpers.js';
 
 const userResolvers = {
 
@@ -84,6 +84,8 @@ const userResolvers = {
                 args.custom_target_calories
             );
 
+			const token = generateToken(createdUser);
+
             return {
                 _id: createdUser._id,
                 first_name: createdUser.first_name,
@@ -100,6 +102,7 @@ const userResolvers = {
                 updatedAt: createdUser.updatedAt,
                 use_custom_target: createdUser.use_custom_target,
                 custom_target_calories: createdUser.custom_target_calories,
+				token: token
             };
         },
 
@@ -186,6 +189,8 @@ const userResolvers = {
                 args.password
             );
 
+			const token = generateToken(loggedInUser);
+
             return {
                 _id: loggedInUser._id,
                 first_name: loggedInUser.first_name,
@@ -202,6 +207,7 @@ const userResolvers = {
                 updatedAt: loggedInUser.updatedAt,
                 use_custom_target: loggedInUser.use_custom_target,
                 custom_target_calories: loggedInUser.custom_target_calories,
+				token: token
             };
         },
 

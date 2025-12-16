@@ -8,6 +8,7 @@ import typeDefs from './schema/typeDefs/index.js';
 import resolvers from './schema/resolvers/index.js';
 import redisClient, {connectRedis} from "./config/redisConnection.js";
 import {users} from "./config/mongoCollections.js";
+import { getAuthenticatedUser } from './helpers/authContext.js';
 
 // Create user indexes once at startup
 const ensureUserIndexes = async () => {
@@ -26,31 +27,28 @@ async function start() {
     // Ensure user indexes (Mongo)
     await ensureUserIndexes();
 
-    let redisStatus = "Not Connected";
-    if (redisClient && redisClient.isOpen) {
-        redisStatus = "Connected";
-    }
+    const redisStatus = redisClient && redisClient.isOpen ? 'Connected' : 'Not Connected';
 
     // Then create Apollo server
-    let apolloServer = new ApolloServer({
+    const apolloServer = new ApolloServer({
         typeDefs: typeDefs,
         resolvers: resolvers
     });
 
     // Start server
-    let serverResult = await startStandaloneServer(apolloServer, {
+    const serverResult = await startStandaloneServer(apolloServer, {
         listen: {port: 4000},
-        context: async function () {
-            return {
-                redis: redisClient
-            };
+        context: async function ({ req }) {
+            const user = getAuthenticatedUser(req);
+			return {
+				redis: redisClient,
+				user: user
+			}
         }
     });
 
-    let pageUrl = serverResult.url;
-
     console.log("🚀 Redis Client Status: " + redisStatus);
-    console.log("🚀 GraphQL server ready at: " + pageUrl);
+    console.log("🚀 GraphQL server ready at: " + serverResult.url);
 }
 
 // In case it fails to start

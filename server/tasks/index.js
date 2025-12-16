@@ -2,7 +2,7 @@ import {seedBlogs} from './seedBlogs.js';
 import {seedFoods} from './seedFoods.js';
 import {userSeed} from './seedUsers.js';
 import {mealSeed} from './seedMeals.js';
-import {foodLogSeed} from './seedFoodLogs.js';
+import {foodLogSeed} from './seedFoodlogs.js';
 import {closeConnection} from '../config/mongoConnection.js';
 
 async function runAllSeeds() {

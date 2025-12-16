@@ -1,6 +1,5 @@
 // User login page
 import React, {useContext, useState} from "react";
-import {gql} from "@apollo/client";
 import {useMutation} from "@apollo/client/react";
 import {useRouter} from "next/router";
 import Link from "next/link";

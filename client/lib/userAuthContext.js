@@ -1,5 +1,5 @@
 // Implement a global React state with helper functions for user authentication
-import React, {createContext, useEffect, useState} from "react";
+import { createContext, useEffect, useState } from 'react';
 export const AuthContext = createContext(null);
 
 // Authentication Logic
@@ -8,16 +8,18 @@ export const AuthProvider = ({ children }) => {
     const [authLoaded, setAuthLoaded] = useState(false);
 
     useEffect(() => {
-        if (typeof window !== "undefined") {
-            const userStored = localStorage.getItem("fuelmeUser");
+        if (typeof window !== 'undefined') {
+            const userStored = localStorage.getItem('fuelme_user');
+			const token = localStorage.getItem('fuelme_token');
 
             // Get user logged in
-            if (userStored) {
+            if (userStored && token) {
                 try {
                     const userParsed = JSON.parse(userStored);
                     setUser(userParsed);
                 } catch (e) {
                     setUser(null);
+					localStorage.removeItem('fuelme_token');
                 }
             } else {
                 setUser(null);
@@ -33,22 +35,27 @@ export const AuthProvider = ({ children }) => {
         }
 
         // Ensure the user session is stored
-        if (typeof window !== "undefined") {
-            localStorage.setItem("fuelmeUser", JSON.stringify(userData));
+        if (typeof window !== 'undefined') {
+            localStorage.setItem("fuelme_user", JSON.stringify(userData));
 
             if (userData._id) {
                 localStorage.setItem("fuelme_user_id", userData._id);
             }
+
+			if (userData.token) {
+				localStorage.setItem('fuelme_token', userData.token);
+			}
         }
 
         setUser(userData);
     };
 
     const userLogout = () => {
-        if (typeof window !== "undefined") {
-            localStorage.removeItem("fuelmeUser");
-            localStorage.removeItem("fuelme_user_id");
-            localStorage.removeItem("fuelme_user_name");
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('fuelme_user');
+            localStorage.removeItem('fuelme_user_id');
+            localStorage.removeItem('fuelme_user_name');
+			localStorage.removeItem('fuelme_token');
         }
 
         setUser(null);
@@ -56,14 +63,15 @@ export const AuthProvider = ({ children }) => {
 
     // Keeps auth synced across tabs
     useEffect(() => {
-        if (typeof window === "undefined") {
+        if (typeof window === 'undefined') {
             return;
         }
 
         const onStorage = () => {
-            const userStored = localStorage.getItem("fuelmeUser");
+            const userStored = localStorage.getItem("fuelme_user");
+			const token = localStorage.getItem('fuelme_token');
 
-            if (!userStored) {
+            if (!userStored || !token) {
                 setUser(null);
                 return;
             }
@@ -76,10 +84,10 @@ export const AuthProvider = ({ children }) => {
             }
         };
 
-        window.addEventListener("storage", onStorage);
+        window.addEventListener('storage', onStorage);
 
         return () => {
-            window.removeEventListener("storage", onStorage);
+            window.removeEventListener('storage', onStorage);
         };
     }, []);
 

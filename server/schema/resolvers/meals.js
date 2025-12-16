@@ -6,8 +6,6 @@ const PUBLIC_MEALS_TTL = 600;
 const MEAL_TTL = 600;
 const USER_MEALS_TTL = 300;
 
-const TEST_USER_ID = "693e185148537db1fa2c23e9"; // Same as food logs
-
 export const resolvers = {
 	// Query results are cached and only fetched if needed
 	Query: {
@@ -48,7 +46,7 @@ export const resolvers = {
 				throwGraphQLError(e.message, 'INTERNAL_SERVER_ERROR');
 			}
 
-			if (!meal.is_public && meal.user_id.toString() !== context.user?.id && meal.user_id.toString() !== TEST_USER_ID) {
+			if (!meal.is_public && (!context.user || meal.user_id.toString() !== context.user.id)) {
 				// Don't reveal which IDs are valid
 				throwGraphQLError(`Meal ${mealId} not found`, 'NOT_FOUND');
 			}
@@ -56,13 +54,12 @@ export const resolvers = {
 			return meal;
 		},
 		getMealsByUser: async (_, args, context) => {
-			// if (!context.user) {
-			// 	throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
-			// }
+			if (!context.user) {
+				throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
+			}
 
 			const userId = validateId(args.userId);
-			const currentUserId = context.user ? context.user.id : TEST_USER_ID;
-			if (currentUserId !== userId) {
+			if (context.user.id !== userId) {
 				throwGraphQLError("Not authorized to view other users' meals", 'FORBIDDEN');
 			}
 
@@ -84,14 +81,12 @@ export const resolvers = {
 	},
 	Mutation: {
 		addMeal: async (_, args, context) => {
-			// if (!context.user) {
-			// 	throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
-			// }
+			if (!context.user) {
+			 	throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
+			}
 
 			const userId = validateId(args.userId);
-			const currentUserId = context.user ? context.user.id : TEST_USER_ID;
-
-			if (currentUserId !== userId) {
+			if (context.user.id !== userId) {
 				throwGraphQLError("Not authorized to create meals for other users", 'FORBIDDEN');
 			}
 
@@ -124,16 +119,15 @@ export const resolvers = {
 			}
 		},
 		updateMeal: async (_, args, context) => {
-			// if (!context.user) {
-			// 	throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
-			// }
+			if (!context.user) {
+			 	throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
+			}
 
 			const mealId = validateId(args.mealId);
-			const currentUserId = context.user ? context.user.id : TEST_USER_ID;
 
 			try {
 				const meal = await mealCollection.getMealById(mealId);
-				if (currentUserId !== meal.user_id.toString()) {
+				if (context.user.id !== meal.user_id.toString()) {
 					throwGraphQLError(`Meal ${mealId} not found`, 'NOT_FOUND');
 				}
 
@@ -172,7 +166,7 @@ export const resolvers = {
 				// Update meal and delete outdated caches
 				const updatedMeal = await mealCollection.updateMeal(mealId, updateData);
 				await deleteCache(`meals:${mealId}`);
-				await deleteCache(`meals:user:${currentUserId}`);
+				await deleteCache(`meals:user:${context.user.id}`);
 				await deleteCache('meals:public');
 				return updatedMeal;
 			} catch (e) {
@@ -188,23 +182,22 @@ export const resolvers = {
 			}
 		},
 		deleteMeal: async (_, args, context) => {
-			// if (!context.user) {
-			// 	throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
-			// }
+			if (!context.user) {
+			 	throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
+			}
 
 			const mealId = validateId(args.mealId);
-			const currentUserId = context.user ? context.user.id : TEST_USER_ID;
 
 			try {
 				const meal = await mealCollection.getMealById(mealId);
-				if (currentUserId !== meal.user_id.toString()) {
+				if (context.user.id !== meal.user_id.toString()) {
 					throwGraphQLError(`Meal ${mealId} not found`, 'NOT_FOUND');
 				}
 
 				// Delete meal and outdated caches
 				const deletedMeal = await mealCollection.deleteMeal(mealId);
 				await deleteCache(`meals:${mealId}`);
-				await deleteCache(`meals:user:${currentUserId}`);
+				await deleteCache(`meals:user:${context.user.id}`);
 				await deleteCache(`meals:public`);
 
 				return deletedMeal;

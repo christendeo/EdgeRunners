@@ -52,10 +52,10 @@ export const SEARCH_FOODS = gql`
 				calories
 				protein
 				carbs
-				fat 
-				fiber 
-				added_by 
-				is_public 
+				fat
+				fiber
+				added_by
+				is_public
 				created_at
 			}
 			total

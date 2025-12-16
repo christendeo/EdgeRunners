@@ -12,7 +12,7 @@ export const foodTypeDefs = `#graphql
         carbs: Float
         fat: Float
         fiber: Float
-        added_by: User
+        added_by: String
         is_public: Boolean
         created_at: String
     } 
