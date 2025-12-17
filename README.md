@@ -26,13 +26,12 @@
 ## Independent Technologies
 * **ElasticSearch:** A distributed search and analytics engine. Our application will use ElasticSearch to allow users to perform real-time searches for food, meals and more.  
 * **Docker:** Used to containerize the application’s services, such as those listed above.  We will create Dockerfiles for each service, and a docker compose file to handle multiple containers.  We will use Docker to streamline our continuous integration workflow by minimizing environment-related bugs as we will all be working in the same environment.  Using a container to deploy our program will eliminate concerns about compatibility and facilitate ease of use.  
-* **ImageMagick (Not Yet Confirmed):** A library that supports multiple digital image manipulation functionalities such as creating, editing, composing, and converting bitmap images. Our application will use ImageMagick to edit user’s profile pictures as well as the images of foods and meals stored in our database.  
 
 ## Setup Installation
 1. Clone the Repository:
 `git clone https://github.com/christendeo/EdgeRunners.git`
 2. Open docker desktop. Open the project folder in a terminal. Run the command 'docker-compose up --build'
-3. Seed the database with the command 'docker exec -it edgerunners-server node tasks/seed.js'
+3. Seed the database with the command 'docker exec -it edgerunners-server node tasks/index.js'
 3. Run the application from the docker desktop application
 
 ## GitHub Repository
