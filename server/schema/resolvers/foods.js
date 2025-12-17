@@ -107,6 +107,7 @@ export const resolvers = {
 
 			try {
 				await deleteCache('allFoods');
+				await deleteCache(`userFoods:${args.added_by}`);
 			} catch (error) {
 				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
 			}
