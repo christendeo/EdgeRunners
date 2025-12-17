@@ -6,6 +6,7 @@ import queries from '@/queries/blogQueries.js';
 import DeletePost from '@/components/DeletePost';
 import EditPost from '@/components/EditPost';
 import {AuthContext} from "../../lib/userAuthContext";
+import tailwindCSS from '../../lib/tailwindUIClasses';
 
 const NimbusFont = localFont({ 
   src: '../../public/NimbuDemo-Regular.otf',
@@ -53,57 +54,68 @@ export default function Post() {
     if (data) {
         const post = data.getBlogById;
         return (
-            <>
-            <div className={NimbusFont.className}>
-                <div className='flex flow-root text-white mx-12 my-8 border-b-4 border-white pb-2'>
-                    <h1 className='float-left text-4xl'>FuelMe Community</h1>
+            <div className={tailwindCSS.pageWrap}>
+                <div className="flex items-center justify-between mb-4">
+                    <h1 className={`${tailwindCSS.h1} ${NimbusFont.className}`}>
+                        FuelMe Community
+                    </h1>
                 </div>
-            </div>
-            <div className="flex text-white mx-12 my-8">
-                <h2 className="text-3xl">{post.title}</h2>
-            </div>
-            <div className="flex text-white mx-12 my-8">
-                <p className="text-xl">{post.content}</p>
-            </div>
-            <div className=' mx-12 my-8 space-x-4'>
-                <button className="px-4 rounded-full bg-lightgreen hover:underline"
-                onClick={() => {
-                    handleOpenDeleteModal(post);
-                }}
-            >
-                Delete
-            </button>
-            <button className="px-4 rounded-full bg-lightgreen hover:underline"
-                onClick={() => {
-                    handleOpenEditModal(post);
-                }}
-            >
-                Edit Post
-            </button>
-            </div>
 
-            {showDeleteModal && (
-                <DeletePost 
-                    isOpen={showDeleteModal}
-                    handleClose={handleCloseModals}
-                    blog={deletePost}
-                />
-            )}
-            {showEditModal && (
-                <EditPost
-                    isOpen={showEditModal}
-                    handleClose={handleCloseModals}
-                    blog={editPost}
-                />
-            )}
+                <hr className="mb-4" />
 
-            </>
+                <div className={tailwindCSS.card}>
+                    <h2 className={`${tailwindCSS.h2} ${NimbusFont.className} mb-4`}>
+                        {post.title}
+                    </h2>
+                    <p className="text-base leading-relaxed mb-4">
+                        {post.content}
+                    </p>
+
+                    <div className="flex gap-2 mt-6">
+                        <button 
+                            className={tailwindCSS.btnSecondary}
+                            onClick={() => handleOpenEditModal(post)}
+                        >
+                            Edit Post
+                        </button>
+                        <button 
+                            className={tailwindCSS.btnDanger}
+                            onClick={() => handleOpenDeleteModal(post)}
+                        >
+                            Delete
+                        </button>
+                    </div>
+                </div>
+
+                {showDeleteModal && (
+                    <DeletePost 
+                        isOpen={showDeleteModal}
+                        handleClose={handleCloseModals}
+                        blog={deletePost}
+                    />
+                )}
+                {showEditModal && (
+                    <EditPost
+                        isOpen={showEditModal}
+                        handleClose={handleCloseModals}
+                        blog={editPost}
+                    />
+                )}
+            </div>
         );
     }
     else if (loading) {
-        return (<div>Loading...</div>);
+        return (
+            <div className={tailwindCSS.pageWrap}>
+                <p>Loading...</p>
+            </div>
+        );
     }
     else if (error) {
-        return (<div>{error.message}</div>);
+        return (
+            <div className={tailwindCSS.pageWrap}>
+                <p className={tailwindCSS.alertError}>{error.message}</p>
+            </div>
+        );
     }
 }

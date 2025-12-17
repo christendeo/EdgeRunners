@@ -1,8 +1,15 @@
 import {useMutation} from '@apollo/client/react';
 import {useState, useContext} from 'react';
 import {useRouter} from 'next/router';
+import localFont from 'next/font/local';
 import queries from '../queries/blogQueries.js';
 import {AuthContext} from "../lib/userAuthContext";
+import tailwindCSS from '../lib/tailwindUIClasses';
+
+const NimbusFont = localFont({ 
+    src: '../public/NimbuDemo-Regular.otf',
+    variable: '--font-nimbus' 
+});
 
 //component for creating blog posts
 export default function CreatePost (props) {
@@ -49,89 +56,95 @@ export default function CreatePost (props) {
     };
 
     return (
-        <div className='flex justify-center bg-darkgreen mx-12 my-8 rounded-full'>
-            <form className='text-center text-white text-lg py-2 space-x-2' id='add-blog' onSubmit={onSubmit}>
+        <div className={`${tailwindCSS.card} mb-6`}>
+            <h3 className={`${tailwindCSS.h2} ${NimbusFont.className} mb-4`}>Create New Post</h3>
+            
+            <form id='add-blog' onSubmit={onSubmit} className="space-y-4">
                 <div>
-                    <label>
+                    <label className="block text-sm font-medium mb-1">
                         Title
-                        <br />
-                        <input className="bg-white text-black"
-                            type='text' 
-                            name='title'
-                            value={formData.title}
-                            onChange={handleChange} 
-                            required 
-                            />
                     </label>
-                    <br />
-                    <br />
+                    <input 
+                        className={tailwindCSS.input}
+                        type='text' 
+                        name='title'
+                        value={formData.title}
+                        onChange={handleChange} 
+                        required 
+                        placeholder="Enter post title"
+                    />
                 </div>
+
                 <div>
-                    <label>
-                        Type your post here
-                        <br />
-                        <input className="bg-white text-black"
-                        type="text" 
+                    <label className="block text-sm font-medium mb-1">
+                        Content
+                    </label>
+                    <textarea 
+                        className={tailwindCSS.input}
                         name='content'
                         value={formData.content}
                         onChange={handleChange}
                         required 
-                        />
-                    </label>
-                    <br />
-                    <br />
+                        rows="4"
+                        placeholder="Type your post here..."
+                    />
                 </div>
-                <p>Post Type</p>
+
                 <div>
-                    <label>
-                        <input 
-                            type="radio"
-                            name="postType"
-                            id="PT1"
-                            value="PROGRESS"
-                            onChange={handleChange}
-                            required
-                        />
-                        Progress Update
-                    </label>
-                    <br />
-                    <label>
-                        <input 
-                            type="radio"
-                            name="postType"
-                            id="PT2"
-                            value="REVIEW"
-                            onChange={handleChange}
-                        />
-                        Review
-                    </label>
-                    <br />
-                    <label>
-                        <input 
-                            type="radio"
-                            name="postType"
-                            id="PT3"
-                            value="COMMENT"
-                            onChange={handleChange}
-                        />
-                        Comment
-                    </label>
+                    <label className="block text-sm font-medium mb-2">Post Type</label>
+                    <div className="space-y-2">
+                        <label className="flex items-center gap-2">
+                            <input 
+                                type="radio"
+                                name="postType"
+                                value="PROGRESS"
+                                onChange={handleChange}
+                                required
+                            />
+                            <span>Progress Update</span>
+                        </label>
+                        <label className="flex items-center gap-2">
+                            <input 
+                                type="radio"
+                                name="postType"
+                                value="REVIEW"
+                                onChange={handleChange}
+                            />
+                            <span>Review</span>
+                        </label>
+                        <label className="flex items-center gap-2">
+                            <input 
+                                type="radio"
+                                name="postType"
+                                value="COMMENT"
+                                onChange={handleChange}
+                            />
+                            <span>Comment</span>
+                        </label>
+                    </div>
                 </div>
-                <br />
-                <br />
+
                 {errorMessage && (
-                    <p>An error has occured. {errorMessage}</p>
+                    <p className={tailwindCSS.alertError}>
+                        An error has occurred. {errorMessage}
+                    </p>
                 )}
-                <button className="px-4 rounded-full border-1 border-white hover:underline" type='submit'>Post</button>
-                <button className="px-4 rounded-full border-1 border-white hover:underline"
-                    type='button'
-                    onClick={() => {
-                        document.getElementById('add-blog').reset();
-                        props.closeAddFormState();
-                    }}
-                >
-                    Cancel
-                </button>
+
+                <div className="flex gap-2 pt-2">
+                    <button className={tailwindCSS.btnPrimary} type='submit'>
+                        Post
+                    </button>
+                    <button 
+                        className={tailwindCSS.btnSecondary}
+                        type='button'
+                        onClick={() => {
+                            document.getElementById('add-blog').reset();
+                            props.closeAddFormState();
+                        }}
+                    >
+                        Cancel
+                    </button>
+                </div>
             </form>
         </div>
     );
