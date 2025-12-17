@@ -22,19 +22,31 @@ export default function MyFoods() {
     const userAuth = useContext(AuthContext);
     const currentUser = userAuth.user;
 
-    const [getFoodsByUser, { loading, error, data }] = useLazyQuery(GET_FOODS_BY_USER);
+    const [getFoodsByUser, { loading, error, data }] = useLazyQuery(GET_FOODS_BY_USER, {
+    fetchPolicy: 'network-only'
+});
 
     const handleShowMyFoods = () => {
+
+        console.log('1. Button clicked');
+    console.log('2. currentUser:', currentUser);
+    console.log('3. currentUser._id:', currentUser?._id);
         if (!currentUser?._id) { //"Cannot read properties of null (reading '_id')"
             console.warn('User not loaded yet');
             return;
         }
+        console.log('4. Calling getFoodsByUser');
         getFoodsByUser({
             variables: {
                 _id: currentUser._id
             }
-        });
+        }).then(result => {
+        console.log('5. Query result:', result);
+    }).catch(err => {
+        console.log('5. Query error:', err);
+    });
     };
+    console.log('loading:', loading, 'error:', error, 'data:', data);
 
     return (
         <div className="max-w-2xl mx-auto p-4">
