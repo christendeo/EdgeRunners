@@ -1,147 +1,223 @@
 import * as foodData from '../../data/foodCollection.js';
 import * as userData from '../../data/userCollection.js';
 import { searchFoods } from '../../data/foodSearch.js'
-import {GraphQLError} from 'graphql';
+import { throwGraphQLError, validateId } from '../../helpers/graphQLHelpers.js';
 import { getCache, setCache, deleteCache, } from '../../config/redisConnection.js';
-
-
 
 export const resolvers = {
     Query: {
-        
         getFoodById: async (_, args) => {
-
             const cacheKey = `food:${args._id}`;
 
-            const cached = await getCache(cacheKey);
-            if (cached) {
-                console.log('Cache hit for:', cacheKey);
-                return cached;
-            }
-            console.log('Cache miss for:', cacheKey);
-            
-            const food = await foodData.getFoodById(args._id);
-            if (!food) {
-                throw new GraphQLError('Food Not Found', {
-                    extensions: {code: 'NOT_FOUND'}
-                });
-            
-            }
-        await setCache(cacheKey, food);
-        return food;
+			let food;
+			try {
+				const cached = await getCache(cacheKey);
+				if (cached) {
+					food = cached;
+				} else {
+					food = await foodData.getFoodById(args._id);
+					await setCache(cacheKey, food);
+				}
+			} catch (error) {
+				if (error.message.includes('not found')) {
+					throwGraphQLError(error.message, 'NOT_FOUND');
+				}
+
+				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+			}
+
+			if (!food.is_public && food.added_by !== context.user.id) {
+				throwGraphQLError(`Food ${args._id} not found`, 'NOT_FOUND');
+			}
+
+			return food;
         },
-        getFoodsByUser: async(_, args) => {
+        getFoodsByUser: async(_, args, context) => {
+			if (!context.user) {
+				throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
+			}
+
+			const userId = validateId(args._id);
+			if (context.user.id !== userId) {
+				throwGraphQLError("Not authorized to view other users' foods", 'FORBIDDEN');
+			}
+
             const cacheKey = `userFoods:${args._id}`;
 
-            const cached = await getCache(cacheKey);
-            if (cached) {
-                console.log('Cache hit for: ', cacheKey);
-                return cached;
-            }
-            console.log('Cahe miss for: ', cacheKey);
+			try {
+				const cached = await getCache(cacheKey);
+				if (cached) {
+					return cached;
+				}
 
-            const userFoods = await foodData.getFoodsByUser(args._id);
-
-            await setCache(cacheKey, userFoods);
-            return userFoods;
+				const userFoods = await foodData.getFoodsByUser(args._id);
+				await setCache(cacheKey, userFoods);
+				return userFoods;
+			} catch (e) {
+				throwGraphQLError(e.message, 'INTERNAL_SERVER_ERROR');
+			}
         },
         foods: async () => {
-             const cacheKey = 'allFoods';
+			const cacheKey = 'allFoods';
 
-            const cached = await getCache(cacheKey);
-            if (cached) {
-                console.log('Cache hit for:', cacheKey);
-                return cached;
-            }
-            console.log('Cache miss for:', cacheKey);
-            
-            const allFoods = await foodData.getAllFoods();
-            if (!allFoods) {
-                throw new GraphQLError('Internal Server Error', {
-                    extensions: {code: 'INTERNAL_SERVER_ERROR'}
-                });
-            }
-            await setCache('allFoods', allFoods);
-            return allFoods;
+			try {
+				const cached = await getCache(cacheKey);
+				if (cached) {
+					return cached;
+				}
+				
+				const allFoods = await foodData.getAllFoods();
+				await setCache('allFoods', allFoods);
+				return allFoods;
+			} catch (e) {
+				throwGraphQLError(e.message, 'INTERNAL_SERVER_ERROR');
+			}
         },
-
         searchFoods: async (_, args) => {
-        const { filters, page = 1, limit = 20 } = args;
-        
-        try {
-            const results = await searchFoods(filters || {}, page, limit);
-            return results;
-        } catch (error) {
-            throw new GraphQLError('Search failed', {
-                extensions: { code: 'INTERNAL_SERVER_ERROR'}
-            });
-        }
+			const { filters, page = 1, limit = 20 } = args;
+			
+			try {
+				const results = await searchFoods(filters || {}, page, limit);
+				return results;
+			} catch (error) {
+				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+			}
+		},
     },
-
-    },
-
-    
-
     Mutation: {
+        addFood: async (_, args, context) => {
+			if (!context.user) {
+				throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
+			}
 
-        addFood: async (_, args) => {
-            
-            const newFood = await foodData.addFood (
-                args.name,
-                args.serving_size,
-                args.serving_unit,
-                args.calories,
-                args.protein,
-                args.carbs,
-                args.fat,
-                args.fiber,
-                args.added_by,
-                args.is_public,
-                
-            );
+			if (args.added_by !== context.user.id) {
+				throwGraphQLError("Not authorized to create foods for other users", 'FORBIDDEN');
+			}
 
-            await deleteCache('allFoods');
-            return newFood;
+			let newFood;
+			try {
+				newFood = await foodData.addFood(
+					args.name,
+					args.serving_size,
+					args.serving_unit,
+					args.calories,
+					args.protein,
+					args.carbs,
+					args.fat,
+					args.fiber,
+					args.added_by,
+					args.is_public,
+				);
+			} catch (error) {
+				if (error.message.includes("Could not add food")) {
+					throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+				}
 
+				throwGraphQLError(error.message, 'BAD_USER_INPUT');
+			}
 
+			try {
+				await deleteCache('allFoods');
+				await deleteCache(`userFoods:${args.added_by}`);
+			} catch (error) {
+				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+			}
+
+			return newFood;
+        },
+        updateFood: async (_, args, context) => {
+			if (!context.user) {
+				throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
+			}
+
+			const { _id, ...updateData } = args;
+
+			try {
+				const food = await foodData.getFoodById(_id);
+				if (food.added_by !== context.user.id) {
+					// Don't reveal valid food IDs
+					throwGraphQLError(`Food ${_id} not found`, 'NOT_FOUND');
+				}
+			} catch (error) {
+				if (error.extensions?.code) { // Rethrow GraphQL errors
+					throw error;
+				}
+
+				if (error.message.includes('not found')) {
+					throwGraphQLError(error.message, 'NOT_FOUND');
+				}
+
+				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+			}
+
+            let updatedFood;
+			
+			try {
+				updatedFood = await foodData.updateFood(_id, updateData);
+			} catch (error) {
+				throwGraphQLError(error.message, 'BAD_USER_INPUT');
+			}
+			
+            try {
+				await deleteCache('allFoods');
+				await deleteCache(`food:${_id}`);
+				await deleteCache(`userFoods:${context.user.id}`);
+			} catch (error) {
+				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+			}
+
+			return updatedFood;
         },
 
-        updateFood: async (_, args) => {
-            
-            const { _id, ...updateData } = args;
-            const updatedFood = await foodData.updateFood (_id, updateData);
+        removeFood: async (_, args, context) => {
+            if (!context.user) {
+				throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
+			}
 
-            await deleteCache('allFoods');
-            await deleteCache(`food:${_id}`);
-            return updatedFood;
-
-
-        },
-
-        removeFood: async (_, args) => {
-            
             const { _id } = args;
-            const removedFood = await foodData.removeFood (_id);
 
-            await deleteCache('allFoods');
-            await deleteCache(`food:${_id}`);
-            return removedFood;
+			try {
+				const food = await foodData.getFoodById(_id);
+				if (food.added_by !== context.user.id) {
+					throwGraphQLError(`Food ${_id} not found`, 'NOT_FOUND');
+				}
+			} catch (error) {
+				if (error.extensions?.code) {
+					throw error;
+				}
 
+				if (error.message.includes('not found')) {
+					throwGraphQLError(error.message, 'NOT_FOUND');
+				}
 
+				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+			}
+
+			try {
+				const removedFood = await foodData.removeFood(_id);
+				await deleteCache('allFoods');
+				await deleteCache(`food:${_id}`);
+				await deleteCache(`userFoods:${context.user.id}`);
+				return removedFood;
+			} catch (error) {
+				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+			}
         }
     },
 
     Food: {
         added_by: async (parent) => {
-            if (!parent.added_by) return null;
+			if (!parent.added_by) {
+				return null;
+			}
 
-            const user = await userData.getUserById(parent.added_by);
-            return user;
+			try {
+				return await userData.getUserById(parent.added_by);
+			} catch {
+				return null;
+			}
         }
     }
 }
 
-
-
 export default resolvers;
-

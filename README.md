@@ -31,9 +31,9 @@
 ## Setup Installation
 1. Clone the Repository:
 `git clone https://github.com/christendeo/EdgeRunners.git`
-2. Install Dependencies:
-`npm install`
-3. Run Application
+2. Open docker desktop. Open the project folder in a terminal. Run the command 'docker-compose up --build'
+3. Seed the database with the command 'docker exec -it edgerunners-server node tasks/seed.js'
+3. Run the application from the docker desktop application
 
 ## GitHub Repository
 * https://github.com/christendeo/EdgeRunners

@@ -45,6 +45,7 @@ export const ADD_USER = gql`
             use_custom_target
             custom_target_calories
             current_target_calories
+			token
         }
     }
 `;
@@ -67,6 +68,7 @@ export const LOGIN_USER = gql`
             use_custom_target
             custom_target_calories
             current_target_calories
+			token
         }
     }
 `;

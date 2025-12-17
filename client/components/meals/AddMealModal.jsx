@@ -8,7 +8,7 @@ export default function AddMealModal({ userId, onClose, refetch }) {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [searchFoods, { data: foodsData, loading: foodsLoading }] = useLazyQuery(SEARCH_FOODS);
 
-	const { register, handleSubmit, control, formState: { errors }, setError } = useForm({
+	const { register, handleSubmit, control, formState: { errors }, setError, setValue, getValues } = useForm({
 		defaultValues: {
 			name: '',
 			is_public: false,
@@ -108,13 +108,22 @@ export default function AddMealModal({ userId, onClose, refetch }) {
 						</div>
 
 						{foodsLoading && <p className="text-sm">Searching...</p>}
-						
+
 						{foodsData?.searchFoods?.foods && (
 							<div className="max-h-40 overflow-y-auto border rounded-lg p-2 mb-3">
-								{foodsData.searchFoods.foods.map((food) => (
+								{foodsData.searchFoods.foods.length === 0
+								? <p className="text-sm text-gray-500 p-2">No foods found.</p>
+								: foodsData.searchFoods.foods.map((food) => (
 									<div
 										key={food._id}
-										onClick={() => append({ food_id: food._id, quantity: 1, serving_unit: 'serving' })}
+										onClick={() => {
+											const values = getValues('foods');
+											if (values.length === 1 && (!values[0].food_id || values[0].food_id.trim() === '')) {
+												setValue('foods.0.food_id', food._id);
+											} else {
+												append({ food_id: food._id, quantity: 1, serving_unit: 'serving' })
+											}
+										}}
 										className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer rounded text-sm"
 									>
 										<div className="font-medium">{food.name}</div>

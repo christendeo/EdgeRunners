@@ -1,4 +1,5 @@
 import { foods, meals } from '../config/mongoCollections.js';
+import { client } from '../config/elasticConnection.js';
 import helpers from '../helpers/serverHelpers.js';
 import { ObjectId } from 'mongodb';
 
@@ -19,7 +20,9 @@ const calculateMealTotals = async (foodsArray) => {
 
 	const foodCollection = await foods();
 	for (const foodItem of foodsArray) {
-		const food = await foodCollection.findOne({ _id: new ObjectId(foodItem.food_id) });
+		const food = ObjectId.isValid(foodItem.food_id)
+			? await foodCollection.findOne({ _id: new ObjectId(foodItem.food_id) })
+			: await foodCollection.findOne({ fdcId: foodItem.food_id });
 
 		if (!food) {
 			throw new Error(`Food ${foodItem.food_id} not found`);
@@ -48,10 +51,43 @@ const checkFoodArray = async (foodArray) => {
 
 	const foodCollection = await foods();
 	for (const foodItem of foodArray) {
-		const foodId = helpers.checkId(foodItem.food_id, 'Food ID');
-		const food = await foodCollection.findOne({ _id: new ObjectId(foodId) });
+		if (!foodItem.food_id) {
+			throw new Error("Food ID is required");
+		}
+
+		let food;
+
+		if (ObjectId.isValid(foodItem.food_id)) {
+			food = await foodCollection.findOne({ _id: new ObjectId(foodItem.food_id) });
+		} else {
+			const esResult = await client.search({
+				index: 'foods',
+				body: {
+					query: {
+						term: { _id: foodItem.food_id.toString() }
+					}
+				}
+			});
+			
+			if (esResult.hits.hits.length > 0) {
+				const esFood = esResult.hits.hits[0];
+				
+				// Copy to MongoDB so we can reference it
+				const mongoFood = {
+					fdcId: esFood._id,
+					...esFood._source,
+					added_by: null,
+					is_public: true,
+					created_at: new Date()
+				};
+				
+				const insertResult = await foodCollection.insertOne(mongoFood);
+				food = await foodCollection.findOne({ _id: insertResult.insertedId });
+			}
+		}
+
 		if (!food) {
-			throw new Error(`Food ${foodId} not found`);
+			throw new Error(`Food ${foodItem.food_id} not found`);
 		}
 
 		// TODO: Should this be integer? Or should we allow like half a food? This needs more validation
@@ -118,7 +154,7 @@ export const addMeal = async (userId, name, foodArray, is_public = false) => {
 		name: name,
 		user_id: new ObjectId(userId),
 		foods: foodArray.map(item => ({
-			food_id: new ObjectId(item.food_id),
+			food_id: item.food_id.toString(),
 			quantity: item.quantity,
 			serving_unit: item.serving_unit || "serving"
 		})),
@@ -163,7 +199,7 @@ export const updateMeal = async (mealId, updateData) => {
 		const totals = await calculateMealTotals(updateData.foods);
 
 		updatedMeal.foods = updateData.foods.map(item => ({
-			food_id: new ObjectId(item.food_id),
+			food_id: item.food_id.toString(),
 			quantity: item.quantity,
 			serving_unit: item.serving_unit || "serving"
 		}));

@@ -10,7 +10,7 @@ export const seedBlogs = async () => {
     //add a user
     let user;
     try {
-            user = await addUser('Jane', 'Doe', 'janedoe@gmail.com', 'JaneDoe1!', 'female', '01/01/1999', 200, 200, 'light', 'maintain');
+            user = await addUser('Jane', 'Doe', 'janedoe@gmail.com', 'JaneDoe1!', 'female', '01/01/1999', 120, 150, 'light', 'maintain');
     } catch (error) {
             if(!user) throw new Error("Error running user creation in seedBlogs.js: " + error.message);
     }
@@ -19,7 +19,7 @@ export const seedBlogs = async () => {
         {
             user_id: user._id.toString(),
             title: 'Progress Update',
-            content: 'My progress has come a long way!', 
+            content: 'I have been using this site for a few months now and I am down 40 pounds! My progress has come a long way!', 
             post_type: 'PROGRESS',
             created_at: '12/09/2025',
             updated_at: '12/09/2025'
@@ -35,7 +35,7 @@ export const seedBlogs = async () => {
         {
             user_id: user._id.toString(),
             title: 'Any Insights?',
-            content: 'Has anyone tried this meal idea?', 
+            content: 'Has anyone tried this meal idea? I want to try it, but figured I would ask for feedback first', 
             post_type: 'COMMENT',
             created_at: '03/10/2025',
             updated_at: '04/09/2025'

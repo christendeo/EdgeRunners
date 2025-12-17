@@ -16,7 +16,8 @@ type User {
     updatedAt: String,
     use_custom_target: Boolean,
     custom_target_calories: Float,
-    current_target_calories: Float
+    current_target_calories: Float,
+	token: String
 }
 
 extend type Query {

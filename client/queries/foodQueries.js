@@ -22,8 +22,8 @@ const GET_FOODS = gql`
 
 `;
 export const GET_FOOD_BY_ID = gql`
-    query GetFoodById($id: String!) {
-        GetFoodById(_id: $id) {
+    query GetFoodById($_id: String!) {
+        getFoodById(_id: $_id) {
             _id
             name
             serving_size
@@ -52,10 +52,10 @@ export const SEARCH_FOODS = gql`
 				calories
 				protein
 				carbs
-				fat 
-				fiber 
-				added_by 
-				is_public 
+				fat
+				fiber
+				added_by
+				is_public
 				created_at
 			}
 			total
