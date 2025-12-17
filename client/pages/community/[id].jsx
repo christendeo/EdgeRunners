@@ -71,7 +71,7 @@ export default function Post() {
                         {post.content}
                     </p>
 
-					{userAuth.user._id === post.user_id && (
+					{userAuth.user?._id === post.user_id && (
 						<div className="flex gap-2 mt-6">
 							<button 
 								className={tailwindCSS.btnSecondary}

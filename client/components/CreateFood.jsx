@@ -66,9 +66,6 @@ export default function CreateFood() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-         console.log('Current user:', currentUser);
-    console.log('User ID:', currentUser._id);
-
         addFood({
             variables: {
                 name: formData.name,
@@ -79,10 +76,8 @@ export default function CreateFood() {
                 carbs: parseFloat(formData.carbs),
                 fat: parseFloat(formData.fat),
                 fiber: parseFloat(formData.fiber),
-                added_by: currentUser._id,
+                added_by: currentUser?._id,
                 is_public: formData.is_public
-                
-
             }
         });
     };

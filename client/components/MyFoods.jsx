@@ -28,23 +28,16 @@ export default function MyFoods() {
 
     const handleShowMyFoods = () => {
 
-        console.log('1. Button clicked');
-    console.log('2. currentUser:', currentUser);
-    console.log('3. currentUser._id:', currentUser?._id);
         if (!currentUser?._id) { //"Cannot read properties of null (reading '_id')"
             console.warn('User not loaded yet');
             return;
         }
-        console.log('4. Calling getFoodsByUser');
+		
         getFoodsByUser({
             variables: {
-                _id: currentUser._id
+                _id: currentUser?._id
             }
-        }).then(result => {
-        console.log('5. Query result:', result);
-    }).catch(err => {
-        console.log('5. Query error:', err);
-    });
+        });
     };
     console.log('loading:', loading, 'error:', error, 'data:', data);
 
