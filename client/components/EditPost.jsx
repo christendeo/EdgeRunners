@@ -1,23 +1,17 @@
 import {useState, useContext} from 'react';
 import {useMutation} from '@apollo/client/react';
 import ReactModal from 'react-modal';
+import localFont from 'next/font/local';
 import queries from '../queries/blogQueries.js';
 import {AuthContext} from "../lib/userAuthContext";
+import tailwindCSS from '../lib/tailwindUIClasses';
+
+const NimbusFont = localFont({ 
+    src: '../public/NimbuDemo-Regular.otf',
+    variable: '--font-nimbus' 
+});
 
 ReactModal.setAppElement('#__next');
-const customStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-    width: '50%',
-    borderRadius: '4px',
-    background: "#007E6E"
-  }
-};
 
 //component for editing blog posts with react modal
 export default function EditPost(props){
@@ -77,48 +71,63 @@ export default function EditPost(props){
                 name='editModal'
                 isOpen={showEditModal}
                 contentLabel='Edit Post'
-                style={customStyles}
+                className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background text-foreground rounded-lg border p-6 w-[90%] max-w-[600px] focus:outline-none"
+                overlayClassName="fixed inset-0"
             >
-                <form className='text-lg text-center'
+                <h3 className={`${tailwindCSS.h2} ${NimbusFont.className} mb-4`}>Edit Post</h3>
+                
+                <form 
                     id='edit-blog-post'
                     onSubmit={handleSubmit}
+                    className="space-y-4"
                 >
                     <div>
-                        <label>
-                            Title:
-                            <br />
-                            <input className="bg-white text-black"
-                                type='text' 
-                                name='title'
-                                value={formData.title}
-                                onChange={handleChange} 
-                                required 
-                            />
+                        <label className="block text-sm font-medium mb-1">
+                            Title
                         </label>
+                        <input 
+                            className={tailwindCSS.input}
+                            type='text' 
+                            name='title'
+                            value={formData.title}
+                            onChange={handleChange} 
+                            required 
+                        />
                     </div>
-                    <br />
+
                     <div>
-                        <label>
-                            Type your post here:
-                            <br />
-                            <input className="bg-white text-black"
-                                type="text" 
-                                name='content'
-                                value={formData.content}
-                                onChange={handleChange}
-                                required 
-                            />
+                        <label className="block text-sm font-medium mb-1">
+                            Content
                         </label>
+                        <textarea 
+                            className={tailwindCSS.input}
+                            name='content'
+                            value={formData.content}
+                            onChange={handleChange}
+                            required 
+                            rows="4"
+                        />
                     </div>
-                    <br />
-                <button className='hover:underline' type='submit'>Update Post</button>
-                </form>
-                <div className="text-lg text-center">
+
                     {errorMessage && (
-                        <p>An error has occured. {errorMessage}</p>
+                        <p className={tailwindCSS.alertError}>
+                            An error has occurred. {errorMessage}
+                        </p>
                     )}
-                    <button className="hover:underline" onClick={handleCloseEditModal}>Cancel</button> 
-                </div>
+
+                    <div className="flex gap-2 pt-2">
+                        <button className={tailwindCSS.btnPrimary} type='submit'>
+                            Update Post
+                        </button>
+                        <button 
+                            className={tailwindCSS.btnSecondary}
+                            type='button'
+                            onClick={handleCloseEditModal}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </form>
             </ReactModal>
         </div>
     );

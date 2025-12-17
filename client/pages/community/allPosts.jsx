@@ -6,6 +6,7 @@ import queries from '@/queries/blogQueries.js';
 import CreatePost from '@/components/CreatePost';
 import PostCards from '@/components/PostCard';
 import {AuthContext} from "../../lib/userAuthContext";
+import tailwindCSS from '../../lib/tailwindUIClasses';
 
 const NimbusFont = localFont({ 
   src: '../../public/NimbuDemo-Regular.otf',
@@ -35,32 +36,47 @@ export default function AllPosts() {
     if (data){
         const posts = data.blogs;
        return (
-        <>
-        <div className={NimbusFont.className}>
-            <div className='flex flow-root text-white mx-12 my-8 border-b-4 border-white pb-2'>
-                    <h1 className='float-left text-4xl'>FuelMe Community</h1>
-                    <button className='float-right bg-lightgreen hover:bg-darkgreen text-lg font-bold py-2 px-4 rounded-full' onClick={() => setShowAddForm(!showAddForm)}>
-                        Add Post
-                    </button>
+        <div className={tailwindCSS.pageWrap}>
+            {/* Header with title and add button */}
+            <div className="flex items-center justify-between mb-2">
+                <h1 className={`${tailwindCSS.h1} ${NimbusFont.className} -mb-4`}>
+                    FuelMe Community
+                </h1>
+                <button 
+                    className={tailwindCSS.btnPrimary}
+                    onClick={() => setShowAddForm(!showAddForm)}
+                >
+                    Add Post
+                </button>
+            </div>
+
+            <hr className="mb-4" />
+
+            {showAddForm && (
+                <CreatePost closeAddFormState={closeAddFormState}/>
+            )}
+
+            <div className="space-y-4">
+                {posts.map((post) => {
+                    return <PostCards key={post._id} post={post}/>
+                })}
             </div>
         </div>
-        {showAddForm && (
-            <CreatePost closeAddFormState={closeAddFormState}/>
-        )}
-        <div>
-            {posts.map((post) => {
-                return <PostCards key={post._id} post={post}/>
-            })}
-        </div>
-        </>
         ); 
     }
     else if (loading) {
-        return (<div>Loading...</div>);
+        return (
+            <div className={tailwindCSS.pageWrap}>
+                <p>Loading...</p>
+            </div>
+        );
     }
     else if (error) {
-         return (<div>{error.message}</div>);
+        return (
+            <div className={tailwindCSS.pageWrap}>
+                <p className={tailwindCSS.alertError}>{error.message}</p>
+            </div>
+        );
     }
-
 }
 
