@@ -35,7 +35,7 @@ export const getBlogById = async (id) => {
     return blog;
 }
 
-export const getBlogsByUserId = async (userId) => {
+export const getBlogsByUser = async (userId) => {
 	userId = helpers.checkId(userId, "User ID");
 	
     const blogsCollection = await blogs();

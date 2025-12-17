@@ -1,8 +1,15 @@
+import { useState, useContext } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { useMutation } from '@apollo/client/react';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { ADD_FOOD_LOG } from '../queries/foodLogQueries';
+import { GET_MEALS_BY_USER, GET_ALL_PUBLIC_MEALS } from '@/queries/mealQueries';
+import { AuthContext } from '@/lib/userAuthContext';
 
-export default function AddMealToLogModal({ meals, onClose, refetch }) {
+export default function AddMealToLogModal({ onClose, refetch }) {
+	const [view, setView] = useState('user');
+	const userAuth = useContext(AuthContext);
+	const currentUser = userAuth.user;
+
     const { register, handleSubmit, control, formState: { errors }, setError } = useForm({
         defaultValues: {
             selectedMeals: [{ mealId: '' }]
@@ -13,6 +20,17 @@ export default function AddMealToLogModal({ meals, onClose, refetch }) {
         control,
         name: "selectedMeals"
     });
+
+	const { data: userMealsData, loading: userMealsLoading } = useQuery(GET_MEALS_BY_USER, {
+		variables: { userId: currentUser?._id },
+		skip: view !== 'user' || !currentUser?._id,
+		fetchPolicy: 'cache-and-network'
+	});
+
+	const { data: publicMealsData, loading: publicMealsLoading } = useQuery(GET_ALL_PUBLIC_MEALS, {
+		skip: view !== 'public',
+		fetchPolicy: 'cache-and-network'
+	});
     
     const [addFoodLog, { loading }] = useMutation(ADD_FOOD_LOG, {
         onCompleted: () => {
@@ -61,6 +79,9 @@ export default function AddMealToLogModal({ meals, onClose, refetch }) {
         });
     };
 
+	const meals = view === 'user' ? (userMealsData?.getMealsByUser || []) : (publicMealsData?.getAllPublicMeals || []);
+	const isLoading = view === 'user' ? userMealsLoading : publicMealsLoading;
+
     return (
         <div className="fixed inset-0 flex items-center justify-center ">
             <div className="p-6 rounded-lg w-96 max-h-[80vh] overflow-y-auto border bg-[var(--color-background)] text-[var(--color-foreground)]">
@@ -79,6 +100,27 @@ export default function AddMealToLogModal({ meals, onClose, refetch }) {
                         {errors.date && <p className="text-red-500 text-sm">{errors.date.message}</p>}
                     </div>
 
+					<div className="border rounded-lg p-3">
+						<label className="block text-sm font-medium">Meal Source</label>
+						<div className="flex gap-2">
+							<button
+								type="button"
+								onClick={() => setView('user')}
+								className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${view === 'user' ? 'bg-gradient-to-b from-[#73AF6F] to-[#007E6E] text-white' : 'border hover:opacity-80'}`}
+							>
+								My Meals
+							</button>
+
+							<button
+								type="button"
+								onClick={() => setView('public')}
+								className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${view === 'public' ? 'bg-gradient-to-b from-[#73AF6F] to-[#007E6E] text-white' : 'border hover:opacity-80'}`}
+							>
+								Public Meals
+							</button>
+						</div>
+					</div>
+
                     <fieldset>
                         <legend className="flex items-center justify-between mb-1 w-full">
                             <span className="block text-sm font-medium">Select Meals</span>
@@ -90,38 +132,45 @@ export default function AddMealToLogModal({ meals, onClose, refetch }) {
                                 + Add Another
                             </button>
                         </legend>
-                        
-                        <div className="space-y-2">
-                            {fields.map((field, index) => (
-                                <div key={field.id} className="flex gap-2">
-                                    <label htmlFor={`meal-select-${index}`} className="sr-only">
-                                        Meal {index + 1}
-                                    </label>
-                                    <select
-                                        id={`meal-select-${index}`}
-                                        {...register(`selectedMeals.${index}.mealId`)}
-                                        className="flex-1 px-3 py-2 border rounded-lg bg-[var(--color-background)] text-[var(--color-foreground)]"
-                                    >
-                                        <option value="">-- Choose a meal --</option>
-                                        {meals?.map((meal) => (
-                                            <option key={meal._id} value={meal._id}>
-                                                {meal.name} ({meal.total_calories} cal)
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {fields.length > 1 && (
-                                        <button
-                                            type="button"
-                                            onClick={() => remove(index)}
-                                            className="px-3 py-2 border rounded-lg hover:opacity-80 text-red-500"
-                                            aria-label={`Remove meal ${index + 1}`}
-                                        >
-                                            ✕
-                                        </button>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
+
+						{isLoading ? (
+							<p className="text-sm text-gray-500 p-2">Loading meals...</p>
+						) : meals.length === 0 ? (
+							<p className="text-sm text-gray-500 p-2">{view === 'user' ? 'No meals found. Create your first meal!' : 'No public meals available yet.'}</p>
+						) : (
+							<div className="space-y-2">
+								{fields.map((field, index) => (
+									<div key={field.id} className="flex gap-2">
+										<label htmlFor={`meal-select-${index}`} className="sr-only">
+											Meal {index + 1}
+										</label>
+										<select
+											id={`meal-select-${index}`}
+											{...register(`selectedMeals.${index}.mealId`)}
+											className="flex-1 px-3 py-2 border rounded-lg bg-[var(--color-background)] text-[var(--color-foreground)]"
+										>
+											<option value="">-- Choose a meal --</option>
+											{meals?.map((meal) => (
+												<option key={meal._id} value={meal._id}>
+													{meal.name} ({Math.round(meal.total_calories)} cal)
+												</option>
+											))}
+										</select>
+										{fields.length > 1 && (
+											<button
+												type="button"
+												onClick={() => remove(index)}
+												className="px-3 py-2 border rounded-lg hover:opacity-80 text-red-500"
+												aria-label={`Remove meal ${index + 1}`}
+											>
+												✕
+											</button>
+										)}
+									</div>
+								))}
+							</div>
+						)}
+
                         {errors.selectedMeals && (
                             <p className="text-red-500 text-sm mt-1">{errors.selectedMeals.message}</p>
                         )}
@@ -152,7 +201,7 @@ export default function AddMealToLogModal({ meals, onClose, refetch }) {
                         </button>
                         <button
                             type="submit"
-                            disabled={loading}
+                            disabled={loading || isLoading}
                             className="px-4 py-2 bg-gradient-to-b from-[#73AF6F] to-[#007E6E] text-white rounded-lg hover:opacity-90 disabled:opacity-50"
                         >
                             {loading ? 'Adding...' : 'Add Meals'}

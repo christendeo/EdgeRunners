@@ -79,8 +79,8 @@ export default function AddMealModal({ userId, onClose, refetch }) {
 	};
 
 	return (
-		<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-			<div className="p-6 rounded-lg w-[600px] max-h-[80vh] overflow-y-auto border backdrop-blue-md bg-white/90 dark:bg-black/90">
+		<div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+			<div className="p-6 rounded-lg w-[600px] max-h-[80vh] overflow-y-auto border bg-[var(--color-background)] text-[var(--color-foreground)]">
 				<h2 className="text-2xl font-bold mb-4">Create New Meal</h2>
 				
 				<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

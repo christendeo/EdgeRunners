@@ -52,7 +52,7 @@ export const resolvers = {
 					return cached;
 				}
 
-				const blogPosts = await blogs.getBlogsByUserId(userId);
+				const blogPosts = await blogs.getBlogsByUser(userId);
 				await setCache(cacheKey, blogPosts);
 				return blogPosts;
 			} catch (error) {
