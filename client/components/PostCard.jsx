@@ -14,7 +14,7 @@ export default function PostCards(props){
         <div className={tailwindCSS.card}>
             <div className="flex items-start justify-between gap-4">
                 <Link 
-                    className={`${tailwindCSS.link} text-xl font-semibold ${NimbusFont.className}`} 
+                    className={`${tailwindCSS.link} text-xl ${NimbusFont.className}`} 
                     href={`/community/${post._id}`}
                 >
                     {post.title}
