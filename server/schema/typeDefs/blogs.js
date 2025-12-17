@@ -2,7 +2,7 @@ export const blogTypeDefs = `#graphql
     type Query {
         blogs: [Blog]
         getBlogById(_id: String!): Blog
-        getBlogsByUserId(user_id: String!): [Blog]
+        getBlogsByUser(user_id: String!): [Blog]
     }
     type Blog {
         _id: String!
