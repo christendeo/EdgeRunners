@@ -48,7 +48,7 @@ export const resolvers = {
 				throwGraphQLError(e.message, 'INTERNAL_SERVER_ERROR');
             }
         },
-        getTodayFoodLog: async (_, _, context) => {
+        getTodayFoodLog: async (_, _args, context) => {
 			if (!context.user) {
 				throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
 			}

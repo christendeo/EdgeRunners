@@ -32,7 +32,7 @@ const userResolvers = {
 				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
 			}
         },
-        users: async (_, _, context) => {
+        users: async (_, _args, context) => {
 			if (!context.user) {
 				throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
 			}
