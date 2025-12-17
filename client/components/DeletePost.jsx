@@ -48,8 +48,7 @@ export default function DeletePost(props){
     try {
       await removeBlog({
         variables: {
-          _id: blog._id,
-          user_id: userAuth.user._id
+          _id: blog._id
         }
       });
       setShowDeleteModal(false);

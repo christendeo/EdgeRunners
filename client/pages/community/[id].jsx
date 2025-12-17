@@ -65,22 +65,17 @@ export default function Post() {
             <div className="flex text-white mx-12 my-8">
                 <p className="text-xl">{post.content}</p>
             </div>
-            <div className=' mx-12 my-8 space-x-4'>
-                <button className="px-4 rounded-full bg-lightgreen hover:underline"
-                onClick={() => {
-                    handleOpenDeleteModal(post);
-                }}
-            >
-                Delete
-            </button>
-            <button className="px-4 rounded-full bg-lightgreen hover:underline"
-                onClick={() => {
-                    handleOpenEditModal(post);
-                }}
-            >
-                Edit Post
-            </button>
-            </div>
+
+            {userAuth.user._id === post.user_id && (
+				<div className=' mx-12 my-8 space-x-4'>
+					<button className="px-4 rounded-full bg-lightgreen hover:underline" onClick={() => handleOpenDeleteModal(post)}>
+						Delete
+					</button>
+					<button className="px-4 rounded-full bg-lightgreen hover:underline" onClick={() => handleOpenEditModal(post) }>
+						Edit Post
+					</button>
+				</div>
+			)}
 
             {showDeleteModal && (
                 <DeletePost 

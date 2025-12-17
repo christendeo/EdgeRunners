@@ -49,7 +49,7 @@ export default function AllPosts() {
         )}
         <div>
             {posts.map((post) => {
-                return <PostCards post={post}/>
+                return <PostCards key={post._id} post={post}/>
             })}
         </div>
         </>
