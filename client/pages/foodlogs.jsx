@@ -14,15 +14,8 @@ const NimbusFont = localFont({
 
 import { 
     GET_RANGED_FOOD_LOGS,
-    UPDATE_FOOD_LOG,
     REMOVE_FOOD_LOG,
 } from "../queries/foodLogQueries";
-//BONUS: get list of foods in meals
-import {
-    GET_FOOD_BY_ID
-} from "../queries/foodQueries.js";
-
-import { GET_MEALS_BY_USER } from "../queries/mealQueries";
 
 export default function FoodLogs() {
     const router = useRouter();
@@ -100,7 +93,6 @@ export default function FoodLogs() {
             const [startMonth, startDay, startYear] = startDate.split('/');
             const [endMonth, endDay, endYear] = endDate.split('/');
             
-
             return `${formatDisplayDate(startDate)} - ${formatDisplayDate(endDate)}`;
         }
     };
@@ -123,19 +115,11 @@ export default function FoodLogs() {
     
     const currentUser = userAuth.user;
 
-
     const [removeLog] = useMutation(REMOVE_FOOD_LOG);
   
     const { data: logsData, loading: logsLoading, refetch } = useQuery(GET_RANGED_FOOD_LOGS, {
         variables: { startDate, endDate }
     });
-    
-    const { data: mealsData, loading: mealsLoading, error: mealsError } = useQuery(GET_MEALS_BY_USER, {
-        variables: { userId: currentUser?._id }
-    });
-
-    console.log("Meals Data:", mealsData);
-    console.log("Current User:", currentUser);
     
     useEffect(() => {
         if (userAuth.authLoaded && !userAuth.user) {
@@ -288,7 +272,6 @@ export default function FoodLogs() {
             {/* Add meal modal */}
             {isUpdatelogOpen && (
                 <AddFoodLog
-                    meals={mealsData?.getMealsByUser || []}
                     onClose={() => setIsUpdateLogOpen(false)}
                     refetch={refetch}
                 />
@@ -298,7 +281,6 @@ export default function FoodLogs() {
             {updatingLog && (
                 <UpdateFoodLog
                     log={updatingLog}
-                    meals={mealsData?.getMealsByUser || []}
                     onClose={() => setupdatingLog(null)}
                     refetch={refetch}
                 />
