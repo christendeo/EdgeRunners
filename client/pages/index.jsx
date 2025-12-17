@@ -2,11 +2,16 @@
 import {useContext, useEffect} from "react";
 import {useRouter} from "next/router";
 import {AuthContext} from "../lib/userAuthContext";
-import localFont from 'next/font/local';
+import Link from "next/link";
 
-const NimbusFont = localFont({ 
-  src: '../public/NimbuDemo-Regular.otf',
-  variable: '--font-nimbus' 
+// Import Tailwind
+import tailwindCSS from "../lib/tailwindUIClasses";
+
+// Import custom font
+import localFont from "next/font/local";
+const NimbusFont = localFont({
+    src: "../public/NimbuDemo-Regular.otf",
+    variable: "--font-nimbus"
 });
 
 export default function Home() {
@@ -32,34 +37,65 @@ export default function Home() {
     // Check if user is authenticated
     if (!authLoaded) {
         return (
-            <div>
-                <h1>FuelMe</h1>
-                <p>Loading...</p>
+            <div className={tailwindCSS.pageWrap}>
+                <h1 className={`${tailwindCSS.h1} ${NimbusFont.className}`}>FuelMe</h1>
+                <p className="opacity-70 mt-2">Loading...</p>
             </div>
         );
     }
 
     // If logged out, show the public home page
     return (
-        <div>
-            <div className={NimbusFont.className}>
-                <h1 className='text-6xl text-center text-lightgreen mx-12 my-6 border-b-4 border-white pb-2'>Welcome to FuelMe</h1>
-            </div>
-            <p className="text-center text-3xl pb-4">Please log in or sign up to get started</p>
-            <div className="grid grid-cols-3 mx-12 my-6 justify-between">
-                <div className="flex order-first grid mx-4">
-                    <h2 className='text-center text-2xl text-lightgreen col-start-1 row-start-1'>Acheive your fitness goals</h2>
-                    <p className="text-white text-center">With FuelMe, acheiving your fitness goals is easier than ever. Simply enter some basic information about you and your goals and FuelMe will create custom macro goals just for you!</p>
+        <div className={tailwindCSS.pageWrap}>
+
+            {/* Main Window */}
+            <div className="relative overflow-hidden rounded-2xl border p-8">
+                <div className="absolute inset-0 opacity-20 bg-gradient-to-b from-lightgreen to-darkgreen" />
+                <div className="relative">
+                    <h1 className={`${NimbusFont.className} ${tailwindCSS.h1} md:text-6xl leading-tight`}>
+                        Welcome to <span className="text-lightgreen">FuelMe</span>
+                    </h1>
+
+                    <p className="mt-3 max-w-2xl text-lg opacity-80">
+                        With FuelMe, achieving your fitness goals is easier than ever. Simply enter some basic information about you and your goals and FuelMe will create custom macro goals just for you!
+                    </p>
+
+                    <div className="mt-6 flex flex-wrap gap-3">
+                        <Link href="/signup" className={tailwindCSS.btnPrimary}>
+                            Create Account
+                        </Link>
+
+                        <Link href="/login" className={tailwindCSS.btnSecondary}>
+                            Log In
+                        </Link>
+                    </div>
                 </div>
-                <div className="flex grid mx-4">
-                    <h2 className="text-center text-2xl text-lightgreen col-start-1 row-start-1">Find foods you enjoy</h2>
-                    <p className="text-white text-center">Track what you eat throughout the day and see how close you are to reaching your goals. FuelMe has hundreds of foods and meals in its system with all of the information you need 
+            </div>
+
+            {/* Feature Cards */}
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+                <div className={tailwindCSS.cardSoft}>
+                    <h2 className={`${NimbusFont.className} text-xl font-semibold text-lightgreen`}>
+                        Achieve Your Daily Targets
+                    </h2>
+                    <p className="mt-2 text-sm opacity-80">
+                        Track what you eat throughout the day and see how close you are to reaching your goals. FuelMe has hundreds of foods and meals in its system with all of the information you need
                         to reach your daily goals. Can't find your favorite meal? Don't worry, you can create your own!
                     </p>
                 </div>
-                <div className="flex grid order-last mx-4">
-                    <h2 className="text-center text-2xl text-lightgreen col-start-1 row-start-1">Track your progress</h2>
-                    <p className="text-white text-center">Create logs of everything you eat and monitor your progress over time. As you start to see results, you can adjust your goals whenever you need to.</p>
+
+                <div className={tailwindCSS.cardSoft}>
+                    <h2 className={`${NimbusFont.className} text-xl font-semibold text-lightgreen`}>Track Progress Over Time</h2>
+                    <p className="mt-2 text-sm opacity-80">
+                        Create daily logs of everything you eat and monitor your progress over time. As you start to see results, you can adjust your goals whenever you need to.
+                    </p>
+                </div>
+
+                <div className={tailwindCSS.cardSoft}>
+                    <h2 className={`${NimbusFont.className} text-xl font-semibold text-lightgreen`}>Community Blog Center</h2>
+                    <p className="mt-2 text-sm opacity-80">
+                        Want to share your journey? Post updates in the community blog and interact with others through comments and feedback while keeping your personal details private.
+                    </p>
                 </div>
             </div>
         </div>
