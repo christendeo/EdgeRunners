@@ -21,11 +21,8 @@ export const getAllBlogs = async () => {
 }
 
 export const getBlogById = async (id) => {
-    try {
-        id = helpers.checkId(id, 'Blog post ID');
-    } catch (e) {
-        throw new Error (e);
-    }
+	id = helpers.checkId(id, 'Blog post ID');
+
     const blogsCollection = await blogs();
     const blog = await blogsCollection.findOne({_id: new ObjectId(id)});
 
@@ -39,11 +36,8 @@ export const getBlogById = async (id) => {
 }
 
 export const getBlogsByUserId = async (userId) => {
-    try {
-        userId = helpers.checkId(userId, "User ID");
-    } catch (e) {
-        throw new Error (e);
-    }
+	userId = helpers.checkId(userId, "User ID");
+	
     const blogsCollection = await blogs();
     const userBlogs = await blogsCollection.find({user_id: new ObjectId(userId)}).toArray();
 
@@ -99,38 +93,25 @@ export const createBlog = async (userId, title, content, postType) => {
 }
 
 //takes in the objectID of the blog post and an object updateInfo containing any fields that may be updated
-export const updateBlog = async (id, userId, updateInfo) => {
-    let blog;
-
-    try {
-       id = helpers.checkId(id, 'Blog post ID');
-       userId = helpers.checkId(userId, "User ID");
-    } catch (e) {
-        throw new Error (e);
-    }
+export const updateBlog = async (id, updateInfo) => {
+	id = helpers.checkId(id, 'Blog post ID');
 
     const blogsCollection = await blogs();
-    blog = await blogsCollection.findOne({_id: new ObjectId(id)});     
+    const blog = await blogsCollection.findOne({_id: new ObjectId(id)});     
+	if (!blog) {
+		throw new Error("Could not find blog post");
+	}
 
-    if(blog){
-        if(blog.user_id.toString() !== userId) throw new Error ("Edits can only be made by the user who created this post.");
-        //updateable fields: title, content, post_type, updated_at
-        try {
-            if(updateInfo.title){
-                blog.title = helpers.checkString(updateInfo.title, 'Title');
-            }
-            if(updateInfo.content){
-                blog.content = helpers.checkString(updateInfo.content, 'Content');
-            }
-            if(updateInfo.post_type){
-                blog.post_type = helpers.checkString(updateInfo.post_type, 'Post Type');
-            }
-        } catch (e) {
-            throw new Error (e);
-        }
-    } else {
-        throw new Error (`Could not find blog post`);
-    }
+	//updateable fields: title, content, post_type, updated_at
+	if(updateInfo.title){
+		blog.title = helpers.checkString(updateInfo.title, 'Title');
+	}
+	if(updateInfo.content){
+		blog.content = helpers.checkString(updateInfo.content, 'Content');
+	}
+	if(updateInfo.post_type){
+		blog.post_type = helpers.checkString(updateInfo.post_type, 'Post Type');
+	}
 
     //create the date and format it as MM/DD/YYYY
     let date = new Date(); 
@@ -144,25 +125,16 @@ export const updateBlog = async (id, userId, updateInfo) => {
     return update;
 }
 
-export const deleteBlog = async (id, userId) => {
-    try {
-       id = helpers.checkId(id, 'Blog post ID');
-       userId = helpers.checkId(userId, "User ID");
-    } catch (e) {
-        throw new Error (e);
-    }
+export const deleteBlog = async (id) => {
+	id = helpers.checkId(id, 'Blog post ID');
 
     const blogsCollection = await blogs();
-    let blog = await blogsCollection.findOne({_id: new ObjectId(id)});
-    if(blog.user_id.toString() !== userId) throw new Error ("Only the user who created this post can delete it.");
+    const deletedBlog = await blogsCollection.findOneAndDelete({_id: new ObjectId(id)});
 
-    blog = await blogsCollection.findOneAndDelete({_id: new ObjectId(id)});
-
-    if(!blog){
+    if (!deletedBlog) {
         throw new Error (`Could not delete blog post`);
     }
 
-    blog._id = blog._id.toString();
-    
-    return blog;
+    deletedBlog._id = deletedBlog._id.toString();
+    return deletedBlog;
 }

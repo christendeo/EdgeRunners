@@ -71,20 +71,22 @@ export default function Post() {
                         {post.content}
                     </p>
 
-                    <div className="flex gap-2 mt-6">
-                        <button 
-                            className={tailwindCSS.btnSecondary}
-                            onClick={() => handleOpenEditModal(post)}
-                        >
-                            Edit Post
-                        </button>
-                        <button 
-                            className={tailwindCSS.btnDanger}
-                            onClick={() => handleOpenDeleteModal(post)}
-                        >
-                            Delete
-                        </button>
-                    </div>
+					{userAuth.user._id === post.user_id && (
+						<div className="flex gap-2 mt-6">
+							<button 
+								className={tailwindCSS.btnSecondary}
+								onClick={() => handleOpenEditModal(post)}
+							>
+								Edit Post
+							</button>
+							<button 
+								className={tailwindCSS.btnDanger}
+								onClick={() => handleOpenDeleteModal(post)}
+							>
+								Delete
+							</button>
+						</div>
+					)}
                 </div>
 
                 {showDeleteModal && (

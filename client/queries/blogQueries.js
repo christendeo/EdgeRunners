@@ -70,8 +70,8 @@ const CREATE_BLOG = gql`
 `;
 
 const UPDATE_BLOG = gql`
-    mutation updateBlog($_id: String!, $user_id: String!, $title: String, $content: String, $post_type: String) {
-        editBlog(_id: $_id, user_id: $user_id, title: $title, content: $content, post_type: $post_type) {
+    mutation updateBlog($_id: String!, $title: String, $content: String, $post_type: String) {
+        editBlog(_id: $_id, title: $title, content: $content, post_type: $post_type) {
             _id
             user_id
             title
@@ -85,8 +85,8 @@ const UPDATE_BLOG = gql`
 `;
 
 const DELETE_BLOG = gql`
-    mutation deleteBlog($_id: String!, $user_id: String!) {
-        removeBlog(_id: $_id, user_id: $user_id) {
+    mutation deleteBlog($_id: String!) {
+        removeBlog(_id: $_id) {
             _id
             user_id
             title
