@@ -26,7 +26,7 @@ export const resolvers = {
 				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
 			}
 
-			if (!food.is_public && food.added_by !== context.user.id) {
+			if (!food.is_public && food.added_by !== context.user?.id) {
 				throwGraphQLError(`Food ${args._id} not found`, 'NOT_FOUND');
 			}
 

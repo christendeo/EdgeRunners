@@ -103,7 +103,7 @@ export const resolvers = {
 					throwGraphQLError("Food ID is required as a string or number", 'BAD_USER_INPUT');
 				}
 
-				validateNumber(food.quantity, 'Food Quantity', 0.01);
+				validateNumber(food.quantity, 'Food Quantity', 0.01, 100);
 
 				return {
 					food_id: food.food_id,
@@ -155,7 +155,7 @@ export const resolvers = {
 							throwGraphQLError("Food ID is required as a string or number", 'BAD_USER_INPUT');
 						}
 						
-						validateNumber(food.quantity, 'Food Quantity', 0.01);
+						validateNumber(food.quantity, 'Food Quantity', 0.01, 100);
 
 						return {
 							food_id: food.food_id,

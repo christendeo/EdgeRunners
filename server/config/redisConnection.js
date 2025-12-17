@@ -57,7 +57,7 @@ export async function setCache(redisKey, redisValue, ttl = 3600) {
 }
 
 export async function flushCache() {
-    await client.flushAll();
+    await redisClient.flushAll();
 }
 
 export async function deleteCache(redisKey) {
