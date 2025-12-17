@@ -19,7 +19,7 @@ export const getFoodById = async (foodId) => {
 		: await foodCollection.findOne({ fdcId: foodId.toString() });
 
     if (!food) {
-		throw new Error('No food with that ID');
+		throw new Error(`Food ${foodId} not found`);
 	}
 
     food._id = food._id.toString();
