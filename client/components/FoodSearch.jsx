@@ -7,8 +7,6 @@ import FoodCard from './FoodCard.jsx';
 
 
 
-
-
 const SEARCH_FOODS = gql`
     query SearchFoods($filters: FoodSearchInput, $page: Int, $limit: Int) {
         searchFoods(filters: $filters, page: $page, limit: $limit) {
