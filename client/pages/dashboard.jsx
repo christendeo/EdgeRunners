@@ -3,6 +3,8 @@ import {useContext, useEffect} from "react";
 import {useRouter} from "next/router";
 import Link from "next/link";
 import TodaysProgress from "../components/UserTodaysProgress";
+import WeeklySummary from "@/components/WeeklySummary";
+import RecentActivityPosts from "@/components/RecentActivityPosts";
 
 // Utilize userAuthContext
 import {AuthContext} from "../lib/userAuthContext";
@@ -116,6 +118,13 @@ export default function DashboardPage() {
 
             <div className={`${tailwindCSS.card} mt-6`}>
                 <TodaysProgress />
+            </div>
+
+            <div className={tailwindCSS.pageWrap}>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+                    <WeeklySummary targetCalories={displayTarget} />
+                    <RecentActivityPosts />
+                </div>
             </div>
 
             <div className={`${tailwindCSS.card} mt-6`}>

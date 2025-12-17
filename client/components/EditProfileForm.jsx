@@ -100,108 +100,118 @@ export default function EditProfileForm({userAuth, onUserUpdated}) {
             return;
         }
 
-        // Only build for fields to be changed
-        const userFields = {
-            _id: userAuth.user._id
-        };
+        // Only build for fields to be changed. Ensure error handling
+        let userFields = null;
 
-        if (formData.first_name !== userAuth.user.first_name) {
-            userFields.first_name = formData.first_name;
-        }
+        try {
+            userFields = {
+                _id: userAuth.user._id
+            };
 
-        if (formData.last_name !== userAuth.user.last_name) {
-            userFields.last_name = formData.last_name;
-        }
 
-        if (formData.email !== userAuth.user.email) {
-            userFields.email = formData.email;
-        }
-
-        if (formData.sex !== userAuth.user.sex) {
-            userFields.sex = formData.sex;
-        }
-
-        if (formData.date_of_birth !== userAuth.user.date_of_birth) {
-            userFields.date_of_birth = formData.date_of_birth;
-        }
-
-        // Height conversion for backend
-        if (formData.height_ft !== "" || formData.height_in !== "") {
-
-            // Validations
-            let heightObj = clientHelpers.checkHeightFeetInches(
-                formData.height_ft,
-                formData.height_in,
-                "Height"
-            );
-
-            let heightCm = clientHelpers.feetInchesToCm(heightObj.feet, heightObj.inches);
-            if (heightCm !== userAuth.user.height) {
-                userFields.height = heightCm;
+            if (formData.first_name !== userAuth.user.first_name) {
+                userFields.first_name = formData.first_name;
             }
-        }
 
-        // Weight conversion for backend
-        if (formData.weight_lbs !== "") {
-
-            // Validations
-            let lbsNum = clientHelpers.checkWeightLbs(
-                formData.weight_lbs,
-                "Weight (lbs)"
-            );
-
-            let weightKg = clientHelpers.lbsToKg(lbsNum);
-            if (weightKg !== userAuth.user.weight) {
-                userFields.weight = weightKg;
+            if (formData.last_name !== userAuth.user.last_name) {
+                userFields.last_name = formData.last_name;
             }
-        }
 
-        // Custom target toggle
-        if (formData.use_custom_target !== userAuth.user.use_custom_target) {
-            userFields.use_custom_target = formData.use_custom_target;
-        }
+            if (formData.email !== userAuth.user.email) {
+                userFields.email = formData.email;
+            }
 
-        if (formData.use_custom_target === true) {
-            let customNum = null;
-            if (typeof formData.custom_target_calories === "string") {
-                let trimmedCalories = formData.custom_target_calories.trim();
-                if (trimmedCalories.length > 0) {
-                    customNum = Number(trimmedCalories);
+            if (formData.sex !== userAuth.user.sex) {
+                userFields.sex = formData.sex;
+            }
+
+            if (formData.date_of_birth !== userAuth.user.date_of_birth) {
+                userFields.date_of_birth = formData.date_of_birth;
+            }
+
+            // Height conversion for backend
+            if (formData.height_ft !== "" || formData.height_in !== "") {
+
+                // Validations
+                let heightObj = clientHelpers.checkHeightFeetInches(
+                    formData.height_ft,
+                    formData.height_in,
+                    "Height"
+                );
+
+                let heightCm = clientHelpers.feetInchesToCm(heightObj.feet, heightObj.inches);
+                if (heightCm !== userAuth.user.height) {
+                    userFields.height = heightCm;
                 }
-            } else if (typeof formData.custom_target_calories === "number") {
-                customNum = formData.custom_target_calories;
             }
 
-            let checkedCustomCalories = clientHelpers.checkCustomTargetCalories(customNum, "Custom Target Calories");
+            // Weight conversion for backend
+            if (formData.weight_lbs !== "") {
 
-            if (checkedCustomCalories === null) {
-                setErrorMessage("Oh no! Please enter custom target calories or turn off custom target :(");
-                return;
+                // Validations
+                let lbsNum = clientHelpers.checkWeightLbs(
+                    formData.weight_lbs,
+                    "Weight (lbs)"
+                );
+
+                let weightKg = clientHelpers.lbsToKg(lbsNum);
+                if (weightKg !== userAuth.user.weight) {
+                    userFields.weight = weightKg;
+                }
             }
 
-            if (checkedCustomCalories !== userAuth.user.custom_target_calories) {
-                userFields.custom_target_calories = checkedCustomCalories;
+            // Custom target toggle
+            if (formData.use_custom_target !== userAuth.user.use_custom_target) {
+                userFields.use_custom_target = formData.use_custom_target;
             }
 
-        } else {
+            if (formData.use_custom_target === true) {
+                let customNum = null;
+                if (typeof formData.custom_target_calories === "string") {
+                    let trimmedCalories = formData.custom_target_calories.trim();
+                    if (trimmedCalories.length > 0) {
+                        customNum = Number(trimmedCalories);
+                    }
+                } else if (typeof formData.custom_target_calories === "number") {
+                    customNum = formData.custom_target_calories;
+                }
 
-            // When turning off custom target, clear custom calories
-            if (userAuth.user.custom_target_calories !== null && userAuth.user.custom_target_calories !== undefined) {
-                userFields.custom_target_calories = null;
+                let checkedCustomCalories = clientHelpers.checkCustomTargetCalories(customNum, "Custom Target Calories");
+
+                if (checkedCustomCalories === null) {
+                    setErrorMessage("Oh no! Please enter custom target calories or turn off custom target :(");
+                    return;
+                }
+
+                if (checkedCustomCalories !== userAuth.user.custom_target_calories) {
+                    userFields.custom_target_calories = checkedCustomCalories;
+                }
+
+            } else {
+
+                // When turning off custom target, clear custom calories
+                if (userAuth.user.custom_target_calories !== null && userAuth.user.custom_target_calories !== undefined) {
+                    userFields.custom_target_calories = null;
+                }
             }
-        }
 
-        if (formData.activity_level !== userAuth.user.activity_level) {
-            userFields.activity_level = formData.activity_level;
-        }
+            if (formData.activity_level !== userAuth.user.activity_level) {
+                userFields.activity_level = formData.activity_level;
+            }
 
-        if (formData.diet_goal !== userAuth.user.diet_goal) {
-            userFields.diet_goal = formData.diet_goal;
-        }
+            if (formData.diet_goal !== userAuth.user.diet_goal) {
+                userFields.diet_goal = formData.diet_goal;
+            }
 
-        // Only send if user typed it
-        if (formData.password.trim() !== "") {
-            userFields.password = formData.password;
+            // Only send if user typed it
+            if (formData.password.trim() !== "") {
+                userFields.password = formData.password;
+            }
+
+        } catch (e) {
+            console.error(e);
+            setErrorMessage(e?.message || "Oh no! Invalid input :(");
+            return;
         }
 
         // If nothing changed besides _id, do nothing

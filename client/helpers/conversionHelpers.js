@@ -254,6 +254,31 @@ const exportedMethods = {
             fatCals,
             totalMacroCals: proteinCals + carbsCals + fatCals
         };
+    },
+
+    // Build date for weekly summary on dashboard
+    parseMMDDYYYY(dateString) {
+        if (typeof dateString !== "string") {
+            return new Date(0);
+        }
+
+        const splitDate = dateString.split("/");
+        if (splitDate.length !== 3) {
+            return new Date(0);
+        }
+
+        let getMonth = Number(splitDate[0]);
+        let getDay = Number(splitDate[1]);
+        let getYear = Number(splitDate[2]);
+
+        // Validations
+        if (!Number.isInteger(getMonth) || !Number.isInteger(getDay) || !Number.isInteger(getYear)) {
+            return new Date(0);
+        }
+
+        // Return new parsed date
+        let newDate = new Date(getYear, getMonth - 1, getDay);
+        return newDate;
     }
 };
 
