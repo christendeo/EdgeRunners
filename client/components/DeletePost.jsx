@@ -2,23 +2,17 @@ import {useState, useContext} from 'react';
 import {useMutation} from '@apollo/client/react';
 import { useRouter } from 'next/router'
 import ReactModal from 'react-modal';
+import localFont from 'next/font/local';
 import queries from '../queries/blogQueries.js';
 import {AuthContext} from "../lib/userAuthContext";
+import tailwindCSS from '../lib/tailwindUIClasses';
+
+const NimbusFont = localFont({ 
+    src: '../public/NimbuDemo-Regular.otf',
+    variable: '--font-nimbus' 
+});
 
 ReactModal.setAppElement('#__next');
-const customStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-    width: '50%',
-    borderRadius: '4px',
-    background: "#007E6E"
-  }
-};
 
 //component for deleting blog posts with react modal
 export default function DeletePost(props){
@@ -72,25 +66,41 @@ export default function DeletePost(props){
         name='deleteModal'
         isOpen={showDeleteModal}
         contentLabel='Delete Post'
-        style={customStyles}
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background text-foreground rounded-lg border p-6 w-[90%] max-w-[500px] focus:outline-none"
+        overlayClassName="fixed inset-0"
       >
-        <div className='text-lg text-center'>
-          <p>Are you sure you want to delete this post?</p>
-          {errorMessage && (
-            <p>An error has occured. {errorMessage}</p>
-          )}
-          {loading && (
-            <p>Loading...</p>
-          )}
-          <form
-            className='form'
-            id='delete-blog-post'
-            onSubmit={handleSubmit}
+        <h3 className={`${tailwindCSS.h2} ${NimbusFont.className} mb-4 text-center`}>Delete Post</h3>
+        
+        <p className="text-center mb-4">
+          Are you sure you want to delete this post? This action cannot be undone.
+        </p>
+
+        {errorMessage && (
+          <p className={`${tailwindCSS.alertError} mb-4`}>
+            An error has occurred. {errorMessage}
+          </p>
+        )}
+
+        {loading && (
+          <p className="text-center text-sm opacity-70 mb-4">Loading...</p>
+        )}
+
+        <form
+          id='delete-blog-post'
+          onSubmit={handleSubmit}
+          className="flex gap-2 justify-center"
+        >
+          <button className={tailwindCSS.btnDanger} type='submit'>
+            Delete Post
+          </button>
+          <button 
+            className={tailwindCSS.btnSecondary}
+            type='button'
+            onClick={handleCloseDeleteModal}
           >
-            <button className="hover:underline" type='submit'>Delete Post</button>
-          </form>
-          <button className="hover:underline" onClick={handleCloseDeleteModal}>Cancel</button>
-        </div>
+            Cancel
+          </button>
+        </form>
       </ReactModal>
     </div>
   );
