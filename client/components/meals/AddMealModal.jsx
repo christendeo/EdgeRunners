@@ -1,12 +1,16 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useLazyQuery, useMutation } from '@apollo/client/react';
-import { SEARCH_FOODS } from '@/queries/foodQueries';
+import { SEARCH_FOODS, GET_FOODS_BY_USER } from '@/queries/foodQueries';
 import { ADD_MEAL } from '@/queries/mealQueries';
 import { useState } from 'react';
 
 export default function AddMealModal({ userId, onClose, refetch }) {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [searchFoods, { data: foodsData, loading: foodsLoading }] = useLazyQuery(SEARCH_FOODS);
+
+	const [getUserFoods, { data: userFoodsData, loading: userFoodsLoading }] = useLazyQuery(GET_FOODS_BY_USER, {
+    fetchPolicy: 'network-only'
+});
 
 	const { register, handleSubmit, control, formState: { errors }, setError, setValue, getValues } = useForm({
 		defaultValues: {
@@ -42,6 +46,12 @@ export default function AddMealModal({ userId, onClose, refetch }) {
 			});
 		}
 	};
+
+	const handleShowMyFoods = () => {
+    getUserFoods({
+        variables: { _id: userId }
+    });
+};
 
 	const onSubmit = (data) => {
 		const validFoods = data.foods.filter(food => food.food_id);
@@ -105,9 +115,14 @@ export default function AddMealModal({ userId, onClose, refetch }) {
 							<button type="button" onClick={handleSearch} className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:opacity-80">
 								Search
 							</button>
+
+							<button type="button" onClick={handleShowMyFoods} className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:opacity-80">
+    							My Foods
+							</button>
 						</div>
 
 						{foodsLoading && <p className="text-sm">Searching...</p>}
+						
 
 						{foodsData?.searchFoods?.foods && (
 							<div className="max-h-40 overflow-y-auto border rounded-lg p-2 mb-3">
@@ -134,7 +149,38 @@ export default function AddMealModal({ userId, onClose, refetch }) {
 								))}
 							</div>
 						)}
+
+						{userFoodsLoading && <p className="text-sm">Loading my foods...</p>}
+
+						{userFoodsData?.getFoodsByUser && (
+							<div className="max-h-40 overflow-y-auto border rounded-lg p-2 mb-3">
+								{userFoodsData.getFoodsByUser.length === 0
+								? <p className="text-sm text-gray-500 p-2">No saved foods found.</p>
+								: userFoodsData.getFoodsByUser.map((food) => (
+									<div
+										key={food._id}
+										onClick={() => {
+											const values = getValues('foods');
+											if (values.length === 1 && (!values[0].food_id || values[0].food_id.trim() === '')) {
+												setValue('foods.0.food_id', food._id);
+											} else {
+												append({ food_id: food._id, quantity: 1, serving_unit: 'serving' })
+											}
+										}}
+										className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer rounded text-sm"
+									>
+										<div className="font-medium">{food.name}</div>
+										<div className="text-xs text-gray-600">
+											{Math.round(food.calories)} cal | {Math.round(food.protein)}g protein
+										</div>
+									</div>
+								))}
+							</div>
+						)}
 					</div>
+
+					
+
 
 					<div>
 						<div className="flex items-center justify-between mb-1">

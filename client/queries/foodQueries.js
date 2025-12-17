@@ -65,3 +65,17 @@ export const SEARCH_FOODS = gql`
         }
     }
 `;
+
+export const GET_FOODS_BY_USER = gql`
+    query GetFoodsByUser($_id: String!) {
+        getFoodsByUser(_id: $_id) {
+            _id
+            name
+            calories
+            protein
+            carbs
+            fat 
+            fiber
+        }
+    }
+`;
