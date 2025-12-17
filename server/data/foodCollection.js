@@ -13,11 +13,15 @@ export const getAllFoods = async () => {
 }
 
 export const getFoodById = async (foodId) => {
-    const id = checkId(foodId, 'foodId');
-
     const foodCollection = await foods();
-    const food = await foodCollection.findOne({_id: new ObjectId(id)});
-    if (food === null) throw new Error('No food with that ID');
+    const food = ObjectId.isValid(foodId)
+		? await foodCollection.findOne({ _id: new ObjectId(foodId)})
+		: await foodCollection.findOne({ fdcId: foodId.toString() });
+
+    if (!food) {
+		throw new Error(`Food ${foodId} not found`);
+	}
+
     food._id = food._id.toString();
     return food;
 }
