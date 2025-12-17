@@ -8,17 +8,28 @@ export const resolvers = {
     Query: {
         getFoodById: async (_, args) => {
             const cacheKey = `food:${args._id}`;
-            const cached = await getCache(cacheKey);
-            if (cached) {
-                return cached;
-            }
 
-            const food = await foodData.getFoodById(args._id);
-            if (!food) {
-				throwGraphQLError('Food not found', 'NOT_FOUND');
-            }
+			let food;
+			try {
+				const cached = await getCache(cacheKey);
+				if (cached) {
+					food = cached;
+				} else {
+					food = await foodData.getFoodById(args._id);
+					await setCache(cacheKey, food);
+				}
+			} catch (error) {
+				if (error.message.includes('not found')) {
+					throwGraphQLError(error.message, 'NOT_FOUND');
+				}
 
-			await setCache(cacheKey, food);
+				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+			}
+
+			if (!food.is_public && food.added_by !== context.user.id) {
+				throwGraphQLError(`Food ${args._id} not found`, 'NOT_FOUND');
+			}
+
 			return food;
         },
         getFoodsByUser: async(_, args, context) => {
@@ -150,6 +161,7 @@ export const resolvers = {
             try {
 				await deleteCache('allFoods');
 				await deleteCache(`food:${_id}`);
+				await deleteCache(`userFoods:${context.user.id}`);
 			} catch (error) {
 				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
 			}
@@ -185,6 +197,7 @@ export const resolvers = {
 				const removedFood = await foodData.removeFood(_id);
 				await deleteCache('allFoods');
 				await deleteCache(`food:${_id}`);
+				await deleteCache(`userFoods:${context.user.id}`);
 				return removedFood;
 			} catch (error) {
 				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
