@@ -168,7 +168,7 @@ export const editUser = async (userId, updatedUser) => {
     );
 
     if (!currentUser) {
-        throw new Error ("Oh no! User could not be updated or does not exist :(");
+        throw new Error ("Oh no! User could not be found :(");
     }
 
     const updatedUserData = {};
@@ -339,7 +339,7 @@ export const editUser = async (userId, updatedUser) => {
     );
 
     if (!updateResult.matchedCount || updateResult.matchedCount === 0) {
-        throw new Error ("Oh no! User could not be updated or does not exist :(");
+        throw new Error ("Oh no! User could not be updated :(");
     }
 
     const updatedDoc = await getUserById(userId);

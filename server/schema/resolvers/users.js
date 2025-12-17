@@ -1,4 +1,3 @@
-// Import functions
 import {
     addUser,
     getUserById,
@@ -8,107 +7,83 @@ import {
     changePassword as resetPasswordData
 } from "../../data/userCollection.js";
 import { generateToken } from '../../helpers/jwtHelpers.js';
+import { throwGraphQLError, validateId } from '../../helpers/graphQLHelpers.js';
 
 const userResolvers = {
-
-    // The queries
     Query: {
+        getUserById: async (_, args, context) => {
+			if (!context.user) {
+				throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
+			}
 
-        // Get user by ID
-        getUserById: async (_, args) => {
-            const userId = args._id;
-            const getUser = await getUserById(userId);
+            const userId = validateId(args._id);
 
-            return {
-                _id: getUser._id,
-                first_name: getUser.first_name,
-                last_name: getUser.last_name,
-                email: getUser.email,
-                sex: getUser.sex,
-                date_of_birth: getUser.date_of_birth,
-                height: getUser.height,
-                weight: getUser.weight,
-                activity_level: getUser.activity_level,
-                diet_goal: getUser.diet_goal,
-                target_calories: getUser.target_calories,
-                createdAt: getUser.createdAt,
-                updatedAt: getUser.updatedAt,
-                use_custom_target: getUser.use_custom_target,
-                custom_target_calories: getUser.custom_target_calories,
-            };
+			if (context.user.id !== userId) {
+				throwGraphQLError("Not authorized to view other users' profiles", 'FORBIDDEN');
+			}
+
+			try {
+				return await getUserById(userId);
+			} catch (error) {
+				if (error.message.includes("no user with that ID")) {
+					throwGraphQLError(error.message, 'NOT_FOUND');
+				}
+
+				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+			}
         },
+        users: async (_, _, context) => {
+			if (!context.user) {
+				throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
+			}
 
-        // Get all users
-        users: async () => {
-            const allUsers = await getAllUsers();
-
-            return allUsers.map((currentUser) => {
-                return {
-                    _id: currentUser._id,
-                    first_name: currentUser.first_name,
-                    last_name: currentUser.last_name,
-                    email: currentUser.email,
-                    sex: currentUser.sex,
-                    date_of_birth: currentUser.date_of_birth,
-                    height: currentUser.height,
-                    weight: currentUser.weight,
-                    activity_level: currentUser.activity_level,
-                    diet_goal: currentUser.diet_goal,
-                    target_calories: currentUser.target_calories,
-                    createdAt: currentUser.createdAt,
-                    updatedAt: currentUser.updatedAt,
-                    use_custom_target: currentUser.use_custom_target,
-                    custom_target_calories: currentUser.custom_target_calories,
-                };
-            });
+            try {
+				return await getAllUsers();
+			} catch (error) {
+				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+			}
         }
     },
-
-    // The mutations
     Mutation: {
-
-        // Create the user
         addUser: async (_, args) => {
-            const createdUser = await addUser(
-                args.first_name,
-                args.last_name,
-                args.email,
-                args.password,
-                args.sex,
-                args.date_of_birth,
-                args.height,
-                args.weight,
-                args.activity_level,
-                args.diet_goal,
-                args.use_custom_target,
-                args.custom_target_calories
-            );
+			try {
+				const createdUser = await addUser(
+					args.first_name,
+					args.last_name,
+					args.email,
+					args.password,
+					args.sex,
+					args.date_of_birth,
+					args.height,
+					args.weight,
+					args.activity_level,
+					args.diet_goal,
+					args.use_custom_target,
+					args.custom_target_calories
+            	);
 
-			const token = generateToken(createdUser);
+				const token = generateToken(createdUser);
+				return { ...createdUser, token };
+			} catch (error) {
+				if (error.message.includes("User could not be added")) {
+					throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+				}
 
-            return {
-                _id: createdUser._id,
-                first_name: createdUser.first_name,
-                last_name: createdUser.last_name,
-                email: createdUser.email,
-                sex: createdUser.sex,
-                date_of_birth: createdUser.date_of_birth,
-                height: createdUser.height,
-                weight: createdUser.weight,
-                activity_level: createdUser.activity_level,
-                diet_goal: createdUser.diet_goal,
-                target_calories: createdUser.target_calories,
-                createdAt: createdUser.createdAt,
-                updatedAt: createdUser.updatedAt,
-                use_custom_target: createdUser.use_custom_target,
-                custom_target_calories: createdUser.custom_target_calories,
-				token: token
-            };
+				throwGraphQLError(error.message, 'BAD_USER_INPUT');
+			}
         },
 
         // Update user profile
-        editUser: async (_, args) => {
-            const userId = args._id;
+        editUser: async (_, args, context) => {
+			if (!context.user) {
+				throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
+			}
+
+            const userId = validateId(args._id);
+
+			if (context.user.id !== userId) {
+				throwGraphQLError("Not authorized to edit other users' profiles", 'FORBIDDEN');
+			}
 
             const userInput = {};
 
@@ -161,69 +136,67 @@ const userResolvers = {
                 userInput.custom_target_calories = args.custom_target_calories;
             }
 
-            const updatedUser = await editUser(userId, userInput);
+			try {
+				return await editUser(userId, userInput);
+			} catch (error) {
+				if (error.message.includes("User could not be found")) {
+					throwGraphQLError(error.message, 'NOT_FOUND');
+				}
 
-            return {
-                _id: updatedUser._id,
-                first_name: updatedUser.first_name,
-                last_name: updatedUser.last_name,
-                email: updatedUser.email,
-                sex: updatedUser.sex,
-                date_of_birth: updatedUser.date_of_birth,
-                height: updatedUser.height,
-                weight: updatedUser.weight,
-                activity_level: updatedUser.activity_level,
-                diet_goal: updatedUser.diet_goal,
-                target_calories: updatedUser.target_calories,
-                createdAt: updatedUser.createdAt,
-                updatedAt: updatedUser.updatedAt,
-                use_custom_target: updatedUser.use_custom_target,
-                custom_target_calories: updatedUser.custom_target_calories,
-            };
+				if (error.message.includes("User could not be updated")) {
+					throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+				}
+
+				throwGraphQLError(error.message, 'BAD_USER_INPUT');
+			}
         },
-
-        // Allow user to login
         loginUser: async (_, args) => {
-            const loggedInUser = await loginUserData(
-                args.email,
-                args.password
-            );
+			try {
+				const loggedInUser = await loginUserData(
+					args.email,
+					args.password
+				);
 
-			const token = generateToken(loggedInUser);
+				const token = generateToken(loggedInUser);
+				return { ...loggedInUser, token };
+			} catch (error) {
+				if (error.message.includes("Either the email or password is incorrect")) {
+					throwGraphQLError(error.message, 'BAD_USER_INPUT');
+				}
 
-            return {
-                _id: loggedInUser._id,
-                first_name: loggedInUser.first_name,
-                last_name: loggedInUser.last_name,
-                email: loggedInUser.email,
-                sex: loggedInUser.sex,
-                date_of_birth: loggedInUser.date_of_birth,
-                height: loggedInUser.height,
-                weight: loggedInUser.weight,
-                activity_level: loggedInUser.activity_level,
-                diet_goal: loggedInUser.diet_goal,
-                target_calories: loggedInUser.target_calories,
-                createdAt: loggedInUser.createdAt,
-                updatedAt: loggedInUser.updatedAt,
-                use_custom_target: loggedInUser.use_custom_target,
-                custom_target_calories: loggedInUser.custom_target_calories,
-				token: token
-            };
+				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+			}
         },
+        changePassword: async (_, args, context) => {
+			if (!context.user) {
+				throwGraphQLError("Not authenticated", 'UNAUTHENTICATED');
+			}
 
-        // Allow user to change password
-        changePassword: async (_, args) => {
-            const updatedUser = await resetPasswordData(
-                args._id,
-                args.oldPassword,
-                args.newPassword
-            );
+			const userId = validateId(args._id);
 
-            return updatedUser;
+			if (context.user.id !== userId) {
+				throwGraphQLError("Not authorized to change other users' passwords", 'FORBIDDEN');
+			}
+
+			try {
+				return await resetPasswordData(
+					userId,
+					args.oldPassword,
+					args.newPassword
+				);
+			} catch (error) {
+				if (error.message.includes("User does not exist")) {
+					throwGraphQLError(error.message, 'NOT_FOUND');
+				}
+
+				if (error.message.includes("Password could not be updated")) {
+					throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
+				}
+
+				throwGraphQLError(error.message, 'BAD_USER_INPUT');
+			}
         }
     },
-
-    // For custom target calories
     User: {
         current_target_calories: (parent) => {
             if (parent.use_custom_target === true) {
