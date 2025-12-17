@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ADD_FOOD_LOG } from '../queries/foodLogQueries';
 import { GET_MEALS_BY_USER, GET_ALL_PUBLIC_MEALS } from '@/queries/mealQueries';
+import { AuthContext } from '@/lib/userAuthContext';
 
 export default function AddMealToLogModal({ onClose, refetch }) {
 	const [view, setView] = useState('user');
+	const userAuth = useContext(AuthContext);
+	const currentUser = userAuth.user;
 
     const { register, handleSubmit, control, formState: { errors }, setError } = useForm({
         defaultValues: {
@@ -19,7 +22,8 @@ export default function AddMealToLogModal({ onClose, refetch }) {
     });
 
 	const { data: userMealsData, loading: userMealsLoading } = useQuery(GET_MEALS_BY_USER, {
-		skip: view !== 'user',
+		variables: { userId: currentUser?._id },
+		skip: view !== 'user' || !currentUser?._id,
 		fetchPolicy: 'cache-and-network'
 	});
 
@@ -102,7 +106,7 @@ export default function AddMealToLogModal({ onClose, refetch }) {
 							<button
 								type="button"
 								onClick={() => setView('user')}
-								className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${view === 'user' ? 'bg-gradient-to-b from-[#73AF7F] to-[#007E6E] text-white' : 'border hover:opacity-80'}`}
+								className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${view === 'user' ? 'bg-gradient-to-b from-[#73AF6F] to-[#007E6E] text-white' : 'border hover:opacity-80'}`}
 							>
 								My Meals
 							</button>
@@ -110,7 +114,7 @@ export default function AddMealToLogModal({ onClose, refetch }) {
 							<button
 								type="button"
 								onClick={() => setView('public')}
-								className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${view === 'public' ? 'bg-gradient-to-b from-[#73AF7F] to-[#007E6E] text-white' : 'border hover:opacity-80'}`}
+								className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${view === 'public' ? 'bg-gradient-to-b from-[#73AF6F] to-[#007E6E] text-white' : 'border hover:opacity-80'}`}
 							>
 								Public Meals
 							</button>
@@ -132,7 +136,7 @@ export default function AddMealToLogModal({ onClose, refetch }) {
 						{isLoading ? (
 							<p className="text-sm text-gray-500 p-2">Loading meals...</p>
 						) : meals.length === 0 ? (
-							<p>{view === 'user' ? 'No meals found. Create your first meal!' : 'No public meals available yet.'}</p>
+							<p className="text-sm text-gray-500 p-2">{view === 'user' ? 'No meals found. Create your first meal!' : 'No public meals available yet.'}</p>
 						) : (
 							<div className="space-y-2">
 								{fields.map((field, index) => (
@@ -148,7 +152,7 @@ export default function AddMealToLogModal({ onClose, refetch }) {
 											<option value="">-- Choose a meal --</option>
 											{meals?.map((meal) => (
 												<option key={meal._id} value={meal._id}>
-													{meal.name} ({meal.total_calories} cal)
+													{meal.name} ({Math.round(meal.total_calories)} cal)
 												</option>
 											))}
 										</select>
@@ -197,7 +201,7 @@ export default function AddMealToLogModal({ onClose, refetch }) {
                         </button>
                         <button
                             type="submit"
-                            disabled={loading}
+                            disabled={loading || isLoading}
                             className="px-4 py-2 bg-gradient-to-b from-[#73AF6F] to-[#007E6E] text-white rounded-lg hover:opacity-90 disabled:opacity-50"
                         >
                             {loading ? 'Adding...' : 'Add Meals'}
